@@ -1,10 +1,14 @@
-import React from "react";
+import { type Metadata } from "next";
 
-interface DashboardLayoutProps {
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
+
+export default function DashboardLayout({
+  children,
+}: {
   children: React.ReactNode;
-}
-
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+}) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex"></div>
