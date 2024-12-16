@@ -1,6 +1,6 @@
 import "@repo/ui/styles.css";
 import type { Metadata } from "next";
-import "./globals.css";
+// import "./globals.css";
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
