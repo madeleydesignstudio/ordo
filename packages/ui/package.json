@@ -3,14 +3,22 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist"
+  ],
   "exports": {
     "./button": "./src/button.tsx",
+    "./styles.css": "./dist/index.css",
     "./card": "./src/card.tsx",
     "./code": "./src/code.tsx"
   },
   "scripts": {
-    "lint": "eslint . --max-warnings 0",
-    "generate:component": "turbo gen react-component",
+    "build": "tailwindcss -i ./src/styles.css -o ./dist/index.css",
+    "lint": "eslint src/",
+    "dev": "tailwindcss -i ./src/styles.css -o ./dist/index.css --watch",
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
@@ -20,6 +28,9 @@
     "@types/node": "^20.11.24",
     "@types/react": "18.3.0",
     "@types/react-dom": "18.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.16",
     "typescript": "5.5.4"
   },
   "dependencies": {
