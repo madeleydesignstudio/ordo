@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "./globals.css";
 import "@repo/ui/styles.css";
 
 export const metadata: Metadata = {
