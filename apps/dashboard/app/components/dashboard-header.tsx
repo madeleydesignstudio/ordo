@@ -13,10 +13,12 @@ const DashboardHeader = () => {
   };
 
   return (
-    <div className="flex justify-between h-[40px] border-b border-[#6B9CA9] items-center">
-      <div className="flex items-center">
-        <div className="text-xl font-bold">Orbo</div>
-        <div className="relative group">
+    <div className="flex justify-between h-[40px] border-b border-[#6B9CA9] items-center text-[#6B9CA9] px-4">
+      <div className="flex items-center ">
+        <div className="text-xl font-bold pr-4 border-r border-[#6B9CA9]">
+          Orbo
+        </div>
+        <div className="relative group px-4 border-r border-[#6B9CA9]">
           <button className="flex items-center text-xl px-2 hover:bg-gray-100 rounded">
             <span>
               {pathname === "/knowledge-hub"
@@ -40,7 +42,7 @@ const DashboardHeader = () => {
             </button>
           </div>
         </div>
-        <div className="flex gap-4 text-xs">
+        <div className="flex gap-4 text-xs px-4">
           <Link href="/">Home</Link>
           <Link href="/">Calendar</Link>
           <Link href="/">Projects</Link>
