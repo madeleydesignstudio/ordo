@@ -2,12 +2,29 @@ import "./globals.css";
 import "@repo/ui/styles.css";
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import localFont from "next/font/local";
 import DashboardHeader from "./components/dashboard-header";
 
-// const geistSans = localFont({
-//   src: "./fonts/GeistVF.woff",
-//   variable: "--font-geist-sans",
-// });
+const Nohemi = localFont({
+  src: [
+    {
+      path: "./fonts/NohemiRegular.woff",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/NohemiMedium.woff",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "./fonts/NohemiBold.woff",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-nohemi",
+});
 
 export const metadata: Metadata = {
   title: "Ordo - Dashboard",
@@ -21,7 +38,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-[#FBFEFB] h-screen w-screen overflow-hidden">
+      <body
+        className={`bg-[#FBFEFB] h-screen w-screen overflow-hidden font-nohemi ${Nohemi.variable}`}
+      >
         <Suspense fallback={<div className="h-[40px]" />}>
           <DashboardHeader />
         </Suspense>
