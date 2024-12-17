@@ -13,7 +13,7 @@ const DashboardHeader = () => {
   };
 
   return (
-    <div className="flex justify-between h-[40px] border-b border-[#6B9CA9] items-center text-[#6B9CA9] px-4">
+    <div className="flex justify-between h-[40px] border-b border-[#6B9CA9] items-center text-[#6B9CA9] px-4 fixed top-0 left-0 right-0 ">
       <div className="flex items-center ">
         <div className="text-xl font-bold pr-4 border-r border-[#6B9CA9]">
           Orbo
@@ -42,13 +42,60 @@ const DashboardHeader = () => {
             </button>
           </div>
         </div>
-        <div className="flex gap-4 text-xs px-4">
-          <Link href="/">Home</Link>
-          <Link href="/">Calendar</Link>
-          <Link href="/">Projects</Link>
-          <Link href="/">Tasks</Link>
-          <Link href="/">Journal</Link>
-        </div>
+        {pathname !== "/knowledge-hub" && (
+          <div className="flex gap-4 text-xs px-4">
+            <Link
+              href="/project-manager"
+              className={
+                pathname === "/project-manager"
+                  ? "border-b border-[#6B9CA9]"
+                  : ""
+              }
+            >
+              Home
+            </Link>
+            <Link
+              href="/project-manager/calendar"
+              className={
+                pathname === "/project-manager/calendar"
+                  ? "border-b border-[#6B9CA9]"
+                  : ""
+              }
+            >
+              Calendar
+            </Link>
+            <Link
+              href="/project-manager/projects"
+              className={
+                pathname === "/project-manager/projects"
+                  ? "border-b border-[#6B9CA9]"
+                  : ""
+              }
+            >
+              Projects
+            </Link>
+            <Link
+              href="/project-manager/tasks"
+              className={
+                pathname === "/project-manager/tasks"
+                  ? "border-b border-[#6B9CA9]"
+                  : ""
+              }
+            >
+              Tasks
+            </Link>
+            <Link
+              href="/project-manager/journal"
+              className={
+                pathname === "/project-manager/journal"
+                  ? "border-b border-[#6B9CA9]"
+                  : ""
+              }
+            >
+              Journal
+            </Link>
+          </div>
+        )}
       </div>
       <div className="flex items-center ">
         <div>Search</div>

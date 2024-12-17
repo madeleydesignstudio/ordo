@@ -1,6 +1,7 @@
 import "./globals.css";
 import "@repo/ui/styles.css";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import DashboardHeader from "./components/dashboard-header";
 
 // const geistSans = localFont({
@@ -20,8 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-[#FBFEFB]">
-        <DashboardHeader />
+      <body className="bg-[#FBFEFB] h-screen w-screen overflow-hidden">
+        <Suspense fallback={<div className="h-[40px]" />}>
+          <DashboardHeader />
+        </Suspense>
         {children}
       </body>
     </html>
