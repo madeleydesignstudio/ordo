@@ -8,22 +8,22 @@ import DashboardHeader from "./components/dashboard-header";
 const Nohemi = localFont({
   src: [
     {
-      path: "../public/fonts/NohemiLight.woff",
+      path: "../public/fonts/nohemilight.woff",
       weight: "300",
       style: "normal",
     },
     {
-      path: "../public/fonts/NohemiRegular.woff",
+      path: "../public/fonts/nohemiregular.woff",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../public/fonts/NohemiMedium.woff",
+      path: "../public/fonts/nohemimedium.woff",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../public/fonts/NohemiBold.woff",
+      path: "../public/fonts/nohemibold.woff",
       weight: "700",
       style: "normal",
     },

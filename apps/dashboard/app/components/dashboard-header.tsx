@@ -43,7 +43,7 @@ const DashboardHeader = () => {
           </div>
         </div>
         {pathname !== "/knowledge-hub" && (
-          <div className="flex gap-4 text-xs px-4">
+          <div className="flex gap-4 text-xs px-4 font-normal">
             <Link
               href="/project-manager"
               className={
