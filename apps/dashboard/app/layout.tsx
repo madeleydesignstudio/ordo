@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import localFont from "next/font/local";
 import DashboardHeader from "./components/dashboard-header";
 
-const Nohemi = localFont({
+const nohemi = localFont({
   src: [
     {
       path: "../public/fonts/nohemilight.woff",
@@ -44,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`bg-[#FBFEFB] h-screen w-screen overflow-hidden font-nohemi ${Nohemi.variable}`}
+        className={`bg-[#FBFEFB] h-screen w-screen overflow-hidden font-nohemi ${nohemi.variable}`}
       >
         <Suspense fallback={<div className="h-[40px]" />}>
           <DashboardHeader />
