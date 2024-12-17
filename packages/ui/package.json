@@ -15,7 +15,8 @@
     "./card": "./src/card.tsx",
     "./code": "./src/code.tsx",
     "./postcss.config": "./postcss.config.mjs",
-    "./tailwind.config": "./tailwind.config.ts"
+    "./tailwind.config": "./tailwind.config.ts",
+    "./dashboard/dashboard-header": "./src/dashboard/dashboard-header.tsx"
   },
   "scripts": {
     "build": "tailwindcss -i ./src/styles.css -o ./dist/index.css",

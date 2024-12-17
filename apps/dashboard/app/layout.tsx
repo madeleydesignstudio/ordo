@@ -1,13 +1,11 @@
+import "./globals.css";
 import "@repo/ui/styles.css";
 import type { Metadata } from "next";
+import DashboardHeader from "./components/dashboard-header";
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
 //   variable: "--font-geist-sans",
-// });
-// const geistMono = localFont({
-//   src: "./fonts/GeistMonoVF.woff",
-//   variable: "--font-geist-mono",
 // });
 
 export const metadata: Metadata = {
@@ -22,7 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-[#FBFEFB]">
+        <DashboardHeader />
+        {children}
+      </body>
     </html>
   );
 }

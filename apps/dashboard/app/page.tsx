@@ -1,11 +1,5 @@
-import { Card } from "@repo/ui/card";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div>
-      <Card title="Hello World" href="/">
-        <p>Hello World</p>
-      </Card>
-    </div>
-  );
+  redirect("/project-manager");
 }
