@@ -1,5 +1,5 @@
 import "./globals.css";
-import "@repo/ui/styles.css";
+import "@repo/ui/dist/index.css";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
