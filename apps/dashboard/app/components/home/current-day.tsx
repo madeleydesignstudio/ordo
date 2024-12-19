@@ -1,28 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 
-export default function CurrentDay() {
-  const [currentDate, setCurrentDate] = useState(new Date());
+interface CurrentDayProps {
+  date: Date;
+}
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentDate(new Date());
-    }, 60000); // Update every minute
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-
-  const dayOfWeek = currentDate.toLocaleString("default", { weekday: "long" });
-  const month = currentDate.toLocaleString("default", { month: "long" });
-  const dayOfMonth = currentDate.getDate();
+export default function CurrentDay({ date }: CurrentDayProps) {
+  const dayOfWeek = date.toLocaleString("default", { weekday: "long" });
+  const month = date.toLocaleString("default", { month: "long" });
+  const dayOfMonth = date.getDate();
 
   return (
-    <div className=" flex items-end justify-center text-center p-4 space-x-4 text-[#6B9CA9]">
+    <div className="flex items-end justify-center text-center pt-2 space-x-4 text-[#6B9CA9] ">
       <h2 className="text-6xl font-bold">{dayOfWeek}</h2>
-      <p className="text-xl mt-2">
+      <p className="text-xl">
         {dayOfMonth} {month}
       </p>
     </div>
