@@ -1,4 +1,6 @@
-import { EditorContent, EditorRoot } from "novel";
+"use client";
+
+import TailwindEditor from "./tailwind-editor";
 
 const Journal = () => {
   return (
@@ -7,9 +9,7 @@ const Journal = () => {
         <div className="border border-[#6B9CA9] rounded-lg w-full h-full bg-[F8FEFA]">
           <div className="p-2 font-bold text-[#6B9CA9]">Journal</div>
           <div>
-            <EditorRoot>
-              <EditorContent />
-            </EditorRoot>
+            <TailwindEditor />
           </div>
         </div>
       </div>
