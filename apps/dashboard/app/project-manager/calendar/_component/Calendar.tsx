@@ -13,16 +13,17 @@ import {
 import moment from "moment";
 import { useRouter } from "next/navigation";
 import { dummyEvents, Event } from "../data/dummyEvents";
-import { Button } from "../../..//components/ui/button";
+import { Button } from "../../../components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../..//components/ui/select";
+} from "../../../components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import "./calendar.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 // Setup the localizer for BigCalendar
