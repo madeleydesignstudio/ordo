@@ -56,16 +56,8 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+}
 
-  .ProseMirror:focus {
-    outline: none;
-  }
-
-  .tiptap p.is-editor-empty:first-child::before {
-    color: #000;
-    content: attr(data-placeholder);
-    float: left;
-    height: 0;
-    pointer-events: none;
-  }
+.ProseMirror-focused {
+  outline: none;
 }
