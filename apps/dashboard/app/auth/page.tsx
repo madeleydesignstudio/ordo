@@ -36,7 +36,7 @@ export default function AuthPage() {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Account created successfully!");
+      toast.success("Account created successfully.");
       router.push("/project-manager");
     }
   };
