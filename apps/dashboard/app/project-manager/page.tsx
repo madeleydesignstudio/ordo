@@ -5,11 +5,31 @@ import Inbox from "../components/home/inbox";
 import Journal from "../components/home/journal";
 import CurrentDay from "../components/home/current-day";
 import TodayButton from "../components/today-button";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { startOfToday } from "date-fns";
+import { Task } from "../../types/task";
+import { useRouter } from "next/navigation";
+import { supabase } from "@repo/supabase";
 
 export default function ProjectManager() {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      router.push("/auth");
+      return;
+    }
+  };
 
   const goToToday = () => {
     const today = startOfToday();
