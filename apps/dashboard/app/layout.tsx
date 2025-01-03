@@ -1,4 +1,4 @@
-import "@workspace/ui/globals.css";
+import "@workspace/ui/dashboard.css";
 import { Providers } from "@/components/providers";
 import localFont from "next/font/local";
 
