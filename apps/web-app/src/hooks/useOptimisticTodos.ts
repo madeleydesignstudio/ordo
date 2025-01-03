@@ -28,7 +28,7 @@ export function useOptimisticTodos(date: string) {
 
       return { previousTodos };
     },
-    onError: (err, newTodo, context) => {
+    onError: (_err, _newTodo, context) => {
       queryClient.setQueryData(queryKey, context?.previousTodos);
     },
     onSettled: () => {
