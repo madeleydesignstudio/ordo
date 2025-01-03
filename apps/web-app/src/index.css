@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes highlight {
+  0% {
+    background-color: theme("colors.blue.100");
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.highlight-task {
+  animation: highlight 2s ease-out;
+}
