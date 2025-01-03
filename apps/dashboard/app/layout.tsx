@@ -35,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={` font-sans antialiased font-nohemi ${nohemi.variable}`}>
+      <body className={` antialiased font-nohemi ${nohemi.variable}`}>
         <Providers>{children}</Providers>
       </body>
     </html>
