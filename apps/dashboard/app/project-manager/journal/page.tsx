@@ -1,9 +1,11 @@
-const Journal = () => {
+import Journal from "./_components/journal-page-components";
+
+const JournalPage = () => {
   return (
     <div className="pt-[40px]">
-      <div>Journal</div>
+      <Journal />
     </div>
   );
 };
 
-export default Journal;
+export default JournalPage;
