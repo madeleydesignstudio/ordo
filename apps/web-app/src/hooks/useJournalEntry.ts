@@ -12,7 +12,7 @@ export function useJournalEntry(date: string) {
     queryKey: ["journal", date],
     queryFn: async () => {
       const { data: userData } = await supabase.auth.getUser();
-      if (!userData?.user) return null;
+      if (!userData?.user) throw new Error("Not authenticated");
 
       const { data, error } = await supabase
         .from("journal_entries")

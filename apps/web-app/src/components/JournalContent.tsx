@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { AutoResizeTextarea } from "./AutoResizeTextarea";
-import { Loader } from "./ui/Loader";
 import { Todo } from "../types";
+import { supabase } from "../lib/supabase";
 
 interface JournalContentProps {
   content: string;
@@ -16,9 +16,21 @@ export function JournalContent({
   setContent,
   todos,
   onTaskClick,
-  isLoading,
 }: JournalContentProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = "/login";
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "[" && e.ctrlKey) {
@@ -45,14 +57,6 @@ export function JournalContent({
     processBacklinks();
   }, [content, todos, onTaskClick]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-[300px] flex items-center justify-center">
-        <Loader size="lg" />
-      </div>
-    );
-  }
-
   return (
     <div className="relative">
       <AutoResizeTextarea
@@ -64,12 +68,6 @@ export function JournalContent({
         placeholder="Write about your day... Use [[Task name]] to link to tasks (Ctrl+[ for quick insert)"
         className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none min-h-[300px] font-mono"
       />
-      {isLoading && (
-        <div className="absolute top-2 right-2 text-sm text-gray-500 flex items-center gap-2">
-          <span>Saving</span>
-          <Loader size="sm" />
-        </div>
-      )}
     </div>
   );
 }
