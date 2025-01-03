@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { SocialLoginButton } from "./SocialLoginButton";
+import { UsernamePrompt } from "./UsernamePrompt";
 
 interface AuthFormProps {
   type: "login" | "signup";
@@ -12,7 +13,19 @@ export function AuthForm({ type }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
   const navigate = useNavigate();
+
+  const checkUsername = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", userId)
+      .single();
+
+    if (error) throw error;
+    return !!data?.username;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,12 +33,21 @@ export function AuthForm({ type }: AuthFormProps) {
     setIsLoading(true);
 
     try {
-      const { error: authError } =
+      const { data, error: authError } =
         type === "signup"
           ? await supabase.auth.signUp({ email, password })
           : await supabase.auth.signInWithPassword({ email, password });
 
       if (authError) throw authError;
+
+      if (data.user) {
+        const hasUsername = await checkUsername(data.user.id);
+        if (!hasUsername) {
+          setShowUsernamePrompt(true);
+          return;
+        }
+      }
+
       navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -155,6 +177,15 @@ export function AuthForm({ type }: AuthFormProps) {
           </div>
         </form>
       </div>
+
+      {showUsernamePrompt && (
+        <UsernamePrompt
+          onComplete={() => {
+            setShowUsernamePrompt(false);
+            navigate("/");
+          }}
+        />
+      )}
     </div>
   );
 }
