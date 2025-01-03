@@ -15,16 +15,7 @@ export default function TailwindEditor() {
       Paragraph,
       Text,
       Placeholder.configure({
-        // Use a placeholder:
         placeholder: "Start writing...",
-        // Use different placeholders depending on the node type:
-        // placeholder: ({ node }) => {
-        //   if (node.type.name === 'heading') {
-        //     return 'What’s the title?'
-        //   }
-
-        //   return 'Can you add some further context?'
-        // },
       }),
     ],
   });

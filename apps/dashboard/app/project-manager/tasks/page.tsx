@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@repo/supabase";
+import { supabase } from "@workspace/supabase";
 import { toast } from "sonner";
 import type { Task } from "../../../types/task";
 import { DashboardHeader } from "./_components/dashboard-header";
