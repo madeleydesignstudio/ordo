@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut, User } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import {
@@ -12,7 +12,13 @@ import { UsernamePrompt } from "./UsernamePrompt";
 
 export function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<{
+    email?: string;
+    user_metadata?: {
+      avatar_url?: string;
+      full_name?: string;
+    };
+  } | null>(null);
   const navigate = useNavigate();
   const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
 
@@ -22,7 +28,7 @@ export function UserMenu() {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from("profiles")
           .select("username")
           .eq("id", user.id)
