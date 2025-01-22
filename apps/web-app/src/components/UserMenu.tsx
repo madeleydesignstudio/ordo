@@ -8,7 +8,7 @@ import {
   AvatarFallback,
 } from "@workspace/ui/components/avatar";
 import { useEffect } from "react";
-import { UsernamePrompt } from "./UsernamePrompt";
+// import { UsernamePrompt } from "./UsernamePrompt";
 
 export function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +20,7 @@ export function UserMenu() {
     };
   } | null>(null);
   const navigate = useNavigate();
-  const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
+  // const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -28,16 +28,6 @@ export function UserMenu() {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("username")
-          .eq("id", user.id)
-          .single();
-
-        if (!data?.username) {
-          setShowUsernamePrompt(true);
-        }
-
         setUserData(user);
       }
     };
@@ -96,9 +86,9 @@ export function UserMenu() {
         )}
       </div>
 
-      {showUsernamePrompt && (
+      {/* {showUsernamePrompt && (
         <UsernamePrompt onComplete={() => setShowUsernamePrompt(false)} />
-      )}
+      )} */}
     </>
   );
 }
