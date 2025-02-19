@@ -11,6 +11,7 @@ import { supabase } from "./lib/supabase";
 import { User } from "@supabase/supabase-js";
 import DashboardHeader from "@workspace/ui/components/dashboard-header";
 import { CalendarWeek } from "@workspace/ui/components/calendar-week";
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,6 +42,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function ProtectedLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <DashboardHeader />
+      {children}
+    </>
+  );
+}
+
 function App() {
   return (
     <Router>
@@ -51,9 +61,13 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <Route path="/" element={<DashboardHeader />} />
-              <JournalEditor />
-              <CalendarWeek onDateChange={() => {}} selectedDate={new Date()} />
+              <ProtectedLayout>
+                <JournalEditor />
+                <CalendarWeek
+                  onDateChange={() => {}}
+                  selectedDate={new Date()}
+                />
+              </ProtectedLayout>
             </ProtectedRoute>
           }
         />
