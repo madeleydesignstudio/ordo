@@ -44,10 +44,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <div>
       <DashboardHeader />
       {children}
-    </>
+    </div>
   );
 }
 
