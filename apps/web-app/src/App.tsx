@@ -3,6 +3,7 @@ import {
   Routes,
   Route,
   Navigate,
+  BrowserRouter,
 } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AuthForm } from "./components/AuthForm";
@@ -51,7 +52,10 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <DashboardHeader />
+              <BrowserRouter>
+                <DashboardHeader />
+              </BrowserRouter>
+
               <JournalEditor />
               <CalendarWeek onDateChange={() => {}} selectedDate={new Date()} />
             </ProtectedRoute>
