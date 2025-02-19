@@ -52,9 +52,7 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <BrowserRouter>
-                <DashboardHeader />
-              </BrowserRouter>
+              <Route path="/" element={<DashboardHeader />} />
               <JournalEditor />
               <CalendarWeek onDateChange={() => {}} selectedDate={new Date()} />
             </ProtectedRoute>
