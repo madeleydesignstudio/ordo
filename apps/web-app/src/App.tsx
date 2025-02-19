@@ -48,11 +48,11 @@ function App() {
       <Routes>
         <Route path="/login" element={<AuthForm type="login" />} />
         <Route path="/signup" element={<AuthForm type="signup" />} />
-        <Route path="/" element={<DashboardHeader />} />
         <Route
           path="/"
           element={
             <ProtectedRoute>
+              <DashboardHeader />
               <JournalEditor />
               <CalendarWeek onDateChange={() => {}} selectedDate={new Date()} />
             </ProtectedRoute>
