@@ -9,7 +9,7 @@ import { AuthForm } from "./components/AuthForm";
 import { JournalEditor } from "./components/JournalEditor";
 import { supabase } from "./lib/supabase";
 import { User } from "@supabase/supabase-js";
-import DashboardHeader from "@workspace/ui/components/dashboard-header";
+import { UIDashboardHeader } from "./components/DashboardHeader";
 import { CalendarWeek } from "@workspace/ui/components/calendar-week";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -49,12 +49,44 @@ function App() {
         <Route path="/login" element={<AuthForm type="login" />} />
         <Route path="/signup" element={<AuthForm type="signup" />} />
         <Route
-          path="/"
+          path="/*"
           element={
             <ProtectedRoute>
-              <DashboardHeader />
-              <JournalEditor />
-              <CalendarWeek onDateChange={() => {}} selectedDate={new Date()} />
+              <UIDashboardHeader />
+              <div className="mt-[40px]">
+                <Routes>
+                  <Route
+                    path="/"
+                    element={<Navigate to="/project-manager" />}
+                  />
+                  <Route path="/project-manager" element={<JournalEditor />} />
+                  <Route
+                    path="/project-manager/calendar"
+                    element={
+                      <CalendarWeek
+                        onDateChange={() => {}}
+                        selectedDate={new Date()}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/project-manager/projects"
+                    element={<div>Projects Page</div>}
+                  />
+                  <Route
+                    path="/project-manager/tasks"
+                    element={<div>Tasks Page</div>}
+                  />
+                  <Route
+                    path="/project-manager/journal"
+                    element={<JournalEditor />}
+                  />
+                  <Route
+                    path="/knowledge-hub"
+                    element={<div>Knowledge Hub</div>}
+                  />
+                </Routes>
+              </div>
             </ProtectedRoute>
           }
         />

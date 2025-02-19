@@ -2,15 +2,15 @@
 
 import { Link } from "react-router-dom";
 import { Bell, Search, User, ChevronDown } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const DashboardHeader = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // const handleSectionChange = (section: string) => {
-  //   navigate(`/${section.toLowerCase().replace(" ", "-")}`);
-  // };
+  const handleSectionChange = (section: string) => {
+    navigate(`/${section.toLowerCase().replace(" ", "-")}`);
+  };
 
   return (
     <div className="flex justify-between h-[40px] border-b border-[#6B9CA9] items-center text-[#6B9CA9] px-4 fixed top-0 left-0 right-0">
@@ -29,13 +29,13 @@ const DashboardHeader = () => {
           </button>
           <div className="absolute hidden group-hover:block w-48 bg-white border rounded-md shadow-lg">
             <button
-              // onClick={() => handleSectionChange("project-manager")}
+              onClick={() => handleSectionChange("project-manager")}
               className="w-full text-left px-4 py-2 hover:bg-gray-100"
             >
               Project Manager
             </button>
             <button
-              // onClick={() => handleSectionChange("knowledge-hub")}
+              onClick={() => handleSectionChange("knowledge-hub")}
               className="w-full text-left px-4 py-2 hover:bg-gray-100"
             >
               Knowledge Hub
