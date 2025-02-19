@@ -55,7 +55,6 @@ function App() {
               <BrowserRouter>
                 <DashboardHeader />
               </BrowserRouter>
-
               <JournalEditor />
               <CalendarWeek onDateChange={() => {}} selectedDate={new Date()} />
             </ProtectedRoute>
