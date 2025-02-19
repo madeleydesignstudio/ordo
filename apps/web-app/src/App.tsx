@@ -9,7 +9,8 @@ import { AuthForm } from "./components/AuthForm";
 import { JournalEditor } from "./components/JournalEditor";
 import { supabase } from "./lib/supabase";
 import { User } from "@supabase/supabase-js";
-
+import DashboardHeader from "@workspace/ui/components/dashboard-header";
+import { CalendarWeek } from "@workspace/ui/components/calendar-week";
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +51,9 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
+              <DashboardHeader />
               <JournalEditor />
+              <CalendarWeek onDateChange={() => {}} selectedDate={new Date()} />
             </ProtectedRoute>
           }
         />
