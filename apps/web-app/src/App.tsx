@@ -42,32 +42,19 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div>
-      <DashboardHeader />
-      {children}
-    </div>
-  );
-}
-
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<AuthForm type="login" />} />
         <Route path="/signup" element={<AuthForm type="signup" />} />
+        <Route path="/" element={<DashboardHeader />} />
         <Route
           path="/"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <JournalEditor />
-                <CalendarWeek
-                  onDateChange={() => {}}
-                  selectedDate={new Date()}
-                />
-              </ProtectedLayout>
+              <JournalEditor />
+              <CalendarWeek onDateChange={() => {}} selectedDate={new Date()} />
             </ProtectedRoute>
           }
         />
