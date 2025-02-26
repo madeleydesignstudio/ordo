@@ -6,10 +6,10 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
-import "@workspace/ui/globals.css";
-
-// import appCss from "@/styles/app.css?url";
+import appCss from "@/styles/app.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -25,12 +25,12 @@ export const Route = createRootRoute({
         title: "TanStack Start Starter",
       },
     ],
-    // links: [
-    //   {
-    //     rel: "stylesheet",
-    //     href: appCss,
-    //   },
-    // ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
+    ],
   }),
   component: RootComponent,
 });
@@ -38,7 +38,9 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <Outlet />
+      <AppLayout>
+        <Outlet />
+      </AppLayout>
     </RootDocument>
   );
 }
@@ -46,13 +48,24 @@ function RootComponent() {
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html>
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
+      <SidebarProvider>
+        <head>
+          <HeadContent />
+        </head>
+        <body>
+          {children}
+          <Scripts />
+        </body>
+      </SidebarProvider>
     </html>
+  );
+}
+
+function AppLayout({ children }: Readonly<{ children: ReactNode }>) {
+  return (
+    <>
+      <AppSidebar />
+      <main>{children}</main>
+    </>
   );
 }
