@@ -1,18 +1,5 @@
-import {
-  Calendar,
-  Check,
-  Folder,
-  Home,
-  Inbox,
-  PanelLeftClose,
-  Search,
-  Settings,
-  X,
-} from "lucide-react";
 import { useSidebar } from "@/components/sidebar-context";
-import { useState } from "react";
-import { Command } from "cmdk";
-import React from "react";
+import { Calendar, Check, Inbox, PanelLeftClose, Search } from "lucide-react";
 
 // Menu items.
 const leftItems = [

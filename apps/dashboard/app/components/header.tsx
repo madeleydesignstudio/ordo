@@ -1,8 +1,9 @@
 import { useSidebar } from "@/components/sidebar-context";
-import { Menu, PanelLeftOpen, SlidersHorizontal, View } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Command } from "cmdk";
-import React from "react";
+import { PanelLeftOpen, SlidersHorizontal, View } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
+
 const Header = () => {
   const { toggleSidebar } = useSidebar();
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -39,7 +40,9 @@ const Header = () => {
   return (
     <div className="fixed top-0 h-[30px] bg-[#FBFEFB] border-b border-[#6B9CA9] flex justify-between items-center w-full overflow-hidden">
       <div className="flex items-center justify-between w-1/8 border-r border-[#6B9CA9] h-full px-2.5">
-        <div className="text-[#6B9CA9]">Ordo</div>
+        <Link to="/" className="text-[#6B9CA9] font-bold">
+          Ordo
+        </Link>
         <button onClick={toggleSidebar} className="text-[#6B9CA9]">
           <PanelLeftOpen className="h-4 w-4" />
         </button>
