@@ -62,15 +62,17 @@ const Header = () => {
       <div className="flex items-center w-1/8 border-l border-[#6B9CA9] h-full justify-between px-2.5 gap-2.5">
         <button
           onClick={() => setOpen(true)}
-          className="flex items-center gap-1 px-2 py-0.5 text-xs border rounded border-[#6B9CA9] text-[#6B9CA9] "
+          className="flex items-center gap-1 px-2 py-0.5 text-xs border rounded border-[#6B9CA9] text-[#6B9CA9] bg-[#F8FEFA]"
         >
           <span className="font-medium">⌘K</span>
         </button>
-        <div className="flex-1 flex items-center text-xs border rounded border-[#6B9CA9] text-[#6B9CA9] overflow-hidden">
+        <div className="flex-1 flex items-center text-xs border rounded border-[#6B9CA9] text-[#6B9CA9] overflow-hidden bg-[#6B9CA9]">
           <span className="bg-[#6B9CA9] text-white px-1 flex items-center">
             DM
           </span>
-          <span className="text-xs px-1 py-0.5">madeleydesignstudio</span>
+          <span className="text-xs px-1 py-0.5 bg-[#F8FEFA]">
+            madeleydesignstudio
+          </span>
         </div>
       </div>
       <div>
