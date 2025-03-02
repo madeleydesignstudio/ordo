@@ -1,16 +1,39 @@
 // app/routes/__root.tsx
-import type { ReactNode } from "react";
-import {
-  Outlet,
-  createRootRoute,
-  HeadContent,
-  Scripts,
-} from "@tanstack/react-router";
-import { SidebarProvider } from "@/components/sidebar-context";
 import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider } from "@/components/sidebar-context";
+import {
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRoute,
+  Link,
+} from "@tanstack/react-router";
+import type { ReactNode } from "react";
 
-import appCss from "@/styles/app.css?url";
 import Header from "@/components/header";
+import appCss from "@/styles/app.css?url";
+
+function NotFoundComponent() {
+  return (
+    <RootDocument>
+      <Header />
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+          <h1 className="text-4xl font-bold">404 - Page Not Found</h1>
+          <p className="mt-4">
+            Sorry, the page you are looking for does not exist.
+          </p>
+          <Link
+            to="/"
+            className="mt-8 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Go Home
+          </Link>
+        </div>
+      </AppLayout>
+    </RootDocument>
+  );
+}
 
 export const Route = createRootRoute({
   head: () => ({
@@ -51,12 +74,14 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootComponent,
+  notFoundComponent: NotFoundComponent,
 });
 
 function RootComponent() {
   return (
     <RootDocument>
       <AppLayout>
+        <Header />
         <Outlet />
       </AppLayout>
     </RootDocument>
@@ -70,8 +95,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <head>
           <HeadContent />
         </head>
-        <body className="font-nohemi">
-          <Header />
+        <body>
           {children}
           <Scripts />
         </body>

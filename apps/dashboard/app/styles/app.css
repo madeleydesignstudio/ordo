@@ -2,8 +2,6 @@
 
 @plugin "tailwindcss-animate";
 
-@import "../../public//fonts//nohemi.css";
-
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -130,26 +128,26 @@
   font-family: "Nohemi";
   font-style: normal;
   font-weight: 400;
-  src: url("../../public/fonts/Nohemi-Regular.woff2") format("woff2");
+  src: url("/fonts/Nohemi-Regular.woff2") format("woff2");
 }
 
 @font-face {
   font-family: "Nohemi";
   font-style: normal;
   font-weight: 500;
-  src: url("../../public/fonts/Nohemi-Medium.woff2") format("woff2");
+  src: url("/fonts/Nohemi-Medium.woff2") format("woff2");
 }
 
 @font-face {
   font-family: "Nohemi";
   font-style: normal;
   font-weight: 600;
-  src: url("../../public/fonts/Nohemi-SemiBold.woff2") format("woff2");
+  src: url("/fonts/Nohemi-SemiBold.woff2") format("woff2");
 }
 
 @font-face {
   font-family: "Nohemi";
   font-style: normal;
   font-weight: 700;
-  src: url("../../public/fonts/Nohemi-Bold.woff2") format("woff2");
+  src: url("/fonts/Nohemi-Bold.woff2") format("woff2");
 }
