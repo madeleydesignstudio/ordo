@@ -39,13 +39,15 @@ const Header = () => {
   return (
     <div className="fixed top-0 h-[30px] bg-[#FBFEFB] border-b border-[#6B9CA9] flex justify-between items-center w-full overflow-hidden">
       <div className="flex items-center justify-between w-1/8 border-r border-[#6B9CA9] h-full px-2.5">
-        <div>Ordo</div>
-        <button onClick={toggleSidebar} className="">
+        <div className="text-[#6B9CA9]">Ordo</div>
+        <button onClick={toggleSidebar} className="text-[#6B9CA9]">
           <PanelLeftOpen className="h-4 w-4" />
         </button>
       </div>
       <div className="flex items-center w-6/8 px-2.5 justify-between ">
-        <h2 className="text-md font-semibold">Project Manager</h2>
+        <h2 className="text-md font-semibold text-[#6B9CA9]">
+          Project Manager
+        </h2>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-[#6B9CA9]">
             <View className="h-4 w-4" />
