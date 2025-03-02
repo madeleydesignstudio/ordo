@@ -94,7 +94,7 @@ export function AppSidebar() {
               DM
             </span>
             <span className="text-xs px-1 py-0.5 bg-[#F8FEFA]">
-              madeleydesignstudio
+              madeleydesignstudio.
             </span>
           </div>
         </div>
