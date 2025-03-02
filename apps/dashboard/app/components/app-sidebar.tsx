@@ -10,6 +10,9 @@ import {
   X,
 } from "lucide-react";
 import { useSidebar } from "@/components/sidebar-context";
+import { useState } from "react";
+import { Command } from "cmdk";
+import React from "react";
 
 // Menu items.
 const leftItems = [
@@ -80,18 +83,22 @@ export function AppSidebar() {
 
       {/* Right Sidebar */}
       <div
-        className={`fixed inset-y-0 right-0 transform ${isOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 ease-in-out z-10 w-1/8 bg-[#F1FCF4] border-l h-full`}
+        className={`fixed inset-y-0 right-0 transform ${isOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 ease-in-out z-10 w-1/8 bg-[#F1FCF4] border-l border-[#6B9CA9] h-full`}
       >
-        <div className="px-2.5 h-[30px] border-b flex justify-between items-center">
-          <h2 className="text-lg font-semibold">Ordo</h2>
-          <button
-            onClick={toggleSidebar}
-            className="p-1 rounded-md hover:bg-accent"
-            aria-label="Close sidebar"
-          >
-            <PanelLeftClose className="h-4 w-4" />
+        <div className="flex items-center border-b border-[#6B9CA9] h-[30px] justify-between px-2.5 gap-2.5">
+          <button className="flex items-center gap-1 px-2 py-0.5 text-xs border rounded border-[#6B9CA9] text-[#6B9CA9] bg-[#F8FEFA]">
+            <span className="font-medium">⌘K</span>
           </button>
+          <div className="flex-1 flex items-center text-xs border rounded border-[#6B9CA9] text-[#6B9CA9] overflow-hidden bg-[#6B9CA9]">
+            <span className="bg-[#6B9CA9] text-white px-1 flex items-center">
+              DM
+            </span>
+            <span className="text-xs px-1 py-0.5 bg-[#F8FEFA]">
+              madeleydesignstudio
+            </span>
+          </div>
         </div>
+
         <div className="p-4">
           <div>
             <h3 className="mb-2 text-sm font-medium">Tools</h3>
