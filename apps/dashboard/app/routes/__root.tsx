@@ -6,10 +6,11 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/sidebar-context";
 import { AppSidebar } from "@/components/app-sidebar";
 
 import appCss from "@/styles/app.css?url";
+import Header from "@/components/header";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -53,6 +54,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
           <HeadContent />
         </head>
         <body>
+          <Header />
           {children}
           <Scripts />
         </body>

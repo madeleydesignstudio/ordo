@@ -1,5 +1,13 @@
-import { Calendar, Home, Inbox, Menu, Search, Settings } from "lucide-react";
-import { useState } from "react";
+import {
+  Calendar,
+  Home,
+  Inbox,
+  PanelLeftClose,
+  Search,
+  Settings,
+  X,
+} from "lucide-react";
+import { useSidebar } from "@/components/sidebar-context";
 
 // Menu items.
 const leftItems = [
@@ -7,16 +15,6 @@ const leftItems = [
     title: "Home",
     url: "#",
     icon: Home,
-  },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
   },
 ];
 
@@ -26,32 +24,26 @@ const rightItems = [
     url: "#",
     icon: Search,
   },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
 ];
 
 export function AppSidebar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, toggleSidebar } = useSidebar();
 
   return (
     <>
-      {/* Custom trigger button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-20 flex h-10 w-10 items-center justify-center rounded-md border bg-background"
-      >
-        <Menu className="h-4 w-4" />
-      </button>
-
       {/* Left Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out z-10 w-64 bg-background border-r`}
+        className={`fixed inset-y-0 left-0 transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out z-10 w-1/8 bg-[#F1FCF4] border-r border-[#6B9CA9]`}
       >
-        <div className="px-4 py-2 border-b">
-          <h2 className="text-lg font-semibold">Left Panel</h2>
+        <div className="px-2.5 h-[30px] border-b flex justify-between items-center border-b-[#6B9CA9]">
+          <h2 className="text-lg font-semibold">Ordo</h2>
+          <button
+            onClick={toggleSidebar}
+            className="p-1 rounded-md hover:bg-accent"
+            aria-label="Close sidebar"
+          >
+            <PanelLeftClose className="h-4 w-4" />
+          </button>
         </div>
         <div className="p-4">
           <div>
@@ -75,10 +67,17 @@ export function AppSidebar() {
 
       {/* Right Sidebar */}
       <div
-        className={`fixed inset-y-0 right-0 transform ${isOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 ease-in-out z-10 w-64 bg-background border-l`}
+        className={`fixed inset-y-0 right-0 transform ${isOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 ease-in-out z-10 w-1/8 bg-[#F1FCF4] border-l h-full`}
       >
-        <div className="px-4 py-2 border-b">
-          <h2 className="text-lg font-semibold">Right Panel</h2>
+        <div className="px-2.5 h-[30px] border-b flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Ordo</h2>
+          <button
+            onClick={toggleSidebar}
+            className="p-1 rounded-md hover:bg-accent"
+            aria-label="Close sidebar"
+          >
+            <PanelLeftClose className="h-4 w-4" />
+          </button>
         </div>
         <div className="p-4">
           <div>
