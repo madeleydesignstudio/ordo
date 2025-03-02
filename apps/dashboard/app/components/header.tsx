@@ -80,9 +80,9 @@ const Header = () => {
           open={open}
           onOpenChange={setOpen}
           label="Global Command Menu"
-          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] bg-black text-white rounded-lg shadow-lg p-4 z-50"
+          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] bg-[#F8FEFA] text-[#6B9CA9] rounded-lg shadow-lg p-4 z-50 border border-[#6B9CA9]"
         >
-          <Command.Input className="bg-transparent border border-gray-700 rounded p-2 mb-2 w-full text-white" />
+          <Command.Input className="bg-transparent border border-[#6B9CA9] rounded p-2 mb-2 w-full text-[#6B9CA9]" />
           <Command.List className="mt-2">
             <Command.Empty>No results found.</Command.Empty>
 
