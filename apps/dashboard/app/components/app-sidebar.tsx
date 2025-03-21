@@ -1,32 +1,35 @@
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarHeader,
-} from "@/components/ui/sidebar";
-import SidebarCalendar from "./sidebar-calendar";
-import {
-  BellIcon,
-  DumbbellIcon,
-  Home,
-  NotebookIcon,
-  NotebookPen,
-  PlusIcon,
-  SettingsIcon,
-} from "lucide-react";
-import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import {
+  BellIcon,
+  DumbbellIcon,
+  Home,
+  NotebookPen,
+  PlusIcon,
+  SettingsIcon,
+} from "lucide-react";
+import SidebarCalendar from "./sidebar-calendar";
 
 export function AppSidebar() {
   return (
     <Sidebar className="border-none">
       <SidebarHeader>
-        <h1 className="text-neutral-300 text-sm">madeleydesignstudio</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-neutral-300 text-sm">madeleydesignstudio</h1>
+          <SidebarTrigger />
+        </div>
       </SidebarHeader>
       <SidebarContent className="">
         <SidebarGroup className="gap-2">
@@ -58,7 +61,7 @@ export function AppSidebar() {
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="flex flex-col gap-2 pl-2">
+                <div className="flex flex-col gap-2">
                   <div className="text-neutral-300 text-xs flex items-center gap-2 hover:bg-neutral-800 p-2 rounded-md cursor-pointer">
                     <span>
                       <NotebookPen size={12} />

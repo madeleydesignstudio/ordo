@@ -3,15 +3,15 @@ import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 import { AppSidebar } from "../app-sidebar";
 import TimeLocationDisplay from "../time-location-display";
 import { Link } from "@tanstack/react-router";
+import SidebarIcons from "../sidebar-icons";
+import SmallAppSideBar from "../small-app-sidebar";
 
 const MainContentProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-screen">
         <AppSidebar />
-        <div className="px-1">
-          <SidebarTrigger />
-        </div>
+        <SmallAppSideBar />
         <div className=" w-full h-full pb-2.5 pr-2.5 flex flex-col">
           <div className="h-[30px] flex items-end">
             <div className=" w-1/2 h-3/4 flex justify-between text-neutral-300">
