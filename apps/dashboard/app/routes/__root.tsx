@@ -1,6 +1,5 @@
 // app/routes/__root.tsx
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider } from "@/components/sidebar-context";
+
 import {
   HeadContent,
   Outlet,
@@ -10,13 +9,12 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
-import Header from "@/components/header";
 import appCss from "@/styles/app.css?url";
+import MainContentProvider from "@/components/providers/MainContentProvider";
 
 function NotFoundComponent() {
   return (
     <RootDocument>
-      <Header />
       <AppLayout>
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
           <h1 className="text-4xl font-bold">404 - Page Not Found</h1>
@@ -81,7 +79,6 @@ function RootComponent() {
   return (
     <RootDocument>
       <AppLayout>
-        <Header />
         <Outlet />
       </AppLayout>
     </RootDocument>
@@ -91,15 +88,13 @@ function RootComponent() {
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html>
-      <SidebarProvider>
-        <head>
-          <HeadContent />
-        </head>
-        <body>
-          {children}
-          <Scripts />
-        </body>
-      </SidebarProvider>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
     </html>
   );
 }
@@ -107,8 +102,9 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 function AppLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <>
-      <AppSidebar />
-      <main>{children}</main>
+      <MainContentProvider>
+        <main className="w-full h-full rounded-md">{children}</main>
+      </MainContentProvider>
     </>
   );
 }
