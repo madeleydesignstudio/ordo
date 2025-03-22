@@ -3,8 +3,7 @@ import React from "react";
 
 const PrimaryLinks = () => {
   return (
-    <div>
-      {" "}
+    <div className="flex flex-col gap-2">
       <div className="text-neutral-300 text-xs bg-neutral-950 p-1 rounded-sm border border-neutral-600 flex justify-between">
         <h2>Quick Menu</h2>
         <h3>⌘K</h3>

@@ -4,32 +4,30 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarHeader,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useRouterState } from "@tanstack/react-router";
+import BorderBreak from "./border-break";
 import PersonalLinks from "./personal-links";
 import PrimaryLinks from "./primary-links";
-import QuickLinks from "./quick-links";
+import { QuickLinks } from "./quick-links";
 import SettingsLink from "./settings-link";
 import SidebarCalendar from "./sidebar-calendar";
-import { useRouter } from "@tanstack/react-router";
+import WorkspaceSettings from "./workspace-settings";
 
 export function AppSidebar() {
-  const router = useRouter();
-  const isHomeRoute = router.state.location.pathname === "/";
+  const routerState = useRouterState();
+  const isHomeRoute = routerState.location.pathname === "/";
   return (
     <Sidebar className="border-none">
       <SidebarHeader>
-        <div className="flex items-center justify-between">
-          <h1 className="text-neutral-300 text-sm">madeleydesignstudio</h1>
-          <SidebarTrigger />
-        </div>
+        <WorkspaceSettings />
       </SidebarHeader>
       <SidebarContent className="">
         <SidebarGroup>
           <PrimaryLinks />
           <SidebarCalendar />
         </SidebarGroup>
-        <div className="border-b border-neutral-600 mx-2.5" />
+        <BorderBreak />
         <SidebarGroup className="flex-1">
           {isHomeRoute && <PersonalLinks />}
         </SidebarGroup>

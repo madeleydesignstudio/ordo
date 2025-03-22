@@ -125,7 +125,6 @@ const DateSlider = ({ currentDate, onDateChange }: DateSliderProps) => {
 
   return (
     <div className="h-[15%] border-t border-neutral-600 w-full">
-      {" "}
       <div className="flex flex-col w-full h-full">
         <div className="flex justify-center items-center w-full h-full">
           {visibleDates.map((date, index) => {
