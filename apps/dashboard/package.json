@@ -32,6 +32,7 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
     "lucide-react": "0.456.0",
+    "motion": "^12.5.0",
     "postcss": "^8.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

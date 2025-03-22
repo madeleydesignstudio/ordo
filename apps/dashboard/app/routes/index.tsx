@@ -16,9 +16,7 @@ export default function Home() {
     <div className="flex items-center justify-center h-full w-full rounded-md flex-col">
       <HomeHeader currentDate={currentDate} onDateChange={setCurrentDate} />
       <HomeMainContent />
-      <div className="h-[15%] border-t border-neutral-600 w-full">
-        <DateSlider currentDate={currentDate} onDateChange={setCurrentDate} />
-      </div>
+      <DateSlider currentDate={currentDate} onDateChange={setCurrentDate} />
     </div>
   );
 }

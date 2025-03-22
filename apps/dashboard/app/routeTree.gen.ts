@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SettingsImport } from './routes/settings'
 import { Route as JournalImport } from './routes/journal'
 import { Route as FitnessTrackerImport } from './routes/fitness-tracker'
 import { Route as IndexImport } from './routes/index'
@@ -19,6 +20,12 @@ import { Route as FinanceManagerIndexImport } from './routes/finance-manager/ind
 import { Route as ContentManagerIndexImport } from './routes/content-manager/index'
 
 // Create/Update Routes
+
+const SettingsRoute = SettingsImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const JournalRoute = JournalImport.update({
   id: '/journal',
@@ -81,6 +88,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JournalImport
       parentRoute: typeof rootRoute
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsImport
+      parentRoute: typeof rootRoute
+    }
     '/content-manager/': {
       id: '/content-manager/'
       path: '/content-manager'
@@ -111,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/fitness-tracker': typeof FitnessTrackerRoute
   '/journal': typeof JournalRoute
+  '/settings': typeof SettingsRoute
   '/content-manager': typeof ContentManagerIndexRoute
   '/finance-manager': typeof FinanceManagerIndexRoute
   '/project-manager': typeof ProjectManagerIndexRoute
@@ -120,6 +135,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/fitness-tracker': typeof FitnessTrackerRoute
   '/journal': typeof JournalRoute
+  '/settings': typeof SettingsRoute
   '/content-manager': typeof ContentManagerIndexRoute
   '/finance-manager': typeof FinanceManagerIndexRoute
   '/project-manager': typeof ProjectManagerIndexRoute
@@ -130,6 +146,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/fitness-tracker': typeof FitnessTrackerRoute
   '/journal': typeof JournalRoute
+  '/settings': typeof SettingsRoute
   '/content-manager/': typeof ContentManagerIndexRoute
   '/finance-manager/': typeof FinanceManagerIndexRoute
   '/project-manager/': typeof ProjectManagerIndexRoute
@@ -141,6 +158,7 @@ export interface FileRouteTypes {
     | '/'
     | '/fitness-tracker'
     | '/journal'
+    | '/settings'
     | '/content-manager'
     | '/finance-manager'
     | '/project-manager'
@@ -149,6 +167,7 @@ export interface FileRouteTypes {
     | '/'
     | '/fitness-tracker'
     | '/journal'
+    | '/settings'
     | '/content-manager'
     | '/finance-manager'
     | '/project-manager'
@@ -157,6 +176,7 @@ export interface FileRouteTypes {
     | '/'
     | '/fitness-tracker'
     | '/journal'
+    | '/settings'
     | '/content-manager/'
     | '/finance-manager/'
     | '/project-manager/'
@@ -167,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FitnessTrackerRoute: typeof FitnessTrackerRoute
   JournalRoute: typeof JournalRoute
+  SettingsRoute: typeof SettingsRoute
   ContentManagerIndexRoute: typeof ContentManagerIndexRoute
   FinanceManagerIndexRoute: typeof FinanceManagerIndexRoute
   ProjectManagerIndexRoute: typeof ProjectManagerIndexRoute
@@ -176,6 +197,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FitnessTrackerRoute: FitnessTrackerRoute,
   JournalRoute: JournalRoute,
+  SettingsRoute: SettingsRoute,
   ContentManagerIndexRoute: ContentManagerIndexRoute,
   FinanceManagerIndexRoute: FinanceManagerIndexRoute,
   ProjectManagerIndexRoute: ProjectManagerIndexRoute,
@@ -194,6 +216,7 @@ export const routeTree = rootRoute
         "/",
         "/fitness-tracker",
         "/journal",
+        "/settings",
         "/content-manager/",
         "/finance-manager/",
         "/project-manager/"
@@ -207,6 +230,9 @@ export const routeTree = rootRoute
     },
     "/journal": {
       "filePath": "journal.tsx"
+    },
+    "/settings": {
+      "filePath": "settings.tsx"
     },
     "/content-manager/": {
       "filePath": "content-manager/index.tsx"

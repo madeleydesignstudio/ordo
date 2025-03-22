@@ -53,7 +53,7 @@ const SidebarCalendar = () => {
   };
 
   return (
-    <div className="p-2 text-neutral-300 w-[200px]">
+    <div className="p-2 text-neutral-300 w-full">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium">
           {currentDate.toLocaleDateString("en-US", {
