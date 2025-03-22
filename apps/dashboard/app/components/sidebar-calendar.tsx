@@ -5,10 +5,10 @@ import {
   ChevronRightIcon,
   ChevronUpIcon,
 } from "lucide-react";
+import { useDate } from "@/components/date-context";
 
 const SidebarCalendar = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const { currentDate, setCurrentDate } = useDate();
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -44,10 +44,11 @@ const SidebarCalendar = () => {
   };
 
   const isSelected = (day: number) => {
+    const today = new Date();
     return (
-      selectedDate?.getDate() === day &&
-      selectedDate?.getMonth() === currentDate.getMonth() &&
-      selectedDate?.getFullYear() === currentDate.getFullYear()
+      currentDate.getDate() === day &&
+      currentDate.getMonth() === today.getMonth() &&
+      currentDate.getFullYear() === today.getFullYear()
     );
   };
 
@@ -103,7 +104,7 @@ const SidebarCalendar = () => {
             <button
               key={day}
               onClick={() =>
-                setSelectedDate(
+                setCurrentDate(
                   new Date(
                     currentDate.getFullYear(),
                     currentDate.getMonth(),

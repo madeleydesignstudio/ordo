@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 
 import appCss from "@/styles/app.css?url";
 import MainContentProvider from "@/components/providers/MainContentProvider";
+import { DateProvider } from "@/components/date-context";
 
 function NotFoundComponent() {
   return (
@@ -92,8 +93,10 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <HeadContent />
       </head>
       <body>
-        {children}
-        <Scripts />
+        <DateProvider>
+          {children}
+          <Scripts />
+        </DateProvider>
       </body>
     </html>
   );
