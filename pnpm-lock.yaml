@@ -58,10 +58,13 @@ importers:
         version: 1.111.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@tanstack/start':
         specifier: ^1.111.6
-        version: 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(vite@6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1))(webpack@5.98.0(esbuild@0.19.12))(yaml@2.6.1)
+        version: 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(vite@6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1))(webpack@5.98.0(esbuild@0.19.12))(yaml@2.6.1)
       '@workspace/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      better-auth:
+        specifier: ^1.2.4
+        version: 1.2.4(typescript@5.7.3)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -76,7 +79,7 @@ importers:
         version: 16.4.7
       drizzle-orm:
         specifier: ^0.40.0
-        version: 0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)
+        version: 0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)
       lucide-react:
         specifier: 0.456.0
         version: 0.456.0(react@19.0.0)
@@ -100,7 +103,7 @@ importers:
         version: 1.0.7(tailwindcss@4.0.8)
       vinxi:
         specifier: ^0.5.3
-        version: 0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+        version: 0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
     devDependencies:
       '@types/react':
         specifier: 18.3.0
@@ -134,7 +137,7 @@ importers:
         version: 1.0.7(@swc/core@1.6.1(@swc/helpers@0.5.15))(ajv@8.17.1)(esbuild@0.19.12)(payload@2.32.0(@swc/helpers@0.5.15)(@types/react@18.0.21)(esbuild@0.19.12)(typescript@4.9.5)(webpack@5.98.0))(sass@1.69.4)
       '@payloadcms/db-postgres':
         specifier: ^0.x
-        version: 0.8.10(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(@types/react@18.0.21)(payload@2.32.0(@swc/helpers@0.5.15)(@types/react@18.0.21)(esbuild@0.19.12)(typescript@4.9.5)(webpack@5.98.0))(react@18.3.1)
+        version: 0.8.10(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(@types/react@18.0.21)(kysely@0.27.6)(payload@2.32.0(@swc/helpers@0.5.15)(@types/react@18.0.21)(esbuild@0.19.12)(typescript@4.9.5)(webpack@5.98.0))(react@18.3.1)
       '@payloadcms/plugin-cloud':
         specifier: ^3.0.0
         version: 3.0.2(payload@2.32.0(@swc/helpers@0.5.15)(@types/react@18.0.21)(esbuild@0.19.12)(typescript@4.9.5)(webpack@5.98.0))
@@ -659,6 +662,12 @@ packages:
   '@babel/types@7.26.9':
     resolution: {integrity: sha512-Y3IR1cRnOxOCDvMmNiym7XpXQ93iGDDPHx+Zj+NM+rg0fBaShfQLkg+hKPaZCEvg5N/LeCo4+Rj/i3FuJsIQaw==}
     engines: {node: '>=6.9.0'}
+
+  '@better-auth/utils@0.2.3':
+    resolution: {integrity: sha512-Ap1GaSmo6JYhJhxJOpUB0HobkKPTNzfta+bLV89HfpyCAHN7p8ntCrmNFHNAVD0F6v0mywFVEUg1FUhNCc81Rw==}
+
+  '@better-fetch/fetch@1.1.17':
+    resolution: {integrity: sha512-MQonMalbmEshb+amuLtCkVjYliyyWrYXZkiMnHLgFjNEBsNBbZSY3+lYsFK1/VxePSupVkUW6xinqhqB3uHE1g==}
 
   '@cloudflare/kv-asset-handler@0.3.4':
     resolution: {integrity: sha512-YLPHc8yASwjNkmcDMQMY35yiWjoKAKnhUbPRszBRS0YgH+IXtsMp61j+yTcnCE3oO2DgP0U3iejLC8FTtKDC8Q==}
@@ -1775,6 +1784,9 @@ packages:
   '@hapi/topo@5.1.0':
     resolution: {integrity: sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg==}
 
+  '@hexagon/base64@1.1.28':
+    resolution: {integrity: sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==}
+
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
     engines: {node: '>=18.18.0'}
@@ -1844,6 +1856,9 @@ packages:
 
   '@juggle/resize-observer@3.4.0':
     resolution: {integrity: sha512-dfLbk+PwWvFzSxwk3n5ySL0hfBog779o8h68wK/7/APo/7cgyWp5jcXockbxdk5kFRkbeXWm4Fbi9FrdN381sA==}
+
+  '@levischuck/tiny-cbor@0.2.11':
+    resolution: {integrity: sha512-llBRm4dT4Z89aRsm6u2oEZ8tfwL/2l6BwpZ7JcyieouniDECM5AqNgr/y08zalEIvW3RSK4upYyybDcmjXqAow==}
 
   '@libsql/client@0.3.6':
     resolution: {integrity: sha512-3Mc4ZDI7X5ZLkMxX5XijiBeqhvyrny356lcj/KVVIeMXt9j6g4l+CRIsUvgcsyCAOUHqWqh0+TjI91bCKmdW+w==}
@@ -1987,6 +2002,13 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
+
+  '@noble/ciphers@0.6.0':
+    resolution: {integrity: sha512-mIbq/R9QXk5/cTfESb1OKtyFnk7oc1Om/8onA1158K9/OZUQFDEVy55jVTato+xmp3XX6F6Qh0zz0Nc1AxAlRQ==}
+
+  '@noble/hashes@1.7.1':
+    resolution: {integrity: sha512-B8XBPsn4vT/KJAGqDzbwztd+6Yte3P4V7iafm24bxgDe/mlRuK6xmWPuCNrKt2vDafZ8MfJLlchDG/vYafQEjQ==}
+    engines: {node: ^14.21.3 || >=16}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -2149,6 +2171,21 @@ packages:
     peerDependencies:
       payload: ^2.3.0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
+
+  '@peculiar/asn1-android@2.3.15':
+    resolution: {integrity: sha512-8U2TIj59cRlSXTX2d0mzUKP7whfWGFMzTeC3qPgAbccXFrPNZLaDhpNEdG5U2QZ/tBv/IHlCJ8s+KYXpJeop6w==}
+
+  '@peculiar/asn1-ecc@2.3.15':
+    resolution: {integrity: sha512-/HtR91dvgog7z/WhCVdxZJ/jitJuIu8iTqiyWVgRE9Ac5imt2sT/E4obqIVGKQw7PIy+X6i8lVBoT6wC73XUgA==}
+
+  '@peculiar/asn1-rsa@2.3.15':
+    resolution: {integrity: sha512-p6hsanvPhexRtYSOHihLvUUgrJ8y0FtOM97N5UEpC+VifFYyZa0iZ5cXjTkZoDwxJ/TTJ1IJo3HVTB2JJTpXvg==}
+
+  '@peculiar/asn1-schema@2.3.15':
+    resolution: {integrity: sha512-QPeD8UA8axQREpgR5UTAfu2mqQmm97oUqahDtNdBcfj3qAnoXzFdQW+aNf/tD2WVXF8Fhmftxoj0eMIT++gX2w==}
+
+  '@peculiar/asn1-x509@2.3.15':
+    resolution: {integrity: sha512-0dK5xqTqSLaxv1FHXIcd4Q/BZNuopg+u1l23hT9rOmQ1g4dNtw0g/RnEi+TboB0gOwGtrWn269v27cMgchFIIg==}
 
   '@petamoriken/float16@3.9.1':
     resolution: {integrity: sha512-j+ejhYwY6PeB+v1kn7lZFACUIG97u90WxMuGosILFsl9d4Ovi0sjk0GlPfoEcx+FzvXZDAfioD+NGnnPamXgMA==}
@@ -2653,6 +2690,13 @@ packages:
 
   '@sideway/pinpoint@2.0.0':
     resolution: {integrity: sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==}
+
+  '@simplewebauthn/browser@13.1.0':
+    resolution: {integrity: sha512-WuHZ/PYvyPJ9nxSzgHtOEjogBhwJfC8xzYkPC+rR/+8chl/ft4ngjiK8kSU5HtRJfczupyOh33b25TjYbvwAcg==}
+
+  '@simplewebauthn/server@13.1.1':
+    resolution: {integrity: sha512-1hsLpRHfSuMB9ee2aAdh0Htza/X3f4djhYISrggqGe3xopNjOcePiSDkDDoPzDYaaMCrbqGP1H2TYU7bgL9PmA==}
+    engines: {node: '>=20.0.0'}
 
   '@sindresorhus/merge-streams@2.3.0':
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
@@ -3831,6 +3875,10 @@ packages:
     resolution: {integrity: sha512-bMxMKAjg13EBSVscxTaYA4mRc5t1UAXa2kXiGTNfZ079HIWXEkKmkgFrh/nJqamaLSrXO5H4WFFkPEaLJWbs3A==}
     engines: {node: '>= 0.4'}
 
+  asn1js@3.0.5:
+    resolution: {integrity: sha512-FVnvrKJwpt9LP2lAMl8qZswRNm3T4q9CON+bxldk2iwk3FFpuwhx2FfinyitizWHsVYyaY+y5JzDR0rCMV5yTQ==}
+    engines: {node: '>=12.0.0'}
+
   ast-types@0.13.4:
     resolution: {integrity: sha512-x1FCFnFifvYDDzTaLII71vG5uvDwgtmDTEVWAxrgeiR8VjMONcCXJx7E+USjDtHlwFmt9MysbqgF9b9Vjr6w+w==}
     engines: {node: '>=4'}
@@ -3907,6 +3955,12 @@ packages:
   basic-ftp@5.0.5:
     resolution: {integrity: sha512-4Bcg1P8xhUuqcii/S0Z9wiHIrQVPMermM1any+MX5GeGD7faD3/msQUDGLol9wOcz4/jbg/WJnGqoJF6LiBdtg==}
     engines: {node: '>=10.0.0'}
+
+  better-auth@1.2.4:
+    resolution: {integrity: sha512-/ZK2jbUjm8JwdeCLFrUWUBmexPyI9PkaLVXWLWtN60sMDHTY8B5G72wcHglo1QMFBaw4G0qFkP5ayl9k6XfDaA==}
+
+  better-call@1.0.5:
+    resolution: {integrity: sha512-rAT73GWIJ8LbSP8Y3BdJnY1hwAiQPRRmUJ4R3YVhcVGS927l3eTXG5o5TD6Bv6je6ygjdx6iVq3/BU49eGUCHg==}
 
   big.js@5.2.2:
     resolution: {integrity: sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==}
@@ -6134,6 +6188,9 @@ packages:
   joi@17.9.2:
     resolution: {integrity: sha512-Itk/r+V4Dx0V3c7RLFdRh12IOjySm2/WGPMubBT92cQvRfYZhPM2W0hZlctjj72iES8jsRCwp7S/cRmWBnJ4nw==}
 
+  jose@5.10.0:
+    resolution: {integrity: sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==}
+
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
@@ -6235,6 +6292,10 @@ packages:
 
   knitwork@1.2.0:
     resolution: {integrity: sha512-xYSH7AvuQ6nXkq42x0v5S8/Iry+cfulBz/DJQzhIyESdLD7425jXsPy4vn5cCXU+HhRN2kVw51Vd1K6/By4BQg==}
+
+  kysely@0.27.6:
+    resolution: {integrity: sha512-FIyV/64EkKhJmjgC0g2hygpBv5RNWVPyNCqSAD7eTCv6eFWNIi4PN1UvdSJGicN/o35bnevgis4Y0UDC0qi8jQ==}
+    engines: {node: '>=14.0.0'}
 
   lazystream@1.0.1:
     resolution: {integrity: sha512-b94GiNHQNy6JNTrt5w6zNyffMrNkXZb3KTkCZJb2V1xaEGCk093vkZ2jk3tpaeP33/OiXC+WvK9AxUebnf5nbw==}
@@ -6621,6 +6682,10 @@ packages:
     resolution: {integrity: sha512-WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  nanostores@0.11.4:
+    resolution: {integrity: sha512-k1oiVNN4hDK8NcNERSZLQiMfRzEGtfnvZvdBvey3SQbgn8Dcrk0h1I6vpxApjb10PFUflZrgJ2WEZyJQ+5v7YQ==}
+    engines: {node: ^18.0.0 || >=20.0.0}
 
   napi-build-utils@2.0.0:
     resolution: {integrity: sha512-GEbrYkbfF7MoNaoh2iGG84Mnf/WZfB0GdGEsM8wz7Expx/LlWf5U8t9nvJKXSp3qr5IsEbK04cBGhol/KwOsWA==}
@@ -7514,6 +7579,13 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
+  pvtsutils@1.3.6:
+    resolution: {integrity: sha512-PLgQXQ6H2FWCaeRak8vvk1GW462lMxB5s3Jm673N82zI4vqtVUPuZdffdZbPDFRoU8kAhItWFtPCWiPpp4/EDg==}
+
+  pvutils@1.1.3:
+    resolution: {integrity: sha512-pMpnA0qRdFp32b1sJl1wOJNxZLQ2cbQx+k6tjNtZ8CpvVhNqEPRgivZ2WOUev2YMajecdH7ctUPDvEe87nariQ==}
+    engines: {node: '>=6.0.0'}
+
   qs-middleware@1.0.3:
     resolution: {integrity: sha512-ymlixxD/0Bj3BMY9x1z8ENdQdhkmsIbDNyVvfM8soHn5p/CRFlLPrmtxmE5aG//q1PzHHSGuLi+6QlHezivseg==}
     engines: {node: '>=0.10'}
@@ -7865,6 +7937,9 @@ packages:
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
+  rou3@0.5.1:
+    resolution: {integrity: sha512-OXMmJ3zRk2xeXFGfA3K+EOPHC5u7RDFG7lIOx0X1pdnhUkI8MdVrbV+sNsD80ElpUZ+MRHdyxPnFthq9VHs8uQ==}
+
   run-async@2.4.1:
     resolution: {integrity: sha512-tvVnVv01b8c1RrA6Ep7JkStj85Guv/YrMcwqYQnwjsAS2cTmmPGBBjAjpCW7RrSodNSoE2/qg9O4bceNvUuDgQ==}
     engines: {node: '>=0.12.0'}
@@ -7994,6 +8069,9 @@ packages:
   serve-static@1.16.2:
     resolution: {integrity: sha512-VqpjJZKadQB/PEbEwvFdO43Ax5dFBZ2UECszz8bQ7pi7wt//PWe1P6MN7eCnjsatYtBT6EuiClbjSWP2WrIoTw==}
     engines: {node: '>= 0.8.0'}
+
+  set-cookie-parser@2.7.1:
+    resolution: {integrity: sha512-IOc8uWeOZgnb3ptbCURJWNjWUPcO3ZnTTdzsurqERrP6nPyv+paC55vJM0LpOlT2ne+Ix+9+CRG1MNLlyZ4GjQ==}
 
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
@@ -8905,6 +8983,14 @@ packages:
 
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
+
+  valibot@1.0.0-beta.15:
+    resolution: {integrity: sha512-BKy8XosZkDHWmYC+cJG74LBzP++Gfntwi33pP3D3RKztz2XV9jmFWnkOi21GoqARP8wAWARwhV6eTr1JcWzjGw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   validate-npm-package-name@5.0.1:
     resolution: {integrity: sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==}
@@ -9960,6 +10046,12 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
+  '@better-auth/utils@0.2.3':
+    dependencies:
+      uncrypto: 0.1.3
+
+  '@better-fetch/fetch@1.1.17': {}
+
   '@cloudflare/kv-asset-handler@0.3.4':
     dependencies:
       mime: 3.0.0
@@ -10771,6 +10863,8 @@ snapshots:
     dependencies:
       '@hapi/hoek': 9.3.0
 
+  '@hexagon/base64@1.1.28': {}
+
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.6':
@@ -10839,6 +10933,8 @@ snapshots:
   '@jsdevtools/ono@7.1.3': {}
 
   '@juggle/resize-observer@3.4.0': {}
+
+  '@levischuck/tiny-cbor@0.2.11': {}
 
   '@libsql/client@0.3.6':
     dependencies:
@@ -10975,6 +11071,10 @@ snapshots:
   '@next/swc-win32-x64-msvc@13.5.2':
     optional: true
 
+  '@noble/ciphers@0.6.0': {}
+
+  '@noble/hashes@1.7.1': {}
+
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -11101,12 +11201,12 @@ snapshots:
       - utf-8-validate
       - webpack-dev-server
 
-  '@payloadcms/db-postgres@0.8.10(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(@types/react@18.0.21)(payload@2.32.0(@swc/helpers@0.5.15)(@types/react@18.0.21)(esbuild@0.19.12)(typescript@4.9.5)(webpack@5.98.0))(react@18.3.1)':
+  '@payloadcms/db-postgres@0.8.10(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(@types/react@18.0.21)(kysely@0.27.6)(payload@2.32.0(@swc/helpers@0.5.15)(@types/react@18.0.21)(esbuild@0.19.12)(typescript@4.9.5)(webpack@5.98.0))(react@18.3.1)':
     dependencies:
       '@libsql/client': 0.3.6
       console-table-printer: 2.11.2
       drizzle-kit: 0.23.2-df9e596
-      drizzle-orm: 0.32.1(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(@types/react@18.0.21)(pg@8.11.3)(react@18.3.1)
+      drizzle-orm: 0.32.1(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(@types/react@18.0.21)(kysely@0.27.6)(pg@8.11.3)(react@18.3.1)
       payload: 2.32.0(@swc/helpers@0.5.15)(@types/react@18.0.21)(esbuild@0.19.12)(typescript@4.9.5)(webpack@5.98.0)
       pg: 8.11.3
       prompts: 2.4.2
@@ -11203,6 +11303,39 @@ snapshots:
     transitivePeerDependencies:
       - react-dom
       - react-native
+
+  '@peculiar/asn1-android@2.3.15':
+    dependencies:
+      '@peculiar/asn1-schema': 2.3.15
+      asn1js: 3.0.5
+      tslib: 2.8.1
+
+  '@peculiar/asn1-ecc@2.3.15':
+    dependencies:
+      '@peculiar/asn1-schema': 2.3.15
+      '@peculiar/asn1-x509': 2.3.15
+      asn1js: 3.0.5
+      tslib: 2.8.1
+
+  '@peculiar/asn1-rsa@2.3.15':
+    dependencies:
+      '@peculiar/asn1-schema': 2.3.15
+      '@peculiar/asn1-x509': 2.3.15
+      asn1js: 3.0.5
+      tslib: 2.8.1
+
+  '@peculiar/asn1-schema@2.3.15':
+    dependencies:
+      asn1js: 3.0.5
+      pvtsutils: 1.3.6
+      tslib: 2.8.1
+
+  '@peculiar/asn1-x509@2.3.15':
+    dependencies:
+      '@peculiar/asn1-schema': 2.3.15
+      asn1js: 3.0.5
+      pvtsutils: 1.3.6
+      tslib: 2.8.1
 
   '@petamoriken/float16@3.9.1': {}
 
@@ -11637,6 +11770,18 @@ snapshots:
   '@sideway/formula@3.0.1': {}
 
   '@sideway/pinpoint@2.0.0': {}
+
+  '@simplewebauthn/browser@13.1.0': {}
+
+  '@simplewebauthn/server@13.1.1':
+    dependencies:
+      '@hexagon/base64': 1.1.28
+      '@levischuck/tiny-cbor': 0.2.11
+      '@peculiar/asn1-android': 2.3.15
+      '@peculiar/asn1-ecc': 2.3.15
+      '@peculiar/asn1-rsa': 2.3.15
+      '@peculiar/asn1-schema': 2.3.15
+      '@peculiar/asn1-x509': 2.3.15
 
   '@sindresorhus/merge-streams@2.3.0': {}
 
@@ -12293,11 +12438,11 @@ snapshots:
       - tsx
       - yaml
 
-  '@tanstack/start-api-routes@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
+  '@tanstack/start-api-routes@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
     dependencies:
       '@tanstack/router-core': 1.111.6
-      '@tanstack/start-server': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
-      vinxi: 0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-server': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      vinxi: 0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -12343,7 +12488,7 @@ snapshots:
       - xml2js
       - yaml
 
-  '@tanstack/start-client@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
+  '@tanstack/start-client@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
     dependencies:
       '@tanstack/react-router': 1.111.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       cookie-es: 1.2.2
@@ -12351,7 +12496,7 @@ snapshots:
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
       tiny-invariant: 1.3.3
-      vinxi: 0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      vinxi: 0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -12395,21 +12540,21 @@ snapshots:
       - xml2js
       - yaml
 
-  '@tanstack/start-config@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(vite@6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1))(webpack@5.98.0(esbuild@0.19.12))(yaml@2.6.1)':
+  '@tanstack/start-config@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(vite@6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1))(webpack@5.98.0(esbuild@0.19.12))(yaml@2.6.1)':
     dependencies:
       '@tanstack/react-router': 1.111.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@tanstack/router-generator': 1.111.6(@tanstack/react-router@1.111.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
       '@tanstack/router-plugin': 1.111.6(@tanstack/react-router@1.111.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(vite@6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1))(webpack@5.98.0(esbuild@0.19.12))
       '@tanstack/server-functions-plugin': 1.111.2(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1)
       '@tanstack/start-plugin': 1.111.2(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1)
-      '@tanstack/start-server-functions-handler': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-server-functions-handler': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
       '@vitejs/plugin-react': 4.3.4(vite@6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1))
       import-meta-resolve: 4.1.0
-      nitropack: 2.10.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(typescript@5.7.3)
+      nitropack: 2.10.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(typescript@5.7.3)
       ofetch: 1.4.1
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
-      vinxi: 0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      vinxi: 0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
       vite: 6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1)
       zod: 3.24.1
     transitivePeerDependencies:
@@ -12486,11 +12631,11 @@ snapshots:
       - tsx
       - yaml
 
-  '@tanstack/start-router-manifest@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
+  '@tanstack/start-router-manifest@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
     dependencies:
       '@tanstack/router-core': 1.111.6
       tiny-invariant: 1.3.3
-      vinxi: 0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      vinxi: 0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -12534,10 +12679,10 @@ snapshots:
       - xml2js
       - yaml
 
-  '@tanstack/start-server-functions-client@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
+  '@tanstack/start-server-functions-client@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
     dependencies:
       '@tanstack/server-functions-plugin': 1.111.2(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1)
-      '@tanstack/start-server-functions-fetcher': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-server-functions-fetcher': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -12584,10 +12729,10 @@ snapshots:
       - xml2js
       - yaml
 
-  '@tanstack/start-server-functions-fetcher@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
+  '@tanstack/start-server-functions-fetcher@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
     dependencies:
       '@tanstack/react-router': 1.111.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@tanstack/start-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
     transitivePeerDependencies:
@@ -12633,11 +12778,11 @@ snapshots:
       - xml2js
       - yaml
 
-  '@tanstack/start-server-functions-handler@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
+  '@tanstack/start-server-functions-handler@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
     dependencies:
       '@tanstack/react-router': 1.111.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@tanstack/start-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
-      '@tanstack/start-server': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-server': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
       tiny-invariant: 1.3.3
@@ -12703,12 +12848,12 @@ snapshots:
       - tsx
       - yaml
 
-  '@tanstack/start-server-functions-ssr@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
+  '@tanstack/start-server-functions-ssr@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
     dependencies:
       '@tanstack/server-functions-plugin': 1.111.2(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1)
-      '@tanstack/start-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
-      '@tanstack/start-server': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
-      '@tanstack/start-server-functions-fetcher': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-server': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-server-functions-fetcher': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
       tiny-invariant: 1.3.3
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -12756,10 +12901,10 @@ snapshots:
       - xml2js
       - yaml
 
-  '@tanstack/start-server@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
+  '@tanstack/start-server@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)':
     dependencies:
       '@tanstack/react-router': 1.111.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@tanstack/start-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
       h3: 1.13.0
       isbot: 5.1.23
       jsesc: 3.1.0
@@ -12809,17 +12954,17 @@ snapshots:
       - xml2js
       - yaml
 
-  '@tanstack/start@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(vite@6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1))(webpack@5.98.0(esbuild@0.19.12))(yaml@2.6.1)':
+  '@tanstack/start@1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(vite@6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1))(webpack@5.98.0(esbuild@0.19.12))(yaml@2.6.1)':
     dependencies:
-      '@tanstack/start-api-routes': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
-      '@tanstack/start-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
-      '@tanstack/start-config': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(vite@6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1))(webpack@5.98.0(esbuild@0.19.12))(yaml@2.6.1)
-      '@tanstack/start-router-manifest': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
-      '@tanstack/start-server': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
-      '@tanstack/start-server-functions-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
-      '@tanstack/start-server-functions-handler': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-api-routes': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-config': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(vite@6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1))(webpack@5.98.0(esbuild@0.19.12))(yaml@2.6.1)
+      '@tanstack/start-router-manifest': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-server': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-server-functions-client': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-server-functions-handler': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
       '@tanstack/start-server-functions-server': 1.111.2(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1)
-      '@tanstack/start-server-functions-ssr': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
+      '@tanstack/start-server-functions-ssr': 1.111.6(@libsql/client@0.3.6)(@types/node@22.10.2)(babel-plugin-macros@3.1.0)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1)
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
       vite: 6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1)
@@ -13663,6 +13808,12 @@ snapshots:
       is-array-buffer: 3.0.4
       is-shared-array-buffer: 1.0.3
 
+  asn1js@3.0.5:
+    dependencies:
+      pvtsutils: 1.3.6
+      pvutils: 1.1.3
+      tslib: 2.8.1
+
   ast-types@0.13.4:
     dependencies:
       tslib: 2.8.1
@@ -13750,6 +13901,31 @@ snapshots:
   base64-js@1.5.1: {}
 
   basic-ftp@5.0.5: {}
+
+  better-auth@1.2.4(typescript@5.7.3):
+    dependencies:
+      '@better-auth/utils': 0.2.3
+      '@better-fetch/fetch': 1.1.17
+      '@noble/ciphers': 0.6.0
+      '@noble/hashes': 1.7.1
+      '@simplewebauthn/browser': 13.1.0
+      '@simplewebauthn/server': 13.1.1
+      better-call: 1.0.5
+      defu: 6.1.4
+      jose: 5.10.0
+      kysely: 0.27.6
+      nanostores: 0.11.4
+      valibot: 1.0.0-beta.15(typescript@5.7.3)
+      zod: 3.24.1
+    transitivePeerDependencies:
+      - typescript
+
+  better-call@1.0.5:
+    dependencies:
+      '@better-fetch/fetch': 1.1.17
+      rou3: 0.5.1
+      set-cookie-parser: 2.7.1
+      uncrypto: 0.1.3
 
   big.js@5.2.2: {}
 
@@ -14314,10 +14490,10 @@ snapshots:
       '@deno/shim-deno': 0.19.2
       undici-types: 5.28.4
 
-  db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)):
+  db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)):
     optionalDependencies:
       '@libsql/client': 0.3.6
-      drizzle-orm: 0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)
+      drizzle-orm: 0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)
 
   debounce-fn@4.0.0:
     dependencies:
@@ -14530,21 +14706,23 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.32.1(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(@types/react@18.0.21)(pg@8.11.3)(react@18.3.1):
+  drizzle-orm@0.32.1(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(@types/react@18.0.21)(kysely@0.27.6)(pg@8.11.3)(react@18.3.1):
     optionalDependencies:
       '@libsql/client': 0.3.6
       '@neondatabase/serverless': 0.10.4
       '@types/pg': 8.11.6
       '@types/react': 18.0.21
+      kysely: 0.27.6
       pg: 8.11.3
       react: 18.3.1
 
-  drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3):
+  drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3):
     optionalDependencies:
       '@libsql/client': 0.3.6
       '@neondatabase/serverless': 0.10.4
       '@types/pg': 8.11.6
       gel: 2.0.0
+      kysely: 0.27.6
       pg: 8.11.3
 
   dunder-proto@1.0.0:
@@ -16244,6 +16422,8 @@ snapshots:
       '@sideway/formula': 3.0.1
       '@sideway/pinpoint': 2.0.0
 
+  jose@5.10.0: {}
+
   joycon@3.1.1: {}
 
   js-base64@3.7.7: {}
@@ -16348,6 +16528,8 @@ snapshots:
   klona@2.0.6: {}
 
   knitwork@1.2.0: {}
+
+  kysely@0.27.6: {}
 
   lazystream@1.0.1:
     dependencies:
@@ -16699,6 +16881,8 @@ snapshots:
 
   nanoid@3.3.8: {}
 
+  nanostores@0.11.4: {}
+
   napi-build-utils@2.0.0: {}
 
   natural-compare-lite@1.4.0: {}
@@ -16753,7 +16937,7 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  nitropack@2.10.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(typescript@5.7.3):
+  nitropack@2.10.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(typescript@5.7.3):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
       '@netlify/functions': 2.8.2
@@ -16777,7 +16961,7 @@ snapshots:
       cookie-es: 1.2.2
       croner: 9.0.0
       crossws: 0.3.4
-      db0: 0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))
+      db0: 0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))
       defu: 6.1.4
       destr: 2.0.3
       dot-prop: 9.0.0
@@ -16820,7 +17004,7 @@ snapshots:
       unctx: 2.4.1
       unenv: 1.10.0
       unimport: 3.14.6(rollup@4.34.8)
-      unstorage: 1.15.0(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(ioredis@5.5.0)
+      unstorage: 1.15.0(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(ioredis@5.5.0)
       untyped: 1.5.2
       unwasm: 0.3.9
     transitivePeerDependencies:
@@ -17877,6 +18061,12 @@ snapshots:
 
   punycode@2.3.1: {}
 
+  pvtsutils@1.3.6:
+    dependencies:
+      tslib: 2.8.1
+
+  pvutils@1.1.3: {}
+
   qs-middleware@1.0.3:
     dependencies:
       qs: 6.4.1
@@ -18289,6 +18479,8 @@ snapshots:
       '@rollup/rollup-win32-x64-msvc': 4.34.8
       fsevents: 2.3.3
 
+  rou3@0.5.1: {}
+
   run-async@2.4.1: {}
 
   run-parallel@1.2.0:
@@ -18423,6 +18615,8 @@ snapshots:
       send: 0.19.0
     transitivePeerDependencies:
       - supports-color
+
+  set-cookie-parser@2.7.1: {}
 
   set-function-length@1.2.2:
     dependencies:
@@ -19260,7 +19454,7 @@ snapshots:
       acorn: 8.14.0
       webpack-virtual-modules: 0.6.2
 
-  unstorage@1.15.0(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(ioredis@5.5.0):
+  unstorage@1.15.0(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(ioredis@5.5.0):
     dependencies:
       anymatch: 3.1.3
       chokidar: 4.0.3
@@ -19271,7 +19465,7 @@ snapshots:
       ofetch: 1.4.1
       ufo: 1.5.4
     optionalDependencies:
-      db0: 0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))
+      db0: 0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))
       ioredis: 5.5.0
 
   untildify@4.0.0: {}
@@ -19386,13 +19580,17 @@ snapshots:
 
   v8-compile-cache-lib@3.0.1: {}
 
+  valibot@1.0.0-beta.15(typescript@5.7.3):
+    optionalDependencies:
+      typescript: 5.7.3
+
   validate-npm-package-name@5.0.1: {}
 
   value-equal@1.0.1: {}
 
   vary@1.1.2: {}
 
-  vinxi@0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1):
+  vinxi@0.5.3(@libsql/client@0.3.6)(@types/node@22.10.2)(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(ioredis@5.5.0)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.6.1):
     dependencies:
       '@babel/core': 7.26.9
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.26.9)
@@ -19414,7 +19612,7 @@ snapshots:
       hookable: 5.5.3
       http-proxy: 1.18.1
       micromatch: 4.0.8
-      nitropack: 2.10.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3))(typescript@5.7.3)
+      nitropack: 2.10.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3))(typescript@5.7.3)
       node-fetch-native: 1.6.6
       path-to-regexp: 6.3.0
       pathe: 1.1.2
@@ -19425,7 +19623,7 @@ snapshots:
       ufo: 1.5.4
       unctx: 2.4.1
       unenv: 1.10.0
-      unstorage: 1.15.0(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(pg@8.11.3)))(ioredis@5.5.0)
+      unstorage: 1.15.0(db0@0.2.4(@libsql/client@0.3.6)(drizzle-orm@0.40.0(@libsql/client@0.3.6)(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(gel@2.0.0)(kysely@0.27.6)(pg@8.11.3)))(ioredis@5.5.0)
       vite: 6.1.1(@types/node@22.10.2)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.69.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.6.1)
       zod: 3.24.1
     transitivePeerDependencies:
