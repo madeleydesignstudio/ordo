@@ -11,34 +11,48 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as ProjectManagerImport } from './routes/project-manager'
-import { Route as FinanceManagerImport } from './routes/finance-manager'
-import { Route as ContentManagerImport } from './routes/content-manager'
+import { Route as JournalImport } from './routes/journal'
+import { Route as FitnessTrackerImport } from './routes/fitness-tracker'
 import { Route as IndexImport } from './routes/index'
+import { Route as ProjectManagerIndexImport } from './routes/project-manager/index'
+import { Route as FinanceManagerIndexImport } from './routes/finance-manager/index'
+import { Route as ContentManagerIndexImport } from './routes/content-manager/index'
 
 // Create/Update Routes
 
-const ProjectManagerRoute = ProjectManagerImport.update({
-  id: '/project-manager',
-  path: '/project-manager',
+const JournalRoute = JournalImport.update({
+  id: '/journal',
+  path: '/journal',
   getParentRoute: () => rootRoute,
 } as any)
 
-const FinanceManagerRoute = FinanceManagerImport.update({
-  id: '/finance-manager',
-  path: '/finance-manager',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ContentManagerRoute = ContentManagerImport.update({
-  id: '/content-manager',
-  path: '/content-manager',
+const FitnessTrackerRoute = FitnessTrackerImport.update({
+  id: '/fitness-tracker',
+  path: '/fitness-tracker',
   getParentRoute: () => rootRoute,
 } as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProjectManagerIndexRoute = ProjectManagerIndexImport.update({
+  id: '/project-manager/',
+  path: '/project-manager/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const FinanceManagerIndexRoute = FinanceManagerIndexImport.update({
+  id: '/finance-manager/',
+  path: '/finance-manager/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ContentManagerIndexRoute = ContentManagerIndexImport.update({
+  id: '/content-manager/',
+  path: '/content-manager/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -53,25 +67,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/content-manager': {
-      id: '/content-manager'
+    '/fitness-tracker': {
+      id: '/fitness-tracker'
+      path: '/fitness-tracker'
+      fullPath: '/fitness-tracker'
+      preLoaderRoute: typeof FitnessTrackerImport
+      parentRoute: typeof rootRoute
+    }
+    '/journal': {
+      id: '/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof JournalImport
+      parentRoute: typeof rootRoute
+    }
+    '/content-manager/': {
+      id: '/content-manager/'
       path: '/content-manager'
       fullPath: '/content-manager'
-      preLoaderRoute: typeof ContentManagerImport
+      preLoaderRoute: typeof ContentManagerIndexImport
       parentRoute: typeof rootRoute
     }
-    '/finance-manager': {
-      id: '/finance-manager'
+    '/finance-manager/': {
+      id: '/finance-manager/'
       path: '/finance-manager'
       fullPath: '/finance-manager'
-      preLoaderRoute: typeof FinanceManagerImport
+      preLoaderRoute: typeof FinanceManagerIndexImport
       parentRoute: typeof rootRoute
     }
-    '/project-manager': {
-      id: '/project-manager'
+    '/project-manager/': {
+      id: '/project-manager/'
       path: '/project-manager'
       fullPath: '/project-manager'
-      preLoaderRoute: typeof ProjectManagerImport
+      preLoaderRoute: typeof ProjectManagerIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -81,52 +109,76 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/content-manager': typeof ContentManagerRoute
-  '/finance-manager': typeof FinanceManagerRoute
-  '/project-manager': typeof ProjectManagerRoute
+  '/fitness-tracker': typeof FitnessTrackerRoute
+  '/journal': typeof JournalRoute
+  '/content-manager': typeof ContentManagerIndexRoute
+  '/finance-manager': typeof FinanceManagerIndexRoute
+  '/project-manager': typeof ProjectManagerIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/content-manager': typeof ContentManagerRoute
-  '/finance-manager': typeof FinanceManagerRoute
-  '/project-manager': typeof ProjectManagerRoute
+  '/fitness-tracker': typeof FitnessTrackerRoute
+  '/journal': typeof JournalRoute
+  '/content-manager': typeof ContentManagerIndexRoute
+  '/finance-manager': typeof FinanceManagerIndexRoute
+  '/project-manager': typeof ProjectManagerIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/content-manager': typeof ContentManagerRoute
-  '/finance-manager': typeof FinanceManagerRoute
-  '/project-manager': typeof ProjectManagerRoute
+  '/fitness-tracker': typeof FitnessTrackerRoute
+  '/journal': typeof JournalRoute
+  '/content-manager/': typeof ContentManagerIndexRoute
+  '/finance-manager/': typeof FinanceManagerIndexRoute
+  '/project-manager/': typeof ProjectManagerIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/content-manager' | '/finance-manager' | '/project-manager'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/content-manager' | '/finance-manager' | '/project-manager'
-  id:
-    | '__root__'
+  fullPaths:
     | '/'
+    | '/fitness-tracker'
+    | '/journal'
     | '/content-manager'
     | '/finance-manager'
     | '/project-manager'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/fitness-tracker'
+    | '/journal'
+    | '/content-manager'
+    | '/finance-manager'
+    | '/project-manager'
+  id:
+    | '__root__'
+    | '/'
+    | '/fitness-tracker'
+    | '/journal'
+    | '/content-manager/'
+    | '/finance-manager/'
+    | '/project-manager/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ContentManagerRoute: typeof ContentManagerRoute
-  FinanceManagerRoute: typeof FinanceManagerRoute
-  ProjectManagerRoute: typeof ProjectManagerRoute
+  FitnessTrackerRoute: typeof FitnessTrackerRoute
+  JournalRoute: typeof JournalRoute
+  ContentManagerIndexRoute: typeof ContentManagerIndexRoute
+  FinanceManagerIndexRoute: typeof FinanceManagerIndexRoute
+  ProjectManagerIndexRoute: typeof ProjectManagerIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ContentManagerRoute: ContentManagerRoute,
-  FinanceManagerRoute: FinanceManagerRoute,
-  ProjectManagerRoute: ProjectManagerRoute,
+  FitnessTrackerRoute: FitnessTrackerRoute,
+  JournalRoute: JournalRoute,
+  ContentManagerIndexRoute: ContentManagerIndexRoute,
+  FinanceManagerIndexRoute: FinanceManagerIndexRoute,
+  ProjectManagerIndexRoute: ProjectManagerIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -140,22 +192,30 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/content-manager",
-        "/finance-manager",
-        "/project-manager"
+        "/fitness-tracker",
+        "/journal",
+        "/content-manager/",
+        "/finance-manager/",
+        "/project-manager/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/content-manager": {
-      "filePath": "content-manager.tsx"
+    "/fitness-tracker": {
+      "filePath": "fitness-tracker.tsx"
     },
-    "/finance-manager": {
-      "filePath": "finance-manager.tsx"
+    "/journal": {
+      "filePath": "journal.tsx"
     },
-    "/project-manager": {
-      "filePath": "project-manager.tsx"
+    "/content-manager/": {
+      "filePath": "content-manager/index.tsx"
+    },
+    "/finance-manager/": {
+      "filePath": "finance-manager/index.tsx"
+    },
+    "/project-manager/": {
+      "filePath": "project-manager/index.tsx"
     }
   }
 }

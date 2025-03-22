@@ -64,6 +64,17 @@ const DateSlider = ({ currentDate, onDateChange }: DateSliderProps) => {
                 <span className="text-sm uppercase">{day}</span>
                 <span className="text-sm">{dateNum}</span>
               </div>
+              <div className="flex items-center gap-2 text-xs p-2 bg-neutral-800 m-2 rounded-md hover:bg-neutral-700 transition-colors">
+                <input
+                  type="checkbox"
+                  className="h-3 w-3 rounded border-neutral-600 bg-neutral-900 checked:bg-blue-500"
+                />
+                <h3 className="flex-1">Cut the grass</h3>
+                <span
+                  className="h-2 w-2 rounded-full bg-yellow-500"
+                  title="Medium priority"
+                />
+              </div>
             </div>
           );
         })}
