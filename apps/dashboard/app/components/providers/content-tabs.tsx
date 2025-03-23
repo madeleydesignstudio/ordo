@@ -1,16 +1,9 @@
-import React from "react";
-import { Link, useRouterState, Outlet } from "@tanstack/react-router";
 import TimeLocationDisplay from "@/components/time-location-display";
-import {
-  BookUserIcon,
-  FolderOpenDotIcon,
-  Home,
-  Wallet,
-  WalletCards,
-} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { BookUserIcon, FolderOpenDotIcon, Home, Wallet } from "lucide-react";
 
-const ContentTabs = () => {
+const ContentTabs = ({ children }: { children: React.ReactNode }) => {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
 
@@ -107,7 +100,7 @@ const ContentTabs = () => {
         </div>
       </div>
       <div className="flex-1 bg-neutral-800 rounded-md border border-neutral-600">
-        <Outlet />
+        {children}
       </div>
     </div>
   );
