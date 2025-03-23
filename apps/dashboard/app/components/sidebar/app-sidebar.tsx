@@ -23,9 +23,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-none">
-      <SidebarHeader>
-        <WorkspaceSettings />
-      </SidebarHeader>
+      <WorkspaceSettings />
+
       <SidebarContent className="">
         <SidebarGroup>
           <PrimaryLinks />
@@ -36,9 +35,6 @@ export function AppSidebar() {
           {isHomeRoute && <PersonalLinks />}
           {isProjectRoute && <ProjectManagerLinks />}
         </SidebarGroup>
-        {/* <SidebarGroup>
-          <QuickLinks />
-        </SidebarGroup> */}
       </SidebarContent>
       <SidebarFooter>
         <SettingsLink />

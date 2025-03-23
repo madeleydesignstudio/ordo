@@ -46,17 +46,48 @@ const ContentTabs = () => {
     <div className="w-full h-full flex flex-col pb-2.5 pr-2.5">
       <div className="h-[30px] flex justify-between">
         <div className=" flex gap-2 items-center">
-          <div className="flex gap-4 text-neutral-300 text-sm items-center">
-            <Link to="/" className="hover:text-neutral-100">
+          <div className="h-full py-1">
+            <Separator orientation="vertical" className="bg-neutral-600" />
+          </div>
+          <div className="flex gap-4 text-sm items-center">
+            <Link
+              to="/"
+              className={
+                currentPath === "/"
+                  ? "text-neutral-300"
+                  : "text-neutral-500 hover:text-neutral-300"
+              }
+            >
               <Home size={14} />
             </Link>
-            <Link to="/project-manager" className="hover:text-neutral-100">
+            <Link
+              to="/project-manager"
+              className={
+                currentPath.startsWith("/project-manager")
+                  ? "text-neutral-300"
+                  : "text-neutral-500 hover:text-neutral-300"
+              }
+            >
               <FolderOpenDotIcon size={14} />
             </Link>
-            <Link to="/content-manager" className="hover:text-neutral-100">
+            <Link
+              to="/content-manager"
+              className={
+                currentPath.startsWith("/content-manager")
+                  ? "text-neutral-300"
+                  : "text-neutral-500 hover:text-neutral-300"
+              }
+            >
               <BookUserIcon size={14} />
             </Link>
-            <Link to="/finance-manager" className="hover:text-neutral-100">
+            <Link
+              to="/finance-manager"
+              className={
+                currentPath.startsWith("/finance-manager")
+                  ? "text-neutral-300"
+                  : "text-neutral-500 hover:text-neutral-300"
+              }
+            >
               <Wallet size={14} />
             </Link>
           </div>
@@ -64,11 +95,14 @@ const ContentTabs = () => {
             <Separator orientation="vertical" className="bg-neutral-600" />
           </div>
 
-          <h1 className="text-neutral-300 text-xs text-center ">
+          <h1 className="text-neutral-500 text-xs text-center ">
             {getRouteTitle()}
           </h1>
         </div>
         <div className="flex gap-2 h-full items-center">
+          <div className="h-full py-1">
+            <Separator orientation="vertical" className="bg-neutral-600" />
+          </div>
           <TimeLocationDisplay />
         </div>
       </div>
