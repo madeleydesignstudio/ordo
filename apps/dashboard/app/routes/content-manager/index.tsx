@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Contact, columns } from "@/components/columns";
-import { DataTable } from "@/components/data-table";
+import { Contact, columns } from "@/components/content-manager/columns";
+import { DataTable } from "@/components/content-manager/data-table";
 
 export const Route = createFileRoute("/content-manager/")({
   component: RouteComponent,

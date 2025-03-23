@@ -1,7 +1,7 @@
 // app/routes/index.tsx
-import DateSlider from "@/components/date-slider";
-import HomeHeader from "@/components/home-header";
-import HomeMainContent from "@/components/home-main-content";
+import DateSlider from "@/components/home/date-slider";
+import HomeHeader from "@/components/home/home-header";
+import HomeMainContent from "@/components/home/home-main-content";
 import { createFileRoute } from "@tanstack/react-router";
 import { useDate } from "@/components/date-context";
 

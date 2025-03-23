@@ -6,39 +6,13 @@ const ContentTabs = ({ children }: { children: React.ReactNode }) => {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
 
-  // Memoize the tab routes to prevent unnecessary re-renders
-  const tabbedRoutes = React.useMemo(
-    () => ["/", "/project-manager", "/content-manager", "/finance-manager"],
-    []
-  );
-
-  // Memoize the route check
-  const shouldShowTabs = React.useMemo(
-    () => tabbedRoutes.includes(currentPath),
-    [currentPath, tabbedRoutes]
-  );
-
-  // Early return for non-tabbed routes with consistent styling
-  if (!shouldShowTabs) {
-    return (
-      <div className="w-full h-full pb-2.5 pr-2.5">
-        <div className="h-[30px]">
-          <TimeLocationDisplay />
-        </div>
-        <div className="flex-1 bg-neutral-800 rounded-md border border-neutral-600">
-          {children}
-        </div>
-      </div>
-    );
-  }
-
   // Memoize route checks to prevent unnecessary re-renders
   const routeStates = React.useMemo(
     () => ({
       isHomeRoute: currentPath === "/",
-      isProjectRoute: currentPath === "/project-manager",
-      isContentRoute: currentPath === "/content-manager",
-      isFinanceRoute: currentPath === "/finance-manager",
+      isProjectRoute: currentPath.startsWith("/project-manager"),
+      isContentRoute: currentPath.startsWith("/content-manager"),
+      isFinanceRoute: currentPath.startsWith("/finance-manager"),
     }),
     [currentPath]
   );

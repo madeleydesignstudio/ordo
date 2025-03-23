@@ -1,11 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import React from "react";
-import { Button } from "@/components/ui/button";
-import DateSlider from "@/components/date-slider";
-import WeatherDisplay from "@/components/weather-display";
-import { useState } from "react";
-import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
-import TodayButton from "@/components/today-button";
+import TodayButton from "@/components/home/today-button";
+import WeatherDisplay from "@/components/home/weather-display";
 
 const formatDate = (date: Date) => {
   const day = date.getDate();

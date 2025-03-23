@@ -19,6 +19,8 @@ import { Route as IndexImport } from './routes/index'
 import { Route as ProjectManagerIndexImport } from './routes/project-manager/index'
 import { Route as FinanceManagerIndexImport } from './routes/finance-manager/index'
 import { Route as ContentManagerIndexImport } from './routes/content-manager/index'
+import { Route as ProjectManagerProjectsImport } from './routes/project-manager/projects'
+import { Route as ProjectManagerInboxImport } from './routes/project-manager/inbox'
 
 // Create/Update Routes
 
@@ -70,6 +72,18 @@ const ContentManagerIndexRoute = ContentManagerIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ProjectManagerProjectsRoute = ProjectManagerProjectsImport.update({
+  id: '/project-manager/projects',
+  path: '/project-manager/projects',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProjectManagerInboxRoute = ProjectManagerInboxImport.update({
+  id: '/project-manager/inbox',
+  path: '/project-manager/inbox',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -109,6 +123,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SigninImport
       parentRoute: typeof rootRoute
     }
+    '/project-manager/inbox': {
+      id: '/project-manager/inbox'
+      path: '/project-manager/inbox'
+      fullPath: '/project-manager/inbox'
+      preLoaderRoute: typeof ProjectManagerInboxImport
+      parentRoute: typeof rootRoute
+    }
+    '/project-manager/projects': {
+      id: '/project-manager/projects'
+      path: '/project-manager/projects'
+      fullPath: '/project-manager/projects'
+      preLoaderRoute: typeof ProjectManagerProjectsImport
+      parentRoute: typeof rootRoute
+    }
     '/content-manager/': {
       id: '/content-manager/'
       path: '/content-manager'
@@ -141,6 +169,8 @@ export interface FileRoutesByFullPath {
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
+  '/project-manager/inbox': typeof ProjectManagerInboxRoute
+  '/project-manager/projects': typeof ProjectManagerProjectsRoute
   '/content-manager': typeof ContentManagerIndexRoute
   '/finance-manager': typeof FinanceManagerIndexRoute
   '/project-manager': typeof ProjectManagerIndexRoute
@@ -152,6 +182,8 @@ export interface FileRoutesByTo {
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
+  '/project-manager/inbox': typeof ProjectManagerInboxRoute
+  '/project-manager/projects': typeof ProjectManagerProjectsRoute
   '/content-manager': typeof ContentManagerIndexRoute
   '/finance-manager': typeof FinanceManagerIndexRoute
   '/project-manager': typeof ProjectManagerIndexRoute
@@ -164,6 +196,8 @@ export interface FileRoutesById {
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
+  '/project-manager/inbox': typeof ProjectManagerInboxRoute
+  '/project-manager/projects': typeof ProjectManagerProjectsRoute
   '/content-manager/': typeof ContentManagerIndexRoute
   '/finance-manager/': typeof FinanceManagerIndexRoute
   '/project-manager/': typeof ProjectManagerIndexRoute
@@ -177,6 +211,8 @@ export interface FileRouteTypes {
     | '/journal'
     | '/settings'
     | '/signin'
+    | '/project-manager/inbox'
+    | '/project-manager/projects'
     | '/content-manager'
     | '/finance-manager'
     | '/project-manager'
@@ -187,6 +223,8 @@ export interface FileRouteTypes {
     | '/journal'
     | '/settings'
     | '/signin'
+    | '/project-manager/inbox'
+    | '/project-manager/projects'
     | '/content-manager'
     | '/finance-manager'
     | '/project-manager'
@@ -197,6 +235,8 @@ export interface FileRouteTypes {
     | '/journal'
     | '/settings'
     | '/signin'
+    | '/project-manager/inbox'
+    | '/project-manager/projects'
     | '/content-manager/'
     | '/finance-manager/'
     | '/project-manager/'
@@ -209,6 +249,8 @@ export interface RootRouteChildren {
   JournalRoute: typeof JournalRoute
   SettingsRoute: typeof SettingsRoute
   SigninRoute: typeof SigninRoute
+  ProjectManagerInboxRoute: typeof ProjectManagerInboxRoute
+  ProjectManagerProjectsRoute: typeof ProjectManagerProjectsRoute
   ContentManagerIndexRoute: typeof ContentManagerIndexRoute
   FinanceManagerIndexRoute: typeof FinanceManagerIndexRoute
   ProjectManagerIndexRoute: typeof ProjectManagerIndexRoute
@@ -220,6 +262,8 @@ const rootRouteChildren: RootRouteChildren = {
   JournalRoute: JournalRoute,
   SettingsRoute: SettingsRoute,
   SigninRoute: SigninRoute,
+  ProjectManagerInboxRoute: ProjectManagerInboxRoute,
+  ProjectManagerProjectsRoute: ProjectManagerProjectsRoute,
   ContentManagerIndexRoute: ContentManagerIndexRoute,
   FinanceManagerIndexRoute: FinanceManagerIndexRoute,
   ProjectManagerIndexRoute: ProjectManagerIndexRoute,
@@ -240,6 +284,8 @@ export const routeTree = rootRoute
         "/journal",
         "/settings",
         "/signin",
+        "/project-manager/inbox",
+        "/project-manager/projects",
         "/content-manager/",
         "/finance-manager/",
         "/project-manager/"
@@ -259,6 +305,12 @@ export const routeTree = rootRoute
     },
     "/signin": {
       "filePath": "signin.tsx"
+    },
+    "/project-manager/inbox": {
+      "filePath": "project-manager/inbox.tsx"
+    },
+    "/project-manager/projects": {
+      "filePath": "project-manager/projects.tsx"
     },
     "/content-manager/": {
       "filePath": "content-manager/index.tsx"

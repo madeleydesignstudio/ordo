@@ -1,8 +1,8 @@
 import React from "react";
-import { AppSidebar } from "../app-sidebar";
-import SmallAppSideBar from "../small-app-sidebar";
+import { AppSidebar } from "../sidebar/app-sidebar";
+import SmallAppSideBar from "../sidebar/small-app-sidebar";
 import { SidebarProvider } from "../ui/sidebar";
-import ContentTabs from "../content-tabs";
+import ContentTabs from "./content-tabs";
 import { Outlet } from "@tanstack/react-router";
 
 const MainContentProvider = () => {

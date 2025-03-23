@@ -6,7 +6,7 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { useRouterState } from "@tanstack/react-router";
-import BorderBreak from "./border-break";
+import BorderBreak from "../border-break";
 import PersonalLinks from "./personal-links";
 import PrimaryLinks from "./primary-links";
 import { QuickLinks } from "./quick-links";
@@ -17,8 +17,10 @@ import ProjectManagerLinks from "./project-manager-links";
 
 export function AppSidebar() {
   const routerState = useRouterState();
-  const isHomeRoute = routerState.location.pathname === "/";
-  const isProjectRoute = routerState.location.pathname === "/project-manager";
+  const currentPath = routerState.location.pathname;
+  const isHomeRoute = currentPath === "/"; // Keep home route as exact match
+  const isProjectRoute = currentPath.startsWith("/project-manager");
+
   return (
     <Sidebar className="border-none">
       <SidebarHeader>
@@ -34,9 +36,9 @@ export function AppSidebar() {
           {isHomeRoute && <PersonalLinks />}
           {isProjectRoute && <ProjectManagerLinks />}
         </SidebarGroup>
-        <SidebarGroup>
+        {/* <SidebarGroup>
           <QuickLinks />
-        </SidebarGroup>
+        </SidebarGroup> */}
       </SidebarContent>
       <SidebarFooter>
         <SettingsLink />

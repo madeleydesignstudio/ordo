@@ -4,7 +4,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "./ui/accordion";
+} from "../ui/accordion";
 import { DumbbellIcon, NotebookPen } from "lucide-react";
 
 const PersonalLinks = () => {
