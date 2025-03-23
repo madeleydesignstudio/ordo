@@ -22,7 +22,7 @@ export function AppSidebar() {
   const isProjectRoute = currentPath.startsWith("/project-manager");
 
   return (
-    <Sidebar className="border-none">
+    <Sidebar className="border-none ">
       <WorkspaceSettings />
 
       <SidebarContent className="">

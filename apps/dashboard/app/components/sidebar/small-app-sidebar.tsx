@@ -1,17 +1,15 @@
-import React, { useEffect } from "react";
-import { SidebarTrigger } from "../ui/sidebar";
-import SidebarIcons from "./sidebar-icons";
 import { useSidebar } from "@/components/ui/sidebar";
-import BorderBreak from "../border-break";
-import { Link } from "@tanstack/react-router";
+import { BellIcon, Search } from "lucide-react";
+import { useEffect } from "react";
+import { Separator } from "../ui/separator";
+import { SidebarTrigger } from "../ui/sidebar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { BellIcon, Search, Settings } from "lucide-react";
-import { Separator } from "../ui/separator";
+import SidebarIcons from "./sidebar-icons";
 
 const SmallAppSideBar = () => {
   const { open, setOpen } = useSidebar();
