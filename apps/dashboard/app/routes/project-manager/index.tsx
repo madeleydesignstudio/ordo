@@ -15,7 +15,6 @@ function RouteComponent() {
     <div className="flex items-center justify-center h-full w-full rounded-md flex-col">
       <HomeHeader currentDate={currentDate} onDateChange={setCurrentDate} />
       <ProjectManagerInbox />
-      {/* <DateSlider currentDate={currentDate} onDateChange={setCurrentDate} /> */}
     </div>
   );
 }

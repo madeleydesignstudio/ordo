@@ -13,10 +13,12 @@ import { QuickLinks } from "./quick-links";
 import SettingsLink from "./settings-link";
 import SidebarCalendar from "./sidebar-calendar";
 import WorkspaceSettings from "./workspace-settings";
+import ProjectManagerLinks from "./project-manager-links";
 
 export function AppSidebar() {
   const routerState = useRouterState();
   const isHomeRoute = routerState.location.pathname === "/";
+  const isProjectRoute = routerState.location.pathname === "/project-manager";
   return (
     <Sidebar className="border-none">
       <SidebarHeader>
@@ -30,6 +32,7 @@ export function AppSidebar() {
         <BorderBreak />
         <SidebarGroup className="flex-1">
           {isHomeRoute && <PersonalLinks />}
+          {isProjectRoute && <ProjectManagerLinks />}
         </SidebarGroup>
         <SidebarGroup>
           <QuickLinks />
