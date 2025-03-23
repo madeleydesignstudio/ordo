@@ -1,61 +1,79 @@
 import React from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, Outlet } from "@tanstack/react-router";
 import TimeLocationDisplay from "@/components/time-location-display";
+import {
+  BookUserIcon,
+  FolderOpenDotIcon,
+  Home,
+  Wallet,
+  WalletCards,
+} from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
-const ContentTabs = ({ children }: { children: React.ReactNode }) => {
+const ContentTabs = () => {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
 
-  // Memoize route checks to prevent unnecessary re-renders
-  const routeStates = React.useMemo(
-    () => ({
-      isHomeRoute: currentPath === "/",
-      isProjectRoute: currentPath.startsWith("/project-manager"),
-      isContentRoute: currentPath.startsWith("/content-manager"),
-      isFinanceRoute: currentPath.startsWith("/finance-manager"),
-    }),
-    [currentPath]
-  );
+  const getRouteTitle = () => {
+    const pathParts = currentPath.split("/").filter(Boolean);
+
+    const mainRoute = pathParts[0] || "home";
+    const subRoute = pathParts[1];
+
+    const mainTitles: Record<string, string> = {
+      home: "Home",
+      "project-manager": "Project Manager",
+      "content-manager": "Content Manager",
+      "finance-manager": "Finance Manager",
+      settings: "Settings",
+    };
+
+    const mainTitle = mainTitles[mainRoute] || mainRoute;
+
+    if (subRoute) {
+      // Capitalize and replace hyphens with spaces for subRoute
+      const formattedSubRoute = subRoute
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+      return `${mainTitle} / ${formattedSubRoute}`;
+    }
+
+    return mainTitle;
+  };
 
   return (
-    <div className="w-full h-full pb-2.5 pr-2.5 flex flex-col">
-      <div className="h-[30px] flex items-end">
-        <div className="w-1/2 h-3/4 flex justify-between text-neutral-300">
-          <Link
-            to="/"
-            className={`w-full text-center text-sm flex justify-center items-center rounded-t-md border-t border-x border-neutral-600 font-light
-            ${routeStates.isHomeRoute ? "bg-neutral-800" : "bg-neutral-700 hover:bg-neutral-800/50"}`}
-          >
-            Home
-          </Link>
-          <Link
-            to="/project-manager"
-            className={`w-full text-center text-sm flex justify-center items-center rounded-t-md border-t border-x border-neutral-600 font-light
-            ${routeStates.isProjectRoute ? "bg-neutral-800" : "bg-neutral-700 hover:bg-neutral-800/50"}`}
-          >
-            Project Manager
-          </Link>
-          <Link
-            to="/content-manager"
-            className={`w-full text-center text-sm flex justify-center items-center rounded-t-md border-t border-x border-neutral-600 font-light
-            ${routeStates.isContentRoute ? "bg-neutral-800" : "bg-neutral-700 hover:bg-neutral-800/50"}`}
-          >
-            Content Manager
-          </Link>
-          <Link
-            to="/finance-manager"
-            className={`w-full text-center text-sm flex justify-center items-center rounded-t-md border-t border-x border-neutral-600 font-light
-            ${routeStates.isFinanceRoute ? "bg-neutral-800" : "bg-neutral-700 hover:bg-neutral-800/50"}`}
-          >
-            Finance Manager
-          </Link>
+    <div className="w-full h-full flex flex-col pb-2.5 pr-2.5">
+      <div className="h-[30px] flex justify-between">
+        <div className=" flex gap-2 items-center">
+          <div className="flex gap-4 text-neutral-300 text-sm items-center">
+            <Link to="/" className="hover:text-neutral-100">
+              <Home size={14} />
+            </Link>
+            <Link to="/project-manager" className="hover:text-neutral-100">
+              <FolderOpenDotIcon size={14} />
+            </Link>
+            <Link to="/content-manager" className="hover:text-neutral-100">
+              <BookUserIcon size={14} />
+            </Link>
+            <Link to="/finance-manager" className="hover:text-neutral-100">
+              <Wallet size={14} />
+            </Link>
+          </div>
+          <div className="h-full py-1">
+            <Separator orientation="vertical" className="bg-neutral-600" />
+          </div>
+
+          <h1 className="text-neutral-300 text-xs text-center ">
+            {getRouteTitle()}
+          </h1>
         </div>
-        <div className="w-1/2 h-full">
+        <div className="flex gap-2 h-full items-center">
           <TimeLocationDisplay />
         </div>
       </div>
-      <div className="flex-1 bg-neutral-800 rounded-tr-md rounded-bl-md rounded-br-md border border-neutral-600">
-        {children}
+      <div className="flex-1 bg-neutral-800 rounded-md border border-neutral-600">
+        <Outlet />
       </div>
     </div>
   );
