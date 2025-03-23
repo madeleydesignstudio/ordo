@@ -5,7 +5,7 @@ import { SidebarProvider } from "../ui/sidebar";
 import ContentTabs from "./content-tabs";
 import { Outlet } from "@tanstack/react-router";
 
-const MainContentProvider = () => {
+const MainContentProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-screen">
