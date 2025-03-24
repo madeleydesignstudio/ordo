@@ -1,5 +1,5 @@
 import { useSidebar } from "@/components/ui/sidebar";
-import { BellIcon, Search } from "lucide-react";
+import { ArrowLeft, BellIcon, Search } from "lucide-react";
 import { useEffect } from "react";
 import { Separator } from "../ui/separator";
 import { SidebarTrigger } from "../ui/sidebar";
@@ -32,40 +32,35 @@ const SmallAppSideBar = () => {
     <div className="px-1 flex flex-col items-center justify-between">
       <div className="flex flex-col items-center">
         <div className="h-[30px] flex items-center">
-          <SidebarTrigger className=" h-3.5 w-3.5 " />
-        </div>
-        <div className="pb-2 w-full ">
-          <Separator orientation="horizontal" className="bg-neutral-600" />
-        </div>
-
-        <div className="gap-2 flex flex-col">
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="p-1 hover:bg-neutral-800 rounded-md cursor-pointer text-neutral-300">
-                  <Search size={14} />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="text-xs">
-                Quick Menu
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="p-1 hover:bg-neutral-800 rounded-md cursor-pointer text-neutral-300">
-                  <BellIcon size={14} />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="text-xs">
-                Notifications
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <ArrowLeft className=" h-3.5 w-3.5 text-neutral-300" />
         </div>
       </div>
-
+      <div className="gap-2 flex flex-col items-center justify-center">
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="p-1 hover:bg-neutral-800 rounded-md cursor-pointer text-neutral-300">
+                <Search size={14} />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="text-xs">
+              Quick Menu
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="p-1 hover:bg-neutral-800 rounded-md cursor-pointer text-neutral-300">
+                <BellIcon size={14} />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="text-xs">
+              Notifications
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
       <SidebarIcons />
     </div>
   );
