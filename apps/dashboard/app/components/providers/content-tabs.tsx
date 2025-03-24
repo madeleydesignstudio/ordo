@@ -99,7 +99,11 @@ const ContentTabs = ({ children }: { children: React.ReactNode }) => {
           <TimeLocationDisplay />
         </div>
       </div>
-      <div className="flex-1 bg-neutral-800 rounded-md border border-neutral-600">
+      <div className="flex-1 bg-neutral-800/80 backdrop-blur-xl rounded-md border border-neutral-600 relative">
+        <div className="absolute -z-10 w-full h-full blur-3xl opacity-20">
+          <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-500/30 rounded-full mix-blend-multiply" />
+          <div className="absolute -bottom-8 -right-4 w-72 h-72 bg-purple-20 rounded-full mix-blend-multiply" />
+        </div>
         {children}
       </div>
     </div>
