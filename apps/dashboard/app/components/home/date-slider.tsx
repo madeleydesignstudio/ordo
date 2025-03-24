@@ -142,25 +142,25 @@ const DateSlider = ({ currentDate, onDateChange }: DateSliderProps) => {
                 onClick={() => onDateChange(date)}
                 className={`flex flex-col w-full text-neutral-300 h-full min-w-[120px] max-h-[200px] cursor-pointer
               ${isSelected ? "bg-neutral-600/50" : ""}
-              ${isToday ? "bg-purple-800/50" : ""}
+              ${isToday ? "bg-purple-800/30" : ""}
               ${index === visibleDates.length - 1 ? "" : "border-r"} 
               border-neutral-600
-              ${isSelected && isToday ? "bg-purple-800/50" : ""}`}
+              ${isSelected && isToday ? "bg-purple-800/30" : ""}`}
               >
-                <div className="flex justify-between px-1 font-bold">
-                  <span className="text-sm uppercase">{day}</span>
-                  <span className="text-sm">{dateNum}</span>
+                <div className="flex justify-between p-1 font-bold">
+                  <span className="text-xs uppercase">{day}</span>
+                  <span className="text-xs">{dateNum}</span>
                 </div>
                 <div className="flex-1 overflow-y-auto">
                   {tasksForDate.map((task) => (
                     <div
                       key={task.id}
-                      className="flex items-center gap-2 text-xs p-2 bg-neutral-800 m-2 rounded-md hover:bg-neutral-700 transition-colors"
+                      className="flex items-center gap-2 text-[10px] p-2 bg-neutral-800 m-2 rounded-md hover:bg-neutral-700 transition-colors"
                     >
                       <input
                         type="checkbox"
                         checked={task.completed}
-                        className="h-3 w-3 rounded border-neutral-600 bg-neutral-900 checked:bg-blue-500"
+                        className="h-2 w-2 rounded border-neutral-600 bg-neutral-900 checked:bg-blue-500"
                       />
                       <h3 className="flex-1">{task.title}</h3>
                       <span

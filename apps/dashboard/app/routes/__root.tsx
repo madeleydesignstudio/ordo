@@ -66,10 +66,6 @@ export const Route = createRootRoute({
       },
       { rel: "manifest", href: "/site.webmanifest", color: "#fffff" },
       { rel: "icon", href: "/favicon.ico" },
-      {
-        rel: "stylesheet",
-        href: "/fonts/nohemi.css",
-      },
     ],
   }),
   component: RootComponent,
