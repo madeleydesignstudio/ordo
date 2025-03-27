@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 import appCss from "@/styles/app.css?url";
 import MainContentProvider from "@/components/providers/MainContentProvider";
 import { DateProvider } from "@/components/date-context";
+import { CommandMenu } from "@/components/command-menu/command-menu";
 
 function NotFoundComponent() {
   return (
@@ -91,6 +92,9 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         <DateProvider>
           {children}
+          <div className="w-full max-w-sm">
+            <CommandMenu />
+          </div>
           <Scripts />
         </DateProvider>
       </body>

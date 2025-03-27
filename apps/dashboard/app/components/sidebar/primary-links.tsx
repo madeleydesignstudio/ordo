@@ -10,9 +10,10 @@ const PrimaryLinks = () => {
         <h2>Quick Menu</h2>
         <h3>⌘K</h3>
       </div>
-      <Command>
+      {/* <Command>
         <CommandMenu />
-      </Command>
+      </Command> */}
+
       <div className="text-neutral-300 text-xs flex items-center gap-2">
         <span>
           <BellIcon size={14} />
