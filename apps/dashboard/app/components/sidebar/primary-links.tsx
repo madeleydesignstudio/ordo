@@ -13,12 +13,6 @@ const PrimaryLinks = () => {
       <Command>
         <CommandMenu />
       </Command>
-      {/* <div className="text-neutral-300 text-xs flex items-center gap-2">
-        <span>
-          <Home size={12} />
-        </span>
-        <h2>Home</h2>
-      </div> */}
       <div className="text-neutral-300 text-xs flex items-center gap-2">
         <span>
           <BellIcon size={14} />
