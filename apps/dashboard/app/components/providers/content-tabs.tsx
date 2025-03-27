@@ -1,11 +1,25 @@
 import TimeLocationDisplay from "@/components/time-location-display";
 import { Separator } from "@/components/ui/separator";
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { BookUserIcon, FolderOpenDotIcon, Home, Wallet } from "lucide-react";
+import {
+  Link,
+  Outlet,
+  useRouterState,
+  useNavigate,
+} from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  ArrowLeftIcon,
+  ArrowRight,
+  BookUserIcon,
+  FolderOpenDotIcon,
+  Home,
+  Wallet,
+} from "lucide-react";
 
 const ContentTabs = ({ children }: { children: React.ReactNode }) => {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
+  const navigate = useNavigate();
 
   const getRouteTitle = () => {
     const pathParts = currentPath.split("/").filter(Boolean);
@@ -40,7 +54,20 @@ const ContentTabs = ({ children }: { children: React.ReactNode }) => {
       <div className="h-[30px] flex justify-between">
         <div className=" flex gap-2 items-center">
           <div className="h-full py-1">
-            <Separator orientation="vertical" className="bg-neutral-600" />
+            <Separator orientation="vertical" className="bg-neutral-700" />
+          </div>
+          <div className="flex gap-4 items-center">
+            <ArrowLeft
+              className="h-3.5 w-3.5 text-neutral-500 cursor-pointer hover:text-neutral-300"
+              onClick={() => window.history.back()}
+            />
+            <ArrowRight
+              className="h-3.5 w-3.5 text-neutral-500 cursor-pointer hover:text-neutral-300"
+              onClick={() => window.history.forward()}
+            />
+          </div>
+          <div className="h-full py-1">
+            <Separator orientation="vertical" className="bg-neutral-700" />
           </div>
           <div className="flex gap-4 text-sm items-center">
             <Link
@@ -85,7 +112,7 @@ const ContentTabs = ({ children }: { children: React.ReactNode }) => {
             </Link>
           </div>
           <div className="h-full py-1">
-            <Separator orientation="vertical" className="bg-neutral-600" />
+            <Separator orientation="vertical" className="bg-neutral-700" />
           </div>
 
           <h1 className="text-neutral-500 text-xs text-center ">
