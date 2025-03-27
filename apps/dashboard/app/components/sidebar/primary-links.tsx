@@ -1,6 +1,7 @@
 import { BellIcon, Home } from "lucide-react";
 import React from "react";
 import { CommandMenu } from "../command-menu/command-menu";
+import { Command } from "cmdk";
 
 const PrimaryLinks = () => {
   return (
@@ -9,7 +10,9 @@ const PrimaryLinks = () => {
         <h2>Quick Menu</h2>
         <h3>⌘K</h3>
       </div>
-      <CommandMenu />
+      <Command>
+        <CommandMenu />
+      </Command>
       {/* <div className="text-neutral-300 text-xs flex items-center gap-2">
         <span>
           <Home size={12} />
