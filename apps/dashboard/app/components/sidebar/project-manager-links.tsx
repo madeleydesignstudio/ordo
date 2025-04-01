@@ -1,58 +1,57 @@
-import { DumbbellIcon, NotebookPen } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../ui/accordion";
+  InboxIcon,
+  FolderIcon,
+  CircleCheckBig,
+  BadgeAlert,
+  StickyNoteIcon,
+  BookCopyIcon,
+  PresentationIcon,
+  LucideIcon,
+} from "lucide-react";
+
+// Define menu item type
+type MenuItem = {
+  icon: LucideIcon;
+  label: string;
+  path: string;
+};
+
+// Define menu items configuration
+const menuItems: MenuItem[] = [
+  { icon: InboxIcon, label: "Inbox", path: "/project-manager/inbox" },
+  { icon: FolderIcon, label: "Projects", path: "/project-manager/projects" },
+  { icon: CircleCheckBig, label: "Tasks", path: "/project-manager/tasks" },
+  { icon: BadgeAlert, label: "My Issues", path: "/project-manager/my-issues" },
+  { icon: StickyNoteIcon, label: "Notes", path: "/project-manager/notes" },
+  {
+    icon: BookCopyIcon,
+    label: "Notebooks",
+    path: "/project-manager/notebooks",
+  },
+  { icon: PresentationIcon, label: "Canvas", path: "/project-manager/canvas" },
+];
 
 const ProjectManagerLinks = () => {
+  // Render menu item
+  const renderMenuItem = (item: MenuItem) => {
+    const Icon = item.icon;
+
+    return (
+      <Link key={item.path} to={item.path}>
+        <div className="text-neutral-300 text-xs flex items-center gap-2 hover:bg-neutral-800 p-2 rounded-md cursor-pointer">
+          <span>
+            <Icon size={12} />
+          </span>
+          <h2>{item.label}</h2>
+        </div>
+      </Link>
+    );
+  };
+
   return (
     <div>
-      <div className="flex flex-col gap-2">
-        <div className="text-neutral-300 text-xs flex items-center gap-2 hover:bg-neutral-800 p-2 rounded-md cursor-pointer">
-          <span>
-            <NotebookPen size={12} />
-          </span>
-          <h2>Inbox</h2>
-        </div>
-        <div className="text-neutral-300 text-xs flex items-center gap-2 hover:bg-neutral-800 p-2 rounded-md cursor-pointer">
-          <span>
-            <DumbbellIcon size={12} />
-          </span>
-          <h2>Projects</h2>
-        </div>
-        <div className="text-neutral-300 text-xs flex items-center gap-2 hover:bg-neutral-800 p-2 rounded-md cursor-pointer">
-          <span>
-            <DumbbellIcon size={12} />
-          </span>
-          <h2>Tasks</h2>
-        </div>
-        <div className="text-neutral-300 text-xs flex items-center gap-2 hover:bg-neutral-800 p-2 rounded-md cursor-pointer">
-          <span>
-            <DumbbellIcon size={12} />
-          </span>
-          <h2>My Issues</h2>
-        </div>
-        <div className="text-neutral-300 text-xs flex items-center gap-2 hover:bg-neutral-800 p-2 rounded-md cursor-pointer">
-          <span>
-            <DumbbellIcon size={12} />
-          </span>
-          <h2>Notes</h2>
-        </div>
-        <div className="text-neutral-300 text-xs flex items-center gap-2 hover:bg-neutral-800 p-2 rounded-md cursor-pointer">
-          <span>
-            <DumbbellIcon size={12} />
-          </span>
-          <h2>Notebooks</h2>
-        </div>
-        <div className="text-neutral-300 text-xs flex items-center gap-2 hover:bg-neutral-800 p-2 rounded-md cursor-pointer">
-          <span>
-            <DumbbellIcon size={12} />
-          </span>
-          <h2>Canvas</h2>
-        </div>
-      </div>
+      <div className="flex flex-col gap-2">{menuItems.map(renderMenuItem)}</div>
     </div>
   );
 };

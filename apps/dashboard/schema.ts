@@ -1,27 +1,75 @@
-import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import {
+  boolean,
+  integer,
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 
-export const usersTable = pgTable("users_table", {
+// Project status enum
+export const projectStatusEnum = pgEnum("project_status", [
+  "not_started",
+  "in_progress",
+  "on_hold",
+  "completed",
+  "cancelled",
+]);
+
+// Task status enum
+export const taskStatusEnum = pgEnum("task_status", [
+  "todo",
+  "in_progress",
+  "in_review",
+  "done",
+]);
+
+// Priority enum
+export const priorityEnum = pgEnum("priority", [
+  "low",
+  "medium",
+  "high",
+  "urgent",
+]);
+
+// Projects table
+export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  age: integer("age").notNull(),
-  email: text("email").notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  status: projectStatusEnum("status").default("not_started").notNull(),
+  startDate: timestamp("start_date").defaultNow(),
+  dueDate: timestamp("due_date"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const postsTable = pgTable("posts_table", {
+// Tasks table
+export const tasks = pgTable("tasks", {
   id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  content: text("content").notNull(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .$onUpdate(() => new Date()),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  status: taskStatusEnum("status").default("todo").notNull(),
+  priority: priorityEnum("priority").default("medium").notNull(),
+  projectId: integer("project_id").references(() => projects.id, {
+    onDelete: "cascade",
+  }),
+  dueDate: timestamp("due_date"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export type InsertUser = typeof usersTable.$inferInsert;
-export type SelectUser = typeof usersTable.$inferSelect;
+// Relations
+export const projectsRelations = relations(projects, ({ many }) => ({
+  tasks: many(tasks),
+}));
 
-export type InsertPost = typeof postsTable.$inferInsert;
-export type SelectPost = typeof postsTable.$inferSelect;
+export const tasksRelations = relations(tasks, ({ one }) => ({
+  project: one(projects, {
+    fields: [tasks.projectId],
+    references: [projects.id],
+  }),
+}));

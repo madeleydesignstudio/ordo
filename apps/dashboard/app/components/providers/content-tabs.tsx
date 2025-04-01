@@ -14,7 +14,13 @@ import {
   FolderOpenDotIcon,
   Home,
   Wallet,
+  PlusIcon,
+  LayoutGrid,
+  LayoutList,
+  Calendar,
+  Table2,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const ContentTabs = ({ children }: { children: React.ReactNode }) => {
   const routerState = useRouterState();
@@ -120,6 +126,65 @@ const ContentTabs = ({ children }: { children: React.ReactNode }) => {
           </h1>
         </div>
         <div className="flex gap-2 h-full items-center">
+          {currentPath.startsWith("/project-manager") && (
+            <>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 text-xs text-neutral-400 hover:text-neutral-200"
+                >
+                  <PlusIcon className="h-3 w-3 mr-1" />
+                  New Project
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 text-xs text-neutral-400 hover:text-neutral-200"
+                >
+                  <PlusIcon className="h-3 w-3 mr-1" />
+                  New Task
+                </Button>
+              </div>
+              <div className="h-full py-1">
+                <Separator orientation="vertical" className="bg-neutral-600" />
+              </div>
+              <div className="flex gap-1 bg-neutral-800/50 rounded-sm p-0.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 w-5 p-0.5 text-neutral-400 hover:text-neutral-200"
+                  title="List view"
+                >
+                  <LayoutList className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 w-5 p-0.5 text-neutral-400 hover:text-neutral-200"
+                  title="Kanban view"
+                >
+                  <LayoutGrid className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 w-5 p-0.5 text-neutral-400 hover:text-neutral-200"
+                  title="Calendar view"
+                >
+                  <Calendar className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 w-5 p-0.5 text-neutral-400 hover:text-neutral-200"
+                  title="Table view"
+                >
+                  <Table2 className="h-3 w-3" />
+                </Button>
+              </div>
+            </>
+          )}
           <div className="h-full py-1">
             <Separator orientation="vertical" className="bg-neutral-600" />
           </div>
