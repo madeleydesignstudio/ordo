@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "@tanstack/react-router";
+import { useRouter, Link } from "@tanstack/react-router";
 
 // Define validation schemas
 const ProjectSchema = z.object({
@@ -105,9 +105,16 @@ function ProjectsComponent() {
         <div className="flex-1 p-6 overflow-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 h-full">
             {currentProjects.map((project) => (
-              <div
+              <Link
                 key={project.id}
-                className="bg-neutral-800 p-6 rounded-lg border border-neutral-700 flex flex-col justify-between h-full"
+                to="/project-manager/$projectSlug"
+                params={{
+                  projectSlug: project.name
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")
+                    .replace(/[^a-z0-9-]/g, ""),
+                }}
+                className="bg-neutral-800 p-6 rounded-lg border border-neutral-700 flex flex-col justify-between h-full hover:bg-neutral-800/70 transition-colors"
               >
                 <h3 className="text-lg font-semibold text-neutral-200">
                   {project.name}
@@ -126,7 +133,7 @@ function ProjectsComponent() {
                     Tasks: {project.tasks?.length || 0}
                   </p>
                 </div>
-              </div>
+              </Link>
             ))}
 
             {/* Empty slots with create button */}
