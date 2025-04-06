@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { getProjectTasks, createTask } from "@/server/tasks";
+import { getProjectTasks, createTask, deleteTask } from "@/server/tasks";
 import { db } from "@/db/db";
 import { projects } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -10,6 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogPortal,
+  DialogOverlay,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,6 +58,8 @@ function ProjectComponent() {
   const { project, tasks } = Route.useLoaderData();
   const [currentPage, setCurrentPage] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -103,6 +107,30 @@ function ProjectComponent() {
     }
   };
 
+  const handleDeleteTask = async () => {
+    if (!taskToDelete) return;
+
+    try {
+      await deleteTask({
+        data: { id: taskToDelete },
+      });
+
+      // Close dialog and reset state
+      setIsDeleteDialogOpen(false);
+      setTaskToDelete(null);
+
+      // Refresh the route data
+      await router.invalidate();
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
+  };
+
+  const openDeleteDialog = (taskId: number) => {
+    setTaskToDelete(taskId);
+    setIsDeleteDialogOpen(true);
+  };
+
   return (
     <>
       <div className="h-full flex flex-col">
@@ -110,33 +138,49 @@ function ProjectComponent() {
           <h1 className="text-2xl font-bold mb-6">{project.name}</h1>
           <p className="text-neutral-400 mb-8">{project.description}</p>
 
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold">Tasks</h2>
+            <Button onClick={() => setIsDialogOpen(true)}>Add New Task</Button>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 h-full">
             {currentTasks.map((task) => (
               <div
                 key={task.id}
                 className="bg-neutral-800 p-6 rounded-lg border border-neutral-700 flex flex-col justify-between h-full"
               >
-                <h3 className="text-lg font-semibold text-neutral-200">
-                  {task.title}
-                </h3>
-                <div className="mt-4 space-y-2">
-                  <p className="text-sm text-neutral-400">
-                    Status: {task.status}
-                  </p>
-                  <p className="text-sm text-neutral-400">
-                    Priority: {task.priority}
-                  </p>
-                  <p className="text-sm text-neutral-400">
-                    Due:{" "}
-                    {task.dueDate
-                      ? new Date(task.dueDate).toLocaleDateString()
-                      : "No due date"}
-                  </p>
-                  {task.description && (
-                    <p className="text-sm text-neutral-400 mt-2">
-                      {task.description}
+                <div>
+                  <h3 className="text-lg font-semibold text-neutral-200">
+                    {task.title}
+                  </h3>
+                  <div className="mt-4 space-y-2">
+                    <p className="text-sm text-neutral-400">
+                      Status: {task.status}
                     </p>
-                  )}
+                    <p className="text-sm text-neutral-400">
+                      Priority: {task.priority}
+                    </p>
+                    <p className="text-sm text-neutral-400">
+                      Due:{" "}
+                      {task.dueDate
+                        ? new Date(task.dueDate).toLocaleDateString()
+                        : "No due date"}
+                    </p>
+                    {task.description && (
+                      <p className="text-sm text-neutral-400 mt-2">
+                        {task.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => openDeleteDialog(task.id)}
+                  >
+                    Delete
+                  </Button>
                 </div>
               </div>
             ))}
@@ -200,108 +244,151 @@ function ProjectComponent() {
 
       {/* Create Task Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create New Task</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleCreateTask}>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Task Title</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, title: e.target.value }))
-                  }
-                  placeholder="Enter task title"
-                  required
-                />
+        <DialogPortal>
+          <DialogOverlay />
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Task</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleCreateTask}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Task Title</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        title: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter task title"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter task description"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <select
+                    id="status"
+                    value={formData.status}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        status: e.target.value as TaskStatus,
+                      }))
+                    }
+                    className="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-200"
+                  >
+                    <option value="todo">To Do</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="in_review">In Review</option>
+                    <option value="done">Done</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="priority">Priority</Label>
+                  <select
+                    id="priority"
+                    value={formData.priority}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        priority: e.target.value as TaskPriority,
+                      }))
+                    }
+                    className="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-200"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="dueDate">Due Date</Label>
+                  <Input
+                    id="dueDate"
+                    type="date"
+                    value={formData.dueDate}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        dueDate: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter task description"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <select
-                  id="status"
-                  value={formData.status}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      status: e.target.value as TaskStatus,
-                    }))
-                  }
-                  className="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-200"
+              <DialogFooter className="mt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
                 >
-                  <option value="todo">To Do</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="in_review">In Review</option>
-                  <option value="done">Done</option>
-                </select>
-              </div>
+                  Cancel
+                </Button>
+                <Button type="submit">Create Task</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
 
-              <div className="space-y-2">
-                <Label htmlFor="priority">Priority</Label>
-                <select
-                  id="priority"
-                  value={formData.priority}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      priority: e.target.value as TaskPriority,
-                    }))
-                  }
-                  className="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-200"
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="urgent">Urgent</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="dueDate">Due Date</Label>
-                <Input
-                  id="dueDate"
-                  type="date"
-                  value={formData.dueDate}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      dueDate: e.target.value,
-                    }))
-                  }
-                />
-              </div>
+      {/* Delete Task Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogPortal>
+          <DialogOverlay />
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Task</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p>
+                Are you sure you want to delete this task? This action cannot be
+                undone.
+              </p>
             </div>
-
-            <DialogFooter className="mt-6">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsDialogOpen(false)}
+                onClick={() => {
+                  setIsDeleteDialogOpen(false);
+                  setTaskToDelete(null);
+                }}
               >
                 Cancel
               </Button>
-              <Button type="submit">Create Task</Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDeleteTask}
+              >
+                Delete
+              </Button>
             </DialogFooter>
-          </form>
-        </DialogContent>
+          </DialogContent>
+        </DialogPortal>
       </Dialog>
     </>
   );
