@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { db } from "@/db/db";
-import { projects } from "../../db/schema";
+import { db } from "../../../db";
+import { projects } from "../../../schema";
 import { createServerFn } from "@tanstack/start";
 import { z } from "zod";
 import {
@@ -103,14 +103,18 @@ function ProjectsComponent() {
     <>
       <div className="h-full flex flex-col">
         <div className="flex-1 p-6 overflow-auto">
-          <h1 className="text-2xl font-bold mb-6">Projects</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 h-full">
             {currentProjects.map((project) => (
               <Link
                 key={project.id}
                 to="/project-manager/$projectSlug"
-                params={{ projectSlug: project.id.toString() }}
-                className="bg-neutral-800 p-6 rounded-lg border border-neutral-700 flex flex-col justify-between h-full hover:bg-neutral-700 transition-colors"
+                params={{
+                  projectSlug: project.name
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")
+                    .replace(/[^a-z0-9-]/g, ""),
+                }}
+                className="bg-neutral-800 p-6 rounded-lg border border-neutral-700 flex flex-col justify-between h-full hover:bg-neutral-800/70 transition-colors"
               >
                 <h3 className="text-lg font-semibold text-neutral-200">
                   {project.name}
@@ -125,12 +129,7 @@ function ProjectsComponent() {
                       ? new Date(project.dueDate).toLocaleDateString()
                       : "No due date"}
                   </p>
-                  {project.description && (
-                    <p className="text-sm text-neutral-400 mt-2">
-                      {project.description}
-                    </p>
-                  )}
-                  <p className="text-sm text-neutral-400 mt-2">
+                  <p className="text-sm text-neutral-400">
                     Tasks: {project.tasks?.length || 0}
                   </p>
                 </div>

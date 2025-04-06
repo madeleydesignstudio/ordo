@@ -8,49 +8,11 @@ import {
   Link,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import appCss from "@/styles/app.css?url";
 import MainContentProvider from "@/components/providers/MainContentProvider";
 import { DateProvider } from "@/components/date-context";
 import { CommandMenu } from "../components/command-menu/command-menu";
-
-// Configure the QueryClient with default options
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: true,
-      retry: 1,
-    },
-  },
-});
-
-function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
-  return (
-    <html>
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
-function AppLayout({ children }: Readonly<{ children: ReactNode }>) {
-  return (
-    <MainContentProvider>
-      <main className="w-full h-full rounded-md">
-        {children}
-        <div className="w-full max-w-sm">
-          <CommandMenu />
-        </div>
-      </main>
-    </MainContentProvider>
-  );
-}
 
 function NotFoundComponent() {
   return (
@@ -69,20 +31,6 @@ function NotFoundComponent() {
           </Link>
         </div>
       </AppLayout>
-    </RootDocument>
-  );
-}
-
-function RootComponent() {
-  return (
-    <RootDocument>
-      <QueryClientProvider client={queryClient}>
-        <DateProvider>
-          <AppLayout>
-            <Outlet />
-          </AppLayout>
-        </DateProvider>
-      </QueryClientProvider>
     </RootDocument>
   );
 }
@@ -124,3 +72,42 @@ export const Route = createRootRoute({
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
 });
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <AppLayout>
+        <Outlet />
+      </AppLayout>
+    </RootDocument>
+  );
+}
+
+function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+  return (
+    <html>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <DateProvider>
+          {children}
+          <div className="w-full max-w-sm">
+            <CommandMenu />
+          </div>
+          <Scripts />
+        </DateProvider>
+      </body>
+    </html>
+  );
+}
+
+function AppLayout({ children }: Readonly<{ children: ReactNode }>) {
+  return (
+    <>
+      <MainContentProvider>
+        <main className="w-full h-full rounded-md">{children}</main>
+      </MainContentProvider>
+    </>
+  );
+}

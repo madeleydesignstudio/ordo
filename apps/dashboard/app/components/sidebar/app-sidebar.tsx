@@ -3,7 +3,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useRouterState } from "@tanstack/react-router";
 import BorderBreak from "../border-break";
@@ -25,9 +24,6 @@ export function AppSidebar() {
       <WorkspaceSettings />
       <SidebarContent className="">
         <SidebarGroup>
-          <div className="flex items-center justify-between">
-            <SidebarTrigger className="h-6 w-6 text-neutral-500" />
-          </div>
           <PrimaryLinks />
           <SidebarCalendar />
         </SidebarGroup>
