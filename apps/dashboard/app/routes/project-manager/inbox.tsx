@@ -117,7 +117,7 @@ function RouteComponent() {
   };
 
   const handleTaskClick = (taskId: string) => {
-    navigate({ to: "/project-manager/$taskId", params: { taskId } });
+    navigate({ to: "/project-manager/task/$taskId", params: { taskId } });
   };
 
   // Filter tasks for today

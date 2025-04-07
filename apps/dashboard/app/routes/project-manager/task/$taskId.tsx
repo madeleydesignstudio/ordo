@@ -23,7 +23,7 @@ type Project = {
   name: string;
 };
 
-export const Route = createFileRoute("/project-manager/$taskId")({
+export const Route = createFileRoute("/project-manager/task/$taskId")({
   component: RouteComponent,
 });
 
