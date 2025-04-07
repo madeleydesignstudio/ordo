@@ -26,6 +26,7 @@ import { Route as ProjectManagerNotebooksImport } from './routes/project-manager
 import { Route as ProjectManagerMyIssuesImport } from './routes/project-manager/my-issues'
 import { Route as ProjectManagerInboxImport } from './routes/project-manager/inbox'
 import { Route as ProjectManagerCanvasImport } from './routes/project-manager/canvas'
+import { Route as ProjectManagerTaskIdImport } from './routes/project-manager/$taskId'
 import { Route as ProjectManagerProjectSlugImport } from './routes/project-manager/$projectSlug'
 import { Route as ContentManagerPeopleImport } from './routes/content-manager/people'
 import { Route as ContentManagerOpportunitiesImport } from './routes/content-manager/opportunities'
@@ -122,6 +123,12 @@ const ProjectManagerInboxRoute = ProjectManagerInboxImport.update({
 const ProjectManagerCanvasRoute = ProjectManagerCanvasImport.update({
   id: '/project-manager/canvas',
   path: '/project-manager/canvas',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProjectManagerTaskIdRoute = ProjectManagerTaskIdImport.update({
+  id: '/project-manager/$taskId',
+  path: '/project-manager/$taskId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -244,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectManagerProjectSlugImport
       parentRoute: typeof rootRoute
     }
+    '/project-manager/$taskId': {
+      id: '/project-manager/$taskId'
+      path: '/project-manager/$taskId'
+      fullPath: '/project-manager/$taskId'
+      preLoaderRoute: typeof ProjectManagerTaskIdImport
+      parentRoute: typeof rootRoute
+    }
     '/project-manager/canvas': {
       id: '/project-manager/canvas'
       path: '/project-manager/canvas'
@@ -331,6 +345,7 @@ export interface FileRoutesByFullPath {
   '/content-manager/opportunities': typeof ContentManagerOpportunitiesRoute
   '/content-manager/people': typeof ContentManagerPeopleRoute
   '/project-manager/$projectSlug': typeof ProjectManagerProjectSlugRoute
+  '/project-manager/$taskId': typeof ProjectManagerTaskIdRoute
   '/project-manager/canvas': typeof ProjectManagerCanvasRoute
   '/project-manager/inbox': typeof ProjectManagerInboxRoute
   '/project-manager/my-issues': typeof ProjectManagerMyIssuesRoute
@@ -355,6 +370,7 @@ export interface FileRoutesByTo {
   '/content-manager/opportunities': typeof ContentManagerOpportunitiesRoute
   '/content-manager/people': typeof ContentManagerPeopleRoute
   '/project-manager/$projectSlug': typeof ProjectManagerProjectSlugRoute
+  '/project-manager/$taskId': typeof ProjectManagerTaskIdRoute
   '/project-manager/canvas': typeof ProjectManagerCanvasRoute
   '/project-manager/inbox': typeof ProjectManagerInboxRoute
   '/project-manager/my-issues': typeof ProjectManagerMyIssuesRoute
@@ -380,6 +396,7 @@ export interface FileRoutesById {
   '/content-manager/opportunities': typeof ContentManagerOpportunitiesRoute
   '/content-manager/people': typeof ContentManagerPeopleRoute
   '/project-manager/$projectSlug': typeof ProjectManagerProjectSlugRoute
+  '/project-manager/$taskId': typeof ProjectManagerTaskIdRoute
   '/project-manager/canvas': typeof ProjectManagerCanvasRoute
   '/project-manager/inbox': typeof ProjectManagerInboxRoute
   '/project-manager/my-issues': typeof ProjectManagerMyIssuesRoute
@@ -406,6 +423,7 @@ export interface FileRouteTypes {
     | '/content-manager/opportunities'
     | '/content-manager/people'
     | '/project-manager/$projectSlug'
+    | '/project-manager/$taskId'
     | '/project-manager/canvas'
     | '/project-manager/inbox'
     | '/project-manager/my-issues'
@@ -429,6 +447,7 @@ export interface FileRouteTypes {
     | '/content-manager/opportunities'
     | '/content-manager/people'
     | '/project-manager/$projectSlug'
+    | '/project-manager/$taskId'
     | '/project-manager/canvas'
     | '/project-manager/inbox'
     | '/project-manager/my-issues'
@@ -452,6 +471,7 @@ export interface FileRouteTypes {
     | '/content-manager/opportunities'
     | '/content-manager/people'
     | '/project-manager/$projectSlug'
+    | '/project-manager/$taskId'
     | '/project-manager/canvas'
     | '/project-manager/inbox'
     | '/project-manager/my-issues'
@@ -477,6 +497,7 @@ export interface RootRouteChildren {
   ContentManagerOpportunitiesRoute: typeof ContentManagerOpportunitiesRoute
   ContentManagerPeopleRoute: typeof ContentManagerPeopleRoute
   ProjectManagerProjectSlugRoute: typeof ProjectManagerProjectSlugRoute
+  ProjectManagerTaskIdRoute: typeof ProjectManagerTaskIdRoute
   ProjectManagerCanvasRoute: typeof ProjectManagerCanvasRoute
   ProjectManagerInboxRoute: typeof ProjectManagerInboxRoute
   ProjectManagerMyIssuesRoute: typeof ProjectManagerMyIssuesRoute
@@ -501,6 +522,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContentManagerOpportunitiesRoute: ContentManagerOpportunitiesRoute,
   ContentManagerPeopleRoute: ContentManagerPeopleRoute,
   ProjectManagerProjectSlugRoute: ProjectManagerProjectSlugRoute,
+  ProjectManagerTaskIdRoute: ProjectManagerTaskIdRoute,
   ProjectManagerCanvasRoute: ProjectManagerCanvasRoute,
   ProjectManagerInboxRoute: ProjectManagerInboxRoute,
   ProjectManagerMyIssuesRoute: ProjectManagerMyIssuesRoute,
@@ -534,6 +556,7 @@ export const routeTree = rootRoute
         "/content-manager/opportunities",
         "/content-manager/people",
         "/project-manager/$projectSlug",
+        "/project-manager/$taskId",
         "/project-manager/canvas",
         "/project-manager/inbox",
         "/project-manager/my-issues",
@@ -578,6 +601,9 @@ export const routeTree = rootRoute
     },
     "/project-manager/$projectSlug": {
       "filePath": "project-manager/$projectSlug.tsx"
+    },
+    "/project-manager/$taskId": {
+      "filePath": "project-manager/$taskId.tsx"
     },
     "/project-manager/canvas": {
       "filePath": "project-manager/canvas.tsx"
