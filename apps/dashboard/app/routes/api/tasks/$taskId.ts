@@ -9,8 +9,14 @@ export const APIRoute = createAPIFileRoute("/api/tasks/$taskId")({
     try {
       const { taskId } = params;
 
+      // Ensure taskId is a valid number
+      const taskIdNum = parseInt(taskId, 10);
+      if (isNaN(taskIdNum)) {
+        return json({ error: "Invalid task ID" }, { status: 400 });
+      }
+
       const task = await db.query.tasks.findFirst({
-        where: eq(tasks.id, parseInt(taskId, 10)),
+        where: eq(tasks.id, taskIdNum),
       });
 
       if (!task) {
@@ -27,11 +33,18 @@ export const APIRoute = createAPIFileRoute("/api/tasks/$taskId")({
   PUT: async ({ request, params }) => {
     try {
       const { taskId } = params;
+
+      // Ensure taskId is a valid number
+      const taskIdNum = parseInt(taskId, 10);
+      if (isNaN(taskIdNum)) {
+        return json({ error: "Invalid task ID" }, { status: 400 });
+      }
+
       const body = await request.json();
 
       // Check if task exists
       const existingTask = await db.query.tasks.findFirst({
-        where: eq(tasks.id, parseInt(taskId, 10)),
+        where: eq(tasks.id, taskIdNum),
       });
 
       if (!existingTask) {
@@ -55,7 +68,7 @@ export const APIRoute = createAPIFileRoute("/api/tasks/$taskId")({
           dueDate: body.dueDate ? new Date(body.dueDate) : existingTask.dueDate,
           updatedAt: new Date(),
         })
-        .where(eq(tasks.id, parseInt(taskId, 10)))
+        .where(eq(tasks.id, taskIdNum))
         .returning();
 
       return json({ task: updatedTask[0] });
@@ -69,9 +82,15 @@ export const APIRoute = createAPIFileRoute("/api/tasks/$taskId")({
     try {
       const { taskId } = params;
 
+      // Ensure taskId is a valid number
+      const taskIdNum = parseInt(taskId, 10);
+      if (isNaN(taskIdNum)) {
+        return json({ error: "Invalid task ID" }, { status: 400 });
+      }
+
       const deletedTask = await db
         .delete(tasks)
-        .where(eq(tasks.id, parseInt(taskId, 10)))
+        .where(eq(tasks.id, taskIdNum))
         .returning();
 
       if (deletedTask.length === 0) {
