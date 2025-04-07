@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { dummyTasks, type Task } from "@/data/tasks";
 
 interface DateSliderProps {
   currentDate: Date;
@@ -9,7 +8,6 @@ interface DateSliderProps {
 
 const DateSlider = ({ currentDate, onDateChange }: DateSliderProps) => {
   const [dates, setDates] = useState<Date[]>([]);
-  const [tasksByDate, setTasksByDate] = useState<Record<string, Task[]>>({});
   const [visibleRange, setVisibleRange] = useState({ start: -3, end: 3 });
 
   const updateDateRange = (center: Date) => {
@@ -21,39 +19,6 @@ const DateSlider = ({ currentDate, onDateChange }: DateSliderProps) => {
       dateArray.push(date);
     }
     setDates(dateArray);
-  };
-
-  // Initialize tasks for the entire date range
-  useEffect(() => {
-    const newTasksByDate: Record<string, Task[]> = {};
-    dates.forEach((date) => {
-      const dateString = date.toDateString();
-      if (!tasksByDate[dateString]) {
-        newTasksByDate[dateString] = dummyTasks.filter(
-          (task) => task.date.toDateString() === dateString
-        );
-      }
-    });
-    setTasksByDate((prev) => ({ ...prev, ...newTasksByDate }));
-  }, [dates]);
-
-  // Replace getTasksForDate with memoized version
-  const getTasksForDate = (date: Date) => {
-    return tasksByDate[date.toDateString()] || [];
-  };
-
-  // Helper function to get priority color
-  const getPriorityColor = (priority: Task["priority"]) => {
-    switch (priority) {
-      case "low":
-        return "bg-green-500";
-      case "medium":
-        return "bg-yellow-500";
-      case "high":
-        return "bg-red-500";
-      default:
-        return "bg-gray-500";
-    }
   };
 
   useEffect(() => {
@@ -134,7 +99,6 @@ const DateSlider = ({ currentDate, onDateChange }: DateSliderProps) => {
               isSelected,
               isToday,
             } = formatDate(date);
-            const tasksForDate = getTasksForDate(date);
 
             return (
               <div
@@ -151,25 +115,7 @@ const DateSlider = ({ currentDate, onDateChange }: DateSliderProps) => {
                   <span className="text-xs uppercase">{day}</span>
                   <span className="text-xs">{dateNum}</span>
                 </div>
-                <div className="flex-1 overflow-y-auto">
-                  {tasksForDate.map((task) => (
-                    <div
-                      key={task.id}
-                      className="flex items-center gap-2 text-[10px] p-2 bg-neutral-800 m-2 rounded-md hover:bg-neutral-700 transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        className="h-2 w-2 rounded border-neutral-600 bg-neutral-900 checked:bg-blue-500"
-                      />
-                      <h3 className="flex-1">{task.title}</h3>
-                      <span
-                        className={`h-2 w-2 rounded-full ${getPriorityColor(task.priority)}`}
-                        title={`${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} priority`}
-                      />
-                    </div>
-                  ))}
-                </div>
+                <div className="flex-1 overflow-y-auto"></div>
               </div>
             );
           })}

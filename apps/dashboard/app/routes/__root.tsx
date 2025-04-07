@@ -13,7 +13,9 @@ import appCss from "@/styles/app.css?url";
 import MainContentProvider from "@/components/providers/MainContentProvider";
 import { DateProvider } from "@/components/date-context";
 import { CommandMenu } from "../components/command-menu/command-menu";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+const queryClient = new QueryClient();
 function NotFoundComponent() {
   return (
     <RootDocument>
@@ -76,9 +78,11 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <AppLayout>
-        <Outlet />
-      </AppLayout>
+      <QueryClientProvider client={queryClient}>
+        <AppLayout>
+          <Outlet />
+        </AppLayout>
+      </QueryClientProvider>
     </RootDocument>
   );
 }
