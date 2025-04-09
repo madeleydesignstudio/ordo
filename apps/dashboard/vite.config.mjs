@@ -9,8 +9,4 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./app"),
     },
   },
-  build: {
-    cssCodeSplit: true,
-    minify: true,
-  },
 });
