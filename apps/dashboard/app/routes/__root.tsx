@@ -15,8 +15,17 @@ import { DateProvider } from "@/components/date-context";
 import { CommandMenu } from "../components/command-menu/command-menu";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GlobalLoader } from "@/components/global-loader";
+import { LoadingProvider } from "@/components/providers/LoadingProvider";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 function NotFoundComponent() {
   return (
     <RootDocument>
@@ -80,9 +89,11 @@ function RootComponent() {
   return (
     <RootDocument>
       <QueryClientProvider client={queryClient}>
-        <AppLayout>
-          <Outlet />
-        </AppLayout>
+        <LoadingProvider>
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        </LoadingProvider>
       </QueryClientProvider>
     </RootDocument>
   );

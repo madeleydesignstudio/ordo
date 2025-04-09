@@ -2,23 +2,36 @@ import { useEffect, useState } from "react";
 
 export function GlobalLoader() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    const handleLoad = () => {
-      setIsLoading(false);
+    // Handle initial hydration
+    const handleHydration = () => {
+      setIsHydrated(true);
     };
 
-    // Check if the page has already loaded
+    // Check if already hydrated
     if (document.readyState === "complete") {
-      setIsLoading(false);
+      setIsHydrated(true);
     } else {
-      window.addEventListener("load", handleLoad);
+      window.addEventListener("load", handleHydration);
     }
 
     return () => {
-      window.removeEventListener("load", handleLoad);
+      window.removeEventListener("load", handleHydration);
     };
   }, []);
+
+  // Keep loading state true until both hydration and initial data loading is complete
+  useEffect(() => {
+    if (isHydrated) {
+      // Add a small delay to ensure smooth transition
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isHydrated]);
 
   if (!isLoading) return null;
 
