@@ -14,8 +14,6 @@ import MainContentProvider from "@/components/providers/MainContentProvider";
 import { DateProvider } from "@/components/date-context";
 import { CommandMenu } from "../components/command-menu/command-menu";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { GlobalLoader } from "@/components/global-loader";
-import { LoadingProvider } from "@/components/providers/LoadingProvider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -85,11 +83,9 @@ function RootComponent() {
   return (
     <RootDocument>
       <QueryClientProvider client={queryClient}>
-        <LoadingProvider>
-          <AppLayout>
-            <Outlet />
-          </AppLayout>
-        </LoadingProvider>
+        <AppLayout>
+          <Outlet />
+        </AppLayout>
       </QueryClientProvider>
     </RootDocument>
   );
@@ -103,7 +99,6 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         <DateProvider>
-          <GlobalLoader />
           {children}
           <div className="w-full max-w-sm">
             <CommandMenu />
