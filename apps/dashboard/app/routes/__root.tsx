@@ -14,6 +14,7 @@ import MainContentProvider from "@/components/providers/MainContentProvider";
 import { DateProvider } from "@/components/date-context";
 import { CommandMenu } from "../components/command-menu/command-menu";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GlobalLoader } from "@/components/global-loader";
 
 const queryClient = new QueryClient();
 function NotFoundComponent() {
@@ -95,6 +96,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         <DateProvider>
+          <GlobalLoader />
           {children}
           <div className="w-full max-w-sm">
             <CommandMenu />
