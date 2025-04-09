@@ -3,8 +3,15 @@ import { useEffect, useState } from "react";
 export function GlobalLoader() {
   const [isLoading, setIsLoading] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+
     // Handle initial hydration
     const handleHydration = () => {
       setIsHydrated(true);
@@ -44,24 +51,23 @@ export function GlobalLoader() {
       window.removeEventListener("load", handleHydration);
       clearInterval(interval);
     };
-  }, []);
+  }, [isClient]);
 
   // Keep loading state true until both hydration and CSS loading is complete
   useEffect(() => {
-    if (isHydrated) {
+    if (isHydrated && isClient) {
       // Add a small delay to ensure smooth transition
       const timer = setTimeout(() => {
         setIsLoading(false);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isHydrated]);
+  }, [isHydrated, isClient]);
 
-  if (!isLoading) return null;
+  if (!isClient || !isLoading) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background"
       style={{
         position: "fixed",
         top: 0,
@@ -76,7 +82,6 @@ export function GlobalLoader() {
       }}
     >
       <div
-        className="flex flex-col items-center gap-4"
         style={{
           display: "flex",
           flexDirection: "column",
