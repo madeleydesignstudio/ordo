@@ -4,18 +4,47 @@ import {
   HeadContent,
   Outlet,
   Scripts,
-  createRootRoute,
   Link,
+  createRootRouteWithContext,
+  ScriptOnce,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import appCss from "@/styles/app.css?url";
 import MainContentProvider from "@/components/providers/MainContentProvider";
 import { DateProvider } from "@/components/date-context";
 import { CommandMenu } from "../components/command-menu/command-menu";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { getWebRequest } from "@tanstack/start/server";
+import { auth } from "@/lib/auth";
+import { createServerFn } from "@tanstack/start";
 
-const queryClient = new QueryClient();
+const getUser = createServerFn({ method: "GET" }).handler(async () => {
+  const { headers } = getWebRequest()!;
+  const session = await auth.api.getSession({ headers });
+  return session?.user || null;
+});
+
+function RootComponent() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 5 * 1000,
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
+
+  return (
+    <RootDocument>
+      <QueryClientProvider client={queryClient}>
+        <AppLayout>
+          <Outlet />
+        </AppLayout>
+      </QueryClientProvider>
+    </RootDocument>
+  );
+}
+
 function NotFoundComponent() {
   return (
     <RootDocument>
@@ -37,25 +66,30 @@ function NotFoundComponent() {
   );
 }
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+  user: Awaited<ReturnType<typeof getUser>>;
+}>()({
+  beforeLoad: async ({ context: { queryClient } }) => {
+    try {
+      const user = await getUser({});
+      return { user };
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      return { user: null };
+    }
+  },
   head: () => ({
     meta: [
-      {
-        charSet: "utf-8",
-      },
+      { charSet: "utf-8" },
       {
         name: "viewport",
         content: "width=device-width, initial-scale=1",
       },
-      {
-        title: "Ordo",
-      },
+      { title: "Ordo" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
       {
         rel: "apple-touch-icon",
         sizes: "180x180",
@@ -75,18 +109,6 @@ export const Route = createRootRoute({
   notFoundComponent: NotFoundComponent,
 });
 
-function RootComponent() {
-  return (
-    <RootDocument>
-      <QueryClientProvider client={queryClient}>
-        <AppLayout>
-          <Outlet />
-        </AppLayout>
-      </QueryClientProvider>
-    </RootDocument>
-  );
-}
-
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html>
@@ -94,6 +116,12 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <HeadContent />
       </head>
       <body>
+        <ScriptOnce>
+          {`document.documentElement.classList.toggle(
+            'dark',
+            localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            )`}
+        </ScriptOnce>
         <DateProvider>
           {children}
           <div className="w-full max-w-sm">
