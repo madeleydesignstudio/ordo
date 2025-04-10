@@ -9,21 +9,13 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
-import "@/styles/app.css";
+import appCss from "@/styles/app.css?url";
 import MainContentProvider from "@/components/providers/MainContentProvider";
 import { DateProvider } from "@/components/date-context";
 import { CommandMenu } from "../components/command-menu/command-menu";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
+const queryClient = new QueryClient();
 function NotFoundComponent() {
   return (
     <RootDocument>
@@ -60,6 +52,10 @@ export const Route = createRootRoute({
       },
     ],
     links: [
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
       {
         rel: "apple-touch-icon",
         sizes: "180x180",

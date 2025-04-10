@@ -54,9 +54,7 @@
     "@workspace/eslint-config": "workspace:^",
     "@workspace/typescript-config": "workspace:*",
     "drizzle-kit": "^0.30.5",
-    "terser": "^5.39.0",
     "typescript": "^5.7.3",
-    "vite": "^6.2.5",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }
