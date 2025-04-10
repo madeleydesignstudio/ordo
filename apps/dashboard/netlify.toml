@@ -1,3 +1,15 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -5,11 +17,26 @@
     X-XSS-Protection = "1; mode=block"
     
 [[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
   for = "/_build/assets/*.css"
   [headers.values]
     Content-Type = "text/css"
 
 [[headers]]
+  for = "/assets/*.css"
+  [headers.values]
+    Content-Type = "text/css"
+
+[[headers]]
   for = "/_build/assets/*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+
+[[headers]]
+  for = "/assets/*.js"
   [headers.values]
     Content-Type = "application/javascript"

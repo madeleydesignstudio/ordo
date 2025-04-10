@@ -11,6 +11,14 @@ export default defineConfig({
       }),
       tailwindcss(),
     ],
+    build: {
+      cssMinify: true,
+      rollupOptions: {
+        output: {
+          assetFileNames: "assets/[name]-[hash][extname]",
+        },
+      },
+    },
   },
   server: {
     preset: "netlify",

@@ -1,0 +1,183 @@
+{
+  "/Users/mxdeley/madeleydesignstudio/ordo/apps/dashboard/app/styles/app.css": {
+    "file": "assets/app-D84rMNva.css",
+    "src": "/Users/mxdeley/madeleydesignstudio/ordo/apps/dashboard/app/styles/app.css"
+  },
+  "_ssr-BLYWBu-d.js": {
+    "file": "assets/ssr-BLYWBu-d.js",
+    "name": "ssr",
+    "dynamicImports": [
+      "app/routes/signin.tsx?tsr-split=component",
+      "app/routes/settings.tsx?tsr-split=component",
+      "app/routes/journal.tsx?tsr-split=component",
+      "app/routes/fitness-tracker.tsx?tsr-split=component",
+      "app/routes/index.tsx?tsr-split=component",
+      "app/routes/finance-manager/index.tsx?tsr-split=component",
+      "app/routes/content-manager/index.tsx?tsr-split=component",
+      "app/routes/project-manager/tasks.tsx?tsr-split=component",
+      "app/routes/project-manager/projects.tsx?tsr-split=component",
+      "app/routes/project-manager/notes.tsx?tsr-split=component",
+      "app/routes/project-manager/notebooks.tsx?tsr-split=component",
+      "app/routes/project-manager/my-issues.tsx?tsr-split=component",
+      "app/routes/project-manager/inbox.tsx?tsr-split=component",
+      "app/routes/project-manager/canvas.tsx?tsr-split=component",
+      "app/routes/project-manager/$projectSlug.tsx?tsr-split=component",
+      "app/routes/content-manager/people.tsx?tsr-split=component",
+      "app/routes/content-manager/opportunities.tsx?tsr-split=component",
+      "app/routes/content-manager/email.tsx?tsr-split=component",
+      "app/routes/content-manager/companies.tsx?tsr-split=component",
+      "app/routes/content-manager/bulk-unsubscribe.tsx?tsr-split=component",
+      "app/routes/project-manager/task/$taskId.tsx?tsr-split=component"
+    ],
+    "assets": [
+      "assets/app-D84rMNva.css"
+    ]
+  },
+  "app/routes/content-manager/bulk-unsubscribe.tsx?tsr-split=component": {
+    "file": "assets/bulk-unsubscribe-BtvPVWl6.js",
+    "name": "bulk-unsubscribe",
+    "src": "app/routes/content-manager/bulk-unsubscribe.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/content-manager/companies.tsx?tsr-split=component": {
+    "file": "assets/companies-BApWh8vt.js",
+    "name": "companies",
+    "src": "app/routes/content-manager/companies.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/content-manager/email.tsx?tsr-split=component": {
+    "file": "assets/email-BqcyULNQ.js",
+    "name": "email",
+    "src": "app/routes/content-manager/email.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/content-manager/index.tsx?tsr-split=component": {
+    "file": "assets/index-BnE275PU.js",
+    "name": "index",
+    "src": "app/routes/content-manager/index.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "_ssr-BLYWBu-d.js"
+    ]
+  },
+  "app/routes/content-manager/opportunities.tsx?tsr-split=component": {
+    "file": "assets/opportunities-Bx0cBM6W.js",
+    "name": "opportunities",
+    "src": "app/routes/content-manager/opportunities.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/content-manager/people.tsx?tsr-split=component": {
+    "file": "assets/people-Ca45bzmV.js",
+    "name": "people",
+    "src": "app/routes/content-manager/people.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/finance-manager/index.tsx?tsr-split=component": {
+    "file": "assets/index-zuxW7HEl.js",
+    "name": "index",
+    "src": "app/routes/finance-manager/index.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/fitness-tracker.tsx?tsr-split=component": {
+    "file": "assets/fitness-tracker-Cqu1aFxG.js",
+    "name": "fitness-tracker",
+    "src": "app/routes/fitness-tracker.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/index.tsx?tsr-split=component": {
+    "file": "assets/index-B-QvMD-v.js",
+    "name": "index",
+    "src": "app/routes/index.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "_ssr-BLYWBu-d.js"
+    ]
+  },
+  "app/routes/journal.tsx?tsr-split=component": {
+    "file": "assets/journal-9M0vdUti.js",
+    "name": "journal",
+    "src": "app/routes/journal.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/project-manager/$projectSlug.tsx?tsr-split=component": {
+    "file": "assets/_projectSlug-BUaa3g_Z.js",
+    "name": "_projectSlug",
+    "src": "app/routes/project-manager/$projectSlug.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "_ssr-BLYWBu-d.js"
+    ]
+  },
+  "app/routes/project-manager/canvas.tsx?tsr-split=component": {
+    "file": "assets/canvas-CbapUs8s.js",
+    "name": "canvas",
+    "src": "app/routes/project-manager/canvas.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/project-manager/inbox.tsx?tsr-split=component": {
+    "file": "assets/inbox-DANAjrwU.js",
+    "name": "inbox",
+    "src": "app/routes/project-manager/inbox.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/project-manager/my-issues.tsx?tsr-split=component": {
+    "file": "assets/my-issues-BNfFh_LY.js",
+    "name": "my-issues",
+    "src": "app/routes/project-manager/my-issues.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/project-manager/notebooks.tsx?tsr-split=component": {
+    "file": "assets/notebooks-_mP9RtH-.js",
+    "name": "notebooks",
+    "src": "app/routes/project-manager/notebooks.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/project-manager/notes.tsx?tsr-split=component": {
+    "file": "assets/notes-DgBet74Q.js",
+    "name": "notes",
+    "src": "app/routes/project-manager/notes.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/project-manager/projects.tsx?tsr-split=component": {
+    "file": "assets/projects-DYlyGErE.js",
+    "name": "projects",
+    "src": "app/routes/project-manager/projects.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/project-manager/task/$taskId.tsx?tsr-split=component": {
+    "file": "assets/_taskId-DZ_4aVPV.js",
+    "name": "_taskId",
+    "src": "app/routes/project-manager/task/$taskId.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "_ssr-BLYWBu-d.js"
+    ]
+  },
+  "app/routes/project-manager/tasks.tsx?tsr-split=component": {
+    "file": "assets/tasks-1UuLOfIm.js",
+    "name": "tasks",
+    "src": "app/routes/project-manager/tasks.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/settings.tsx?tsr-split=component": {
+    "file": "assets/settings-CxxHolBS.js",
+    "name": "settings",
+    "src": "app/routes/settings.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "app/routes/signin.tsx?tsr-split=component": {
+    "file": "assets/signin-CZbnIIhq.js",
+    "name": "signin",
+    "src": "app/routes/signin.tsx?tsr-split=component",
+    "isDynamicEntry": true
+  },
+  "virtual:$vinxi/handler/ssr": {
+    "file": "ssr.js",
+    "name": "ssr",
+    "src": "virtual:$vinxi/handler/ssr",
+    "isEntry": true,
+    "imports": [
+      "_ssr-BLYWBu-d.js"
+    ]
+  }
+}
