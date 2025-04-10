@@ -13,11 +13,6 @@ export default defineConfig({
     ],
     build: {
       cssMinify: true,
-      rollupOptions: {
-        output: {
-          assetFileNames: "assets/[name]-[hash][extname]",
-        },
-      },
     },
   },
   server: {
