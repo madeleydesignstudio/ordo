@@ -15,6 +15,8 @@ import { DateProvider } from "@/components/date-context";
 import { CommandMenu } from "../components/command-menu/command-menu";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import { auth } from "@/lib/auth";
+
 const queryClient = new QueryClient();
 function NotFoundComponent() {
   return (

@@ -32,6 +32,7 @@ import { Route as ContentManagerOpportunitiesImport } from './routes/content-man
 import { Route as ContentManagerEmailImport } from './routes/content-manager/email'
 import { Route as ContentManagerCompaniesImport } from './routes/content-manager/companies'
 import { Route as ContentManagerBulkUnsubscribeImport } from './routes/content-manager/bulk-unsubscribe'
+import { Route as AuthPathnameImport } from './routes/auth/$pathname'
 import { Route as ProjectManagerTaskTaskIdImport } from './routes/project-manager/task/$taskId'
 
 // Create/Update Routes
@@ -164,6 +165,12 @@ const ContentManagerBulkUnsubscribeRoute =
     getParentRoute: () => rootRoute,
   } as any)
 
+const AuthPathnameRoute = AuthPathnameImport.update({
+  id: '/auth/$pathname',
+  path: '/auth/$pathname',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const ProjectManagerTaskTaskIdRoute = ProjectManagerTaskTaskIdImport.update({
   id: '/project-manager/task/$taskId',
   path: '/project-manager/task/$taskId',
@@ -207,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/signin'
       fullPath: '/signin'
       preLoaderRoute: typeof SigninImport
+      parentRoute: typeof rootRoute
+    }
+    '/auth/$pathname': {
+      id: '/auth/$pathname'
+      path: '/auth/$pathname'
+      fullPath: '/auth/$pathname'
+      preLoaderRoute: typeof AuthPathnameImport
       parentRoute: typeof rootRoute
     }
     '/content-manager/bulk-unsubscribe': {
@@ -339,6 +353,7 @@ export interface FileRoutesByFullPath {
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
+  '/auth/$pathname': typeof AuthPathnameRoute
   '/content-manager/bulk-unsubscribe': typeof ContentManagerBulkUnsubscribeRoute
   '/content-manager/companies': typeof ContentManagerCompaniesRoute
   '/content-manager/email': typeof ContentManagerEmailRoute
@@ -364,6 +379,7 @@ export interface FileRoutesByTo {
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
+  '/auth/$pathname': typeof AuthPathnameRoute
   '/content-manager/bulk-unsubscribe': typeof ContentManagerBulkUnsubscribeRoute
   '/content-manager/companies': typeof ContentManagerCompaniesRoute
   '/content-manager/email': typeof ContentManagerEmailRoute
@@ -390,6 +406,7 @@ export interface FileRoutesById {
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
+  '/auth/$pathname': typeof AuthPathnameRoute
   '/content-manager/bulk-unsubscribe': typeof ContentManagerBulkUnsubscribeRoute
   '/content-manager/companies': typeof ContentManagerCompaniesRoute
   '/content-manager/email': typeof ContentManagerEmailRoute
@@ -417,6 +434,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/settings'
     | '/signin'
+    | '/auth/$pathname'
     | '/content-manager/bulk-unsubscribe'
     | '/content-manager/companies'
     | '/content-manager/email'
@@ -441,6 +459,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/settings'
     | '/signin'
+    | '/auth/$pathname'
     | '/content-manager/bulk-unsubscribe'
     | '/content-manager/companies'
     | '/content-manager/email'
@@ -465,6 +484,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/settings'
     | '/signin'
+    | '/auth/$pathname'
     | '/content-manager/bulk-unsubscribe'
     | '/content-manager/companies'
     | '/content-manager/email'
@@ -491,6 +511,7 @@ export interface RootRouteChildren {
   JournalRoute: typeof JournalRoute
   SettingsRoute: typeof SettingsRoute
   SigninRoute: typeof SigninRoute
+  AuthPathnameRoute: typeof AuthPathnameRoute
   ContentManagerBulkUnsubscribeRoute: typeof ContentManagerBulkUnsubscribeRoute
   ContentManagerCompaniesRoute: typeof ContentManagerCompaniesRoute
   ContentManagerEmailRoute: typeof ContentManagerEmailRoute
@@ -516,6 +537,7 @@ const rootRouteChildren: RootRouteChildren = {
   JournalRoute: JournalRoute,
   SettingsRoute: SettingsRoute,
   SigninRoute: SigninRoute,
+  AuthPathnameRoute: AuthPathnameRoute,
   ContentManagerBulkUnsubscribeRoute: ContentManagerBulkUnsubscribeRoute,
   ContentManagerCompaniesRoute: ContentManagerCompaniesRoute,
   ContentManagerEmailRoute: ContentManagerEmailRoute,
@@ -550,6 +572,7 @@ export const routeTree = rootRoute
         "/journal",
         "/settings",
         "/signin",
+        "/auth/$pathname",
         "/content-manager/bulk-unsubscribe",
         "/content-manager/companies",
         "/content-manager/email",
@@ -583,6 +606,9 @@ export const routeTree = rootRoute
     },
     "/signin": {
       "filePath": "signin.tsx"
+    },
+    "/auth/$pathname": {
+      "filePath": "auth/$pathname.tsx"
     },
     "/content-manager/bulk-unsubscribe": {
       "filePath": "content-manager/bulk-unsubscribe.tsx"
