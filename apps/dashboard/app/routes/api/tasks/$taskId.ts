@@ -1,7 +1,7 @@
 import { json } from "@tanstack/start";
 import { createAPIFileRoute } from "@tanstack/start/api";
-import { db } from "../../../db/db";
-import { tasks } from "../../../db/schema";
+import { db } from "../../../lib/db/db";
+import { tasks } from "../../../lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export const APIRoute = createAPIFileRoute("/api/tasks/$taskId")({

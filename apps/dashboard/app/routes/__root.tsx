@@ -1,45 +1,46 @@
 // app/routes/__root.tsx
 
 import {
+  createRootRouteWithContext,
   HeadContent,
   Outlet,
-  Scripts,
-  createRootRoute,
-  Link,
+  Scripts
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
-import appCss from "@/styles/app.css?url";
-import MainContentProvider from "@/components/providers/MainContentProvider";
+import { createServerFn } from "@tanstack/react-start";
+import { getWebRequest } from "@tanstack/react-start/server";
+
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+
 import { DateProvider } from "@/components/date-context";
+import MainContentProvider from "@/components/providers/MainContentProvider";
+import appCss from "@/styles/app.css?url";
+import { QueryClient } from "@tanstack/react-query";
 import { CommandMenu } from "../components/command-menu/command-menu";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/server/auth";
 
-const queryClient = new QueryClient();
-function NotFoundComponent() {
-  return (
-    <RootDocument>
-      <AppLayout>
-        <div className="flex flex-col items-center justify-center min-h-screen p-4">
-          <h1 className="text-4xl font-bold">404 - Page Not Found</h1>
-          <p className="mt-4">
-            Sorry, the page you are looking for does not exist.
-          </p>
-          <Link
-            to="/"
-            className="mt-8 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Go Home
-          </Link>
-        </div>
-      </AppLayout>
-    </RootDocument>
-  );
-}
 
-export const Route = createRootRoute({
+const getUser = createServerFn({ method: "GET" }).handler(async () => {
+  const { headers } = getWebRequest()!;
+  const session = await auth.api.getSession({ headers });
+
+  return session?.user || null;
+});
+
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+  user: Awaited<ReturnType<typeof getUser>>;
+}>()({
+  beforeLoad: async ({ context }) => {
+    const user = await context.queryClient.fetchQuery({
+      queryKey: ["user"],
+      queryFn: ({ signal }) => getUser({ signal }),
+    }); // we're using react-query for caching, see router.tsx
+    return { user };
+  },
   head: () => ({
     meta: [
       {
@@ -74,17 +75,14 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootComponent,
-  notFoundComponent: NotFoundComponent,
 });
 
 function RootComponent() {
   return (
     <RootDocument>
-      <QueryClientProvider client={queryClient}>
         <AppLayout>
           <Outlet />
         </AppLayout>
-      </QueryClientProvider>
     </RootDocument>
   );
 }
@@ -98,6 +96,8 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         <DateProvider>
           {children}
+          <ReactQueryDevtools buttonPosition="bottom-left" />
+          <TanStackRouterDevtools position="bottom-right" />
           <div className="w-full max-w-sm">
             <CommandMenu />
           </div>
