@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsImport } from './routes/settings'
 import { Route as JournalImport } from './routes/journal'
 import { Route as FitnessTrackerImport } from './routes/fitness-tracker'
+import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as ProjectManagerIndexImport } from './routes/project-manager/index'
 import { Route as FinanceManagerIndexImport } from './routes/finance-manager/index'
@@ -31,6 +32,8 @@ import { Route as ContentManagerOpportunitiesImport } from './routes/content-man
 import { Route as ContentManagerEmailImport } from './routes/content-manager/email'
 import { Route as ContentManagerCompaniesImport } from './routes/content-manager/companies'
 import { Route as ContentManagerBulkUnsubscribeImport } from './routes/content-manager/bulk-unsubscribe'
+import { Route as AuthSignupImport } from './routes/_auth/signup'
+import { Route as AuthLoginImport } from './routes/_auth/login'
 import { Route as ProjectManagerTaskTaskIdImport } from './routes/project-manager/task/$taskId'
 
 // Create/Update Routes
@@ -50,6 +53,11 @@ const JournalRoute = JournalImport.update({
 const FitnessTrackerRoute = FitnessTrackerImport.update({
   id: '/fitness-tracker',
   path: '/fitness-tracker',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthRouteRoute = AuthRouteImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -157,6 +165,18 @@ const ContentManagerBulkUnsubscribeRoute =
     getParentRoute: () => rootRoute,
   } as any)
 
+const AuthSignupRoute = AuthSignupImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+
+const AuthLoginRoute = AuthLoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+
 const ProjectManagerTaskTaskIdRoute = ProjectManagerTaskTaskIdImport.update({
   id: '/project-manager/task/$taskId',
   path: '/project-manager/task/$taskId',
@@ -172,6 +192,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRoute
     }
     '/fitness-tracker': {
@@ -194,6 +221,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsImport
       parentRoute: typeof rootRoute
+    }
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginImport
+      parentRoute: typeof AuthRouteImport
+    }
+    '/_auth/signup': {
+      id: '/_auth/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof AuthSignupImport
+      parentRoute: typeof AuthRouteImport
     }
     '/content-manager/bulk-unsubscribe': {
       id: '/content-manager/bulk-unsubscribe'
@@ -319,11 +360,28 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
+interface AuthRouteRouteChildren {
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthSignupRoute: typeof AuthSignupRoute
+}
+
+const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthLoginRoute: AuthLoginRoute,
+  AuthSignupRoute: AuthSignupRoute,
+}
+
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '': typeof AuthRouteRouteWithChildren
   '/fitness-tracker': typeof FitnessTrackerRoute
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
+  '/login': typeof AuthLoginRoute
+  '/signup': typeof AuthSignupRoute
   '/content-manager/bulk-unsubscribe': typeof ContentManagerBulkUnsubscribeRoute
   '/content-manager/companies': typeof ContentManagerCompaniesRoute
   '/content-manager/email': typeof ContentManagerEmailRoute
@@ -345,9 +403,12 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '': typeof AuthRouteRouteWithChildren
   '/fitness-tracker': typeof FitnessTrackerRoute
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
+  '/login': typeof AuthLoginRoute
+  '/signup': typeof AuthSignupRoute
   '/content-manager/bulk-unsubscribe': typeof ContentManagerBulkUnsubscribeRoute
   '/content-manager/companies': typeof ContentManagerCompaniesRoute
   '/content-manager/email': typeof ContentManagerEmailRoute
@@ -370,9 +431,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/_auth': typeof AuthRouteRouteWithChildren
   '/fitness-tracker': typeof FitnessTrackerRoute
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
+  '/_auth/login': typeof AuthLoginRoute
+  '/_auth/signup': typeof AuthSignupRoute
   '/content-manager/bulk-unsubscribe': typeof ContentManagerBulkUnsubscribeRoute
   '/content-manager/companies': typeof ContentManagerCompaniesRoute
   '/content-manager/email': typeof ContentManagerEmailRoute
@@ -396,9 +460,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | ''
     | '/fitness-tracker'
     | '/journal'
     | '/settings'
+    | '/login'
+    | '/signup'
     | '/content-manager/bulk-unsubscribe'
     | '/content-manager/companies'
     | '/content-manager/email'
@@ -419,9 +486,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | ''
     | '/fitness-tracker'
     | '/journal'
     | '/settings'
+    | '/login'
+    | '/signup'
     | '/content-manager/bulk-unsubscribe'
     | '/content-manager/companies'
     | '/content-manager/email'
@@ -442,9 +512,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_auth'
     | '/fitness-tracker'
     | '/journal'
     | '/settings'
+    | '/_auth/login'
+    | '/_auth/signup'
     | '/content-manager/bulk-unsubscribe'
     | '/content-manager/companies'
     | '/content-manager/email'
@@ -467,6 +540,7 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
   FitnessTrackerRoute: typeof FitnessTrackerRoute
   JournalRoute: typeof JournalRoute
   SettingsRoute: typeof SettingsRoute
@@ -491,6 +565,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRouteRoute: AuthRouteRouteWithChildren,
   FitnessTrackerRoute: FitnessTrackerRoute,
   JournalRoute: JournalRoute,
   SettingsRoute: SettingsRoute,
@@ -524,6 +599,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/_auth",
         "/fitness-tracker",
         "/journal",
         "/settings",
@@ -549,6 +625,13 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.tsx"
     },
+    "/_auth": {
+      "filePath": "_auth/route.tsx",
+      "children": [
+        "/_auth/login",
+        "/_auth/signup"
+      ]
+    },
     "/fitness-tracker": {
       "filePath": "fitness-tracker.tsx"
     },
@@ -557,6 +640,14 @@ export const routeTree = rootRoute
     },
     "/settings": {
       "filePath": "settings.tsx"
+    },
+    "/_auth/login": {
+      "filePath": "_auth/login.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/signup": {
+      "filePath": "_auth/signup.tsx",
+      "parent": "/_auth"
     },
     "/content-manager/bulk-unsubscribe": {
       "filePath": "content-manager/bulk-unsubscribe.tsx"

@@ -1,13 +1,12 @@
 import { relations } from "drizzle-orm";
 import {
-  boolean,
   integer,
   pgEnum,
   pgTable,
   serial,
   text,
   timestamp,
-  varchar,
+  varchar
 } from "drizzle-orm/pg-core";
 
 // Project status enum

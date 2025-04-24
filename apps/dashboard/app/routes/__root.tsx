@@ -4,7 +4,8 @@ import {
   createRootRouteWithContext,
   HeadContent,
   Outlet,
-  Scripts
+  Scripts,
+  useMatches
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
@@ -78,11 +79,21 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
+  const matches = useMatches();
+  const isAuthRoute = matches.some(match => 
+    match.pathname === '/login' || 
+    match.pathname === '/signup'
+  );
+
   return (
     <RootDocument>
+      {isAuthRoute ? (
+        <Outlet />
+      ) : (
         <AppLayout>
           <Outlet />
         </AppLayout>
+      )}
     </RootDocument>
   );
 }

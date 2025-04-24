@@ -10,7 +10,6 @@ import { CommandMenu } from "../command-menu/command-menu";
 const MainContentProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
-      {" "}
       <SidebarProvider>
         <div className="flex h-screen w-screen">
           <AppSidebar />
