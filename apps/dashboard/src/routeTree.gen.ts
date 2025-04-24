@@ -11,18 +11,39 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as FinanceManagerRouteImport } from './routes/finance-manager/route'
 import { Route as DashboardRouteImport } from './routes/dashboard/route'
+import { Route as ContentManagerRouteImport } from './routes/content-manager/route'
 import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as IndexImport } from './routes/index'
+import { Route as FinanceManagerIndexImport } from './routes/finance-manager/index'
 import { Route as DashboardIndexImport } from './routes/dashboard/index'
+import { Route as ContentManagerIndexImport } from './routes/content-manager/index'
+import { Route as ContentManagerPeopleImport } from './routes/content-manager/people'
+import { Route as ContentManagerOpportunitiesImport } from './routes/content-manager/opportunities'
+import { Route as ContentManagerEmailImport } from './routes/content-manager/email'
+import { Route as ContentManagerCompaniesImport } from './routes/content-manager/companies'
+import { Route as ContentManagerBulkUnsubscribeImport } from './routes/content-manager/bulk-unsubscribe'
 import { Route as AuthSignupImport } from './routes/_auth/signup'
 import { Route as AuthLoginImport } from './routes/_auth/login'
 
 // Create/Update Routes
 
+const FinanceManagerRouteRoute = FinanceManagerRouteImport.update({
+  id: '/finance-manager',
+  path: '/finance-manager',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const DashboardRouteRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ContentManagerRouteRoute = ContentManagerRouteImport.update({
+  id: '/content-manager',
+  path: '/content-manager',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -37,11 +58,55 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const FinanceManagerIndexRoute = FinanceManagerIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => FinanceManagerRouteRoute,
+} as any)
+
 const DashboardIndexRoute = DashboardIndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+
+const ContentManagerIndexRoute = ContentManagerIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ContentManagerRouteRoute,
+} as any)
+
+const ContentManagerPeopleRoute = ContentManagerPeopleImport.update({
+  id: '/people',
+  path: '/people',
+  getParentRoute: () => ContentManagerRouteRoute,
+} as any)
+
+const ContentManagerOpportunitiesRoute =
+  ContentManagerOpportunitiesImport.update({
+    id: '/opportunities',
+    path: '/opportunities',
+    getParentRoute: () => ContentManagerRouteRoute,
+  } as any)
+
+const ContentManagerEmailRoute = ContentManagerEmailImport.update({
+  id: '/email',
+  path: '/email',
+  getParentRoute: () => ContentManagerRouteRoute,
+} as any)
+
+const ContentManagerCompaniesRoute = ContentManagerCompaniesImport.update({
+  id: '/companies',
+  path: '/companies',
+  getParentRoute: () => ContentManagerRouteRoute,
+} as any)
+
+const ContentManagerBulkUnsubscribeRoute =
+  ContentManagerBulkUnsubscribeImport.update({
+    id: '/bulk-unsubscribe',
+    path: '/bulk-unsubscribe',
+    getParentRoute: () => ContentManagerRouteRoute,
+  } as any)
 
 const AuthSignupRoute = AuthSignupImport.update({
   id: '/signup',
@@ -73,11 +138,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRoute
     }
+    '/content-manager': {
+      id: '/content-manager'
+      path: '/content-manager'
+      fullPath: '/content-manager'
+      preLoaderRoute: typeof ContentManagerRouteImport
+      parentRoute: typeof rootRoute
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/finance-manager': {
+      id: '/finance-manager'
+      path: '/finance-manager'
+      fullPath: '/finance-manager'
+      preLoaderRoute: typeof FinanceManagerRouteImport
       parentRoute: typeof rootRoute
     }
     '/_auth/login': {
@@ -94,12 +173,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignupImport
       parentRoute: typeof AuthRouteImport
     }
+    '/content-manager/bulk-unsubscribe': {
+      id: '/content-manager/bulk-unsubscribe'
+      path: '/bulk-unsubscribe'
+      fullPath: '/content-manager/bulk-unsubscribe'
+      preLoaderRoute: typeof ContentManagerBulkUnsubscribeImport
+      parentRoute: typeof ContentManagerRouteImport
+    }
+    '/content-manager/companies': {
+      id: '/content-manager/companies'
+      path: '/companies'
+      fullPath: '/content-manager/companies'
+      preLoaderRoute: typeof ContentManagerCompaniesImport
+      parentRoute: typeof ContentManagerRouteImport
+    }
+    '/content-manager/email': {
+      id: '/content-manager/email'
+      path: '/email'
+      fullPath: '/content-manager/email'
+      preLoaderRoute: typeof ContentManagerEmailImport
+      parentRoute: typeof ContentManagerRouteImport
+    }
+    '/content-manager/opportunities': {
+      id: '/content-manager/opportunities'
+      path: '/opportunities'
+      fullPath: '/content-manager/opportunities'
+      preLoaderRoute: typeof ContentManagerOpportunitiesImport
+      parentRoute: typeof ContentManagerRouteImport
+    }
+    '/content-manager/people': {
+      id: '/content-manager/people'
+      path: '/people'
+      fullPath: '/content-manager/people'
+      preLoaderRoute: typeof ContentManagerPeopleImport
+      parentRoute: typeof ContentManagerRouteImport
+    }
+    '/content-manager/': {
+      id: '/content-manager/'
+      path: '/'
+      fullPath: '/content-manager/'
+      preLoaderRoute: typeof ContentManagerIndexImport
+      parentRoute: typeof ContentManagerRouteImport
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexImport
       parentRoute: typeof DashboardRouteImport
+    }
+    '/finance-manager/': {
+      id: '/finance-manager/'
+      path: '/'
+      fullPath: '/finance-manager/'
+      preLoaderRoute: typeof FinanceManagerIndexImport
+      parentRoute: typeof FinanceManagerRouteImport
     }
   }
 }
@@ -120,6 +248,27 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
+interface ContentManagerRouteRouteChildren {
+  ContentManagerBulkUnsubscribeRoute: typeof ContentManagerBulkUnsubscribeRoute
+  ContentManagerCompaniesRoute: typeof ContentManagerCompaniesRoute
+  ContentManagerEmailRoute: typeof ContentManagerEmailRoute
+  ContentManagerOpportunitiesRoute: typeof ContentManagerOpportunitiesRoute
+  ContentManagerPeopleRoute: typeof ContentManagerPeopleRoute
+  ContentManagerIndexRoute: typeof ContentManagerIndexRoute
+}
+
+const ContentManagerRouteRouteChildren: ContentManagerRouteRouteChildren = {
+  ContentManagerBulkUnsubscribeRoute: ContentManagerBulkUnsubscribeRoute,
+  ContentManagerCompaniesRoute: ContentManagerCompaniesRoute,
+  ContentManagerEmailRoute: ContentManagerEmailRoute,
+  ContentManagerOpportunitiesRoute: ContentManagerOpportunitiesRoute,
+  ContentManagerPeopleRoute: ContentManagerPeopleRoute,
+  ContentManagerIndexRoute: ContentManagerIndexRoute,
+}
+
+const ContentManagerRouteRouteWithChildren =
+  ContentManagerRouteRoute._addFileChildren(ContentManagerRouteRouteChildren)
+
 interface DashboardRouteRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
@@ -132,13 +281,33 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
   DashboardRouteRouteChildren,
 )
 
+interface FinanceManagerRouteRouteChildren {
+  FinanceManagerIndexRoute: typeof FinanceManagerIndexRoute
+}
+
+const FinanceManagerRouteRouteChildren: FinanceManagerRouteRouteChildren = {
+  FinanceManagerIndexRoute: FinanceManagerIndexRoute,
+}
+
+const FinanceManagerRouteRouteWithChildren =
+  FinanceManagerRouteRoute._addFileChildren(FinanceManagerRouteRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof AuthRouteRouteWithChildren
+  '/content-manager': typeof ContentManagerRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/finance-manager': typeof FinanceManagerRouteRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/signup': typeof AuthSignupRoute
+  '/content-manager/bulk-unsubscribe': typeof ContentManagerBulkUnsubscribeRoute
+  '/content-manager/companies': typeof ContentManagerCompaniesRoute
+  '/content-manager/email': typeof ContentManagerEmailRoute
+  '/content-manager/opportunities': typeof ContentManagerOpportunitiesRoute
+  '/content-manager/people': typeof ContentManagerPeopleRoute
+  '/content-manager/': typeof ContentManagerIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/finance-manager/': typeof FinanceManagerIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -146,45 +315,101 @@ export interface FileRoutesByTo {
   '': typeof AuthRouteRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/signup': typeof AuthSignupRoute
+  '/content-manager/bulk-unsubscribe': typeof ContentManagerBulkUnsubscribeRoute
+  '/content-manager/companies': typeof ContentManagerCompaniesRoute
+  '/content-manager/email': typeof ContentManagerEmailRoute
+  '/content-manager/opportunities': typeof ContentManagerOpportunitiesRoute
+  '/content-manager/people': typeof ContentManagerPeopleRoute
+  '/content-manager': typeof ContentManagerIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/finance-manager': typeof FinanceManagerIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteRouteWithChildren
+  '/content-manager': typeof ContentManagerRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/finance-manager': typeof FinanceManagerRouteRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/signup': typeof AuthSignupRoute
+  '/content-manager/bulk-unsubscribe': typeof ContentManagerBulkUnsubscribeRoute
+  '/content-manager/companies': typeof ContentManagerCompaniesRoute
+  '/content-manager/email': typeof ContentManagerEmailRoute
+  '/content-manager/opportunities': typeof ContentManagerOpportunitiesRoute
+  '/content-manager/people': typeof ContentManagerPeopleRoute
+  '/content-manager/': typeof ContentManagerIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/finance-manager/': typeof FinanceManagerIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/dashboard' | '/login' | '/signup' | '/dashboard/'
+  fullPaths:
+    | '/'
+    | ''
+    | '/content-manager'
+    | '/dashboard'
+    | '/finance-manager'
+    | '/login'
+    | '/signup'
+    | '/content-manager/bulk-unsubscribe'
+    | '/content-manager/companies'
+    | '/content-manager/email'
+    | '/content-manager/opportunities'
+    | '/content-manager/people'
+    | '/content-manager/'
+    | '/dashboard/'
+    | '/finance-manager/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/login' | '/signup' | '/dashboard'
+  to:
+    | '/'
+    | ''
+    | '/login'
+    | '/signup'
+    | '/content-manager/bulk-unsubscribe'
+    | '/content-manager/companies'
+    | '/content-manager/email'
+    | '/content-manager/opportunities'
+    | '/content-manager/people'
+    | '/content-manager'
+    | '/dashboard'
+    | '/finance-manager'
   id:
     | '__root__'
     | '/'
     | '/_auth'
+    | '/content-manager'
     | '/dashboard'
+    | '/finance-manager'
     | '/_auth/login'
     | '/_auth/signup'
+    | '/content-manager/bulk-unsubscribe'
+    | '/content-manager/companies'
+    | '/content-manager/email'
+    | '/content-manager/opportunities'
+    | '/content-manager/people'
+    | '/content-manager/'
     | '/dashboard/'
+    | '/finance-manager/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  ContentManagerRouteRoute: typeof ContentManagerRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  FinanceManagerRouteRoute: typeof FinanceManagerRouteRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  ContentManagerRouteRoute: ContentManagerRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  FinanceManagerRouteRoute: FinanceManagerRouteRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -199,7 +424,9 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/_auth",
-        "/dashboard"
+        "/content-manager",
+        "/dashboard",
+        "/finance-manager"
       ]
     },
     "/": {
@@ -212,10 +439,27 @@ export const routeTree = rootRoute
         "/_auth/signup"
       ]
     },
+    "/content-manager": {
+      "filePath": "content-manager/route.tsx",
+      "children": [
+        "/content-manager/bulk-unsubscribe",
+        "/content-manager/companies",
+        "/content-manager/email",
+        "/content-manager/opportunities",
+        "/content-manager/people",
+        "/content-manager/"
+      ]
+    },
     "/dashboard": {
       "filePath": "dashboard/route.tsx",
       "children": [
         "/dashboard/"
+      ]
+    },
+    "/finance-manager": {
+      "filePath": "finance-manager/route.tsx",
+      "children": [
+        "/finance-manager/"
       ]
     },
     "/_auth/login": {
@@ -226,9 +470,37 @@ export const routeTree = rootRoute
       "filePath": "_auth/signup.tsx",
       "parent": "/_auth"
     },
+    "/content-manager/bulk-unsubscribe": {
+      "filePath": "content-manager/bulk-unsubscribe.tsx",
+      "parent": "/content-manager"
+    },
+    "/content-manager/companies": {
+      "filePath": "content-manager/companies.tsx",
+      "parent": "/content-manager"
+    },
+    "/content-manager/email": {
+      "filePath": "content-manager/email.tsx",
+      "parent": "/content-manager"
+    },
+    "/content-manager/opportunities": {
+      "filePath": "content-manager/opportunities.tsx",
+      "parent": "/content-manager"
+    },
+    "/content-manager/people": {
+      "filePath": "content-manager/people.tsx",
+      "parent": "/content-manager"
+    },
+    "/content-manager/": {
+      "filePath": "content-manager/index.tsx",
+      "parent": "/content-manager"
+    },
     "/dashboard/": {
       "filePath": "dashboard/index.tsx",
       "parent": "/dashboard"
+    },
+    "/finance-manager/": {
+      "filePath": "finance-manager/index.tsx",
+      "parent": "/finance-manager"
     }
   }
 }

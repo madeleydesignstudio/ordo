@@ -5,6 +5,7 @@ import {
   Outlet,
   ScriptOnce,
   Scripts,
+  useLocation
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
@@ -12,6 +13,8 @@ import { getWebRequest } from "@tanstack/react-start/server";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
+import { DateProvider } from "~/components/date-context";
+import MainContentProvider from "~/components/providers/MainContentProvider";
 import { auth } from "~/lib/server/auth";
 import appCss from "~/lib/styles/app.css?url";
 
@@ -56,9 +59,18 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
+  const { pathname } = useLocation();
+  const isAuthRoute = pathname === '/login' || pathname === '/signup';
+
   return (
     <RootDocument>
-      <Outlet />
+      {isAuthRoute ? (
+        <Outlet />
+      ) : (
+        <AppLayout>
+          <Outlet />
+        </AppLayout>
+      )}
     </RootDocument>
   );
 }
@@ -70,6 +82,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
+      <DateProvider>
       <body>
         <ScriptOnce>
           {`document.documentElement.classList.toggle(
@@ -83,8 +96,22 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <TanStackRouterDevtools position="bottom-right" />
 
-        <Scripts />
-      </body>
+          <Scripts />
+        </body>
+      </DateProvider>
     </html>
+  );
+}
+
+function AppLayout({ children }: { children: React.ReactNode }) {
+  return (      
+    <>
+      <MainContentProvider>
+        <main className="w-full h-full rounded-md">
+
+          {children}
+        </main>
+      </MainContentProvider>
+    </>
   );
 }
