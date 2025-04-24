@@ -1,11 +1,10 @@
-import React from "react";
+import { DumbbellIcon, NotebookPen } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import { DumbbellIcon, NotebookPen } from "lucide-react";
 
 const PersonalLinks = () => {
   return (

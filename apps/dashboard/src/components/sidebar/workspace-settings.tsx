@@ -1,6 +1,5 @@
-import React from "react";
-import { SidebarTrigger } from "../ui/sidebar";
 import BorderBreak from "../border-break";
+import { SidebarTrigger } from "../ui/sidebar";
 
 const WorkspaceSettings = () => {
   return (
