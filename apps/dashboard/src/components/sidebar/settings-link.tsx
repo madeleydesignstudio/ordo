@@ -5,7 +5,7 @@ const SettingsLink = () => {
   return (
     <div className="w-fit">
       <Link
-        to="/"
+        to="/settings"
         className="flex gap-2 items-center text-neutral-300 cursor-pointer"
       >
         <SettingsIcon size={12} />
