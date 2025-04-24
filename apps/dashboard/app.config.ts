@@ -11,8 +11,6 @@ export default defineConfig({
       tailwindcss(),
     ],
   },
-
-  // https://react.dev/learn/react-compiler
   react: {
     babel: {
       plugins: [
@@ -27,12 +25,10 @@ export default defineConfig({
   },
 
   tsr: {
-    // https://github.com/TanStack/router/discussions/2863#discussioncomment-12458714
     appDirectory: "./src",
   },
 
   server: {
-    // https://tanstack.com/start/latest/docs/framework/react/hosting#deployment
-    // preset: "netlify",
+    preset: "netlify",
   },
 });
