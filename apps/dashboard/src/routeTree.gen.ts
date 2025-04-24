@@ -11,14 +11,24 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ProjectManagerRouteImport } from './routes/project-manager/route'
 import { Route as FinanceManagerRouteImport } from './routes/finance-manager/route'
 import { Route as DashboardRouteImport } from './routes/dashboard/route'
 import { Route as ContentManagerRouteImport } from './routes/content-manager/route'
 import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as IndexImport } from './routes/index'
+import { Route as ProjectManagerIndexImport } from './routes/project-manager/index'
 import { Route as FinanceManagerIndexImport } from './routes/finance-manager/index'
 import { Route as DashboardIndexImport } from './routes/dashboard/index'
 import { Route as ContentManagerIndexImport } from './routes/content-manager/index'
+import { Route as ProjectManagerTasksImport } from './routes/project-manager/tasks'
+import { Route as ProjectManagerProjectsImport } from './routes/project-manager/projects'
+import { Route as ProjectManagerNotesImport } from './routes/project-manager/notes'
+import { Route as ProjectManagerNotebooksImport } from './routes/project-manager/notebooks'
+import { Route as ProjectManagerMyIssuesImport } from './routes/project-manager/my-issues'
+import { Route as ProjectManagerInboxImport } from './routes/project-manager/inbox'
+import { Route as ProjectManagerCanvasImport } from './routes/project-manager/canvas'
+import { Route as ProjectManagerProjectSlugImport } from './routes/project-manager/$projectSlug'
 import { Route as ContentManagerPeopleImport } from './routes/content-manager/people'
 import { Route as ContentManagerOpportunitiesImport } from './routes/content-manager/opportunities'
 import { Route as ContentManagerEmailImport } from './routes/content-manager/email'
@@ -26,8 +36,15 @@ import { Route as ContentManagerCompaniesImport } from './routes/content-manager
 import { Route as ContentManagerBulkUnsubscribeImport } from './routes/content-manager/bulk-unsubscribe'
 import { Route as AuthSignupImport } from './routes/_auth/signup'
 import { Route as AuthLoginImport } from './routes/_auth/login'
+import { Route as ProjectManagerTaskTaskIdImport } from './routes/project-manager/task/$taskId'
 
 // Create/Update Routes
+
+const ProjectManagerRouteRoute = ProjectManagerRouteImport.update({
+  id: '/project-manager',
+  path: '/project-manager',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const FinanceManagerRouteRoute = FinanceManagerRouteImport.update({
   id: '/finance-manager',
@@ -58,6 +75,12 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ProjectManagerIndexRoute = ProjectManagerIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectManagerRouteRoute,
+} as any)
+
 const FinanceManagerIndexRoute = FinanceManagerIndexImport.update({
   id: '/',
   path: '/',
@@ -74,6 +97,54 @@ const ContentManagerIndexRoute = ContentManagerIndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ContentManagerRouteRoute,
+} as any)
+
+const ProjectManagerTasksRoute = ProjectManagerTasksImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => ProjectManagerRouteRoute,
+} as any)
+
+const ProjectManagerProjectsRoute = ProjectManagerProjectsImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => ProjectManagerRouteRoute,
+} as any)
+
+const ProjectManagerNotesRoute = ProjectManagerNotesImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => ProjectManagerRouteRoute,
+} as any)
+
+const ProjectManagerNotebooksRoute = ProjectManagerNotebooksImport.update({
+  id: '/notebooks',
+  path: '/notebooks',
+  getParentRoute: () => ProjectManagerRouteRoute,
+} as any)
+
+const ProjectManagerMyIssuesRoute = ProjectManagerMyIssuesImport.update({
+  id: '/my-issues',
+  path: '/my-issues',
+  getParentRoute: () => ProjectManagerRouteRoute,
+} as any)
+
+const ProjectManagerInboxRoute = ProjectManagerInboxImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => ProjectManagerRouteRoute,
+} as any)
+
+const ProjectManagerCanvasRoute = ProjectManagerCanvasImport.update({
+  id: '/canvas',
+  path: '/canvas',
+  getParentRoute: () => ProjectManagerRouteRoute,
+} as any)
+
+const ProjectManagerProjectSlugRoute = ProjectManagerProjectSlugImport.update({
+  id: '/$projectSlug',
+  path: '/$projectSlug',
+  getParentRoute: () => ProjectManagerRouteRoute,
 } as any)
 
 const ContentManagerPeopleRoute = ContentManagerPeopleImport.update({
@@ -120,6 +191,12 @@ const AuthLoginRoute = AuthLoginImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any)
 
+const ProjectManagerTaskTaskIdRoute = ProjectManagerTaskTaskIdImport.update({
+  id: '/task/$taskId',
+  path: '/task/$taskId',
+  getParentRoute: () => ProjectManagerRouteRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -157,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/finance-manager'
       fullPath: '/finance-manager'
       preLoaderRoute: typeof FinanceManagerRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/project-manager': {
+      id: '/project-manager'
+      path: '/project-manager'
+      fullPath: '/project-manager'
+      preLoaderRoute: typeof ProjectManagerRouteImport
       parentRoute: typeof rootRoute
     }
     '/_auth/login': {
@@ -208,6 +292,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContentManagerPeopleImport
       parentRoute: typeof ContentManagerRouteImport
     }
+    '/project-manager/$projectSlug': {
+      id: '/project-manager/$projectSlug'
+      path: '/$projectSlug'
+      fullPath: '/project-manager/$projectSlug'
+      preLoaderRoute: typeof ProjectManagerProjectSlugImport
+      parentRoute: typeof ProjectManagerRouteImport
+    }
+    '/project-manager/canvas': {
+      id: '/project-manager/canvas'
+      path: '/canvas'
+      fullPath: '/project-manager/canvas'
+      preLoaderRoute: typeof ProjectManagerCanvasImport
+      parentRoute: typeof ProjectManagerRouteImport
+    }
+    '/project-manager/inbox': {
+      id: '/project-manager/inbox'
+      path: '/inbox'
+      fullPath: '/project-manager/inbox'
+      preLoaderRoute: typeof ProjectManagerInboxImport
+      parentRoute: typeof ProjectManagerRouteImport
+    }
+    '/project-manager/my-issues': {
+      id: '/project-manager/my-issues'
+      path: '/my-issues'
+      fullPath: '/project-manager/my-issues'
+      preLoaderRoute: typeof ProjectManagerMyIssuesImport
+      parentRoute: typeof ProjectManagerRouteImport
+    }
+    '/project-manager/notebooks': {
+      id: '/project-manager/notebooks'
+      path: '/notebooks'
+      fullPath: '/project-manager/notebooks'
+      preLoaderRoute: typeof ProjectManagerNotebooksImport
+      parentRoute: typeof ProjectManagerRouteImport
+    }
+    '/project-manager/notes': {
+      id: '/project-manager/notes'
+      path: '/notes'
+      fullPath: '/project-manager/notes'
+      preLoaderRoute: typeof ProjectManagerNotesImport
+      parentRoute: typeof ProjectManagerRouteImport
+    }
+    '/project-manager/projects': {
+      id: '/project-manager/projects'
+      path: '/projects'
+      fullPath: '/project-manager/projects'
+      preLoaderRoute: typeof ProjectManagerProjectsImport
+      parentRoute: typeof ProjectManagerRouteImport
+    }
+    '/project-manager/tasks': {
+      id: '/project-manager/tasks'
+      path: '/tasks'
+      fullPath: '/project-manager/tasks'
+      preLoaderRoute: typeof ProjectManagerTasksImport
+      parentRoute: typeof ProjectManagerRouteImport
+    }
     '/content-manager/': {
       id: '/content-manager/'
       path: '/'
@@ -228,6 +368,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/finance-manager/'
       preLoaderRoute: typeof FinanceManagerIndexImport
       parentRoute: typeof FinanceManagerRouteImport
+    }
+    '/project-manager/': {
+      id: '/project-manager/'
+      path: '/'
+      fullPath: '/project-manager/'
+      preLoaderRoute: typeof ProjectManagerIndexImport
+      parentRoute: typeof ProjectManagerRouteImport
+    }
+    '/project-manager/task/$taskId': {
+      id: '/project-manager/task/$taskId'
+      path: '/task/$taskId'
+      fullPath: '/project-manager/task/$taskId'
+      preLoaderRoute: typeof ProjectManagerTaskTaskIdImport
+      parentRoute: typeof ProjectManagerRouteImport
     }
   }
 }
@@ -292,12 +446,42 @@ const FinanceManagerRouteRouteChildren: FinanceManagerRouteRouteChildren = {
 const FinanceManagerRouteRouteWithChildren =
   FinanceManagerRouteRoute._addFileChildren(FinanceManagerRouteRouteChildren)
 
+interface ProjectManagerRouteRouteChildren {
+  ProjectManagerProjectSlugRoute: typeof ProjectManagerProjectSlugRoute
+  ProjectManagerCanvasRoute: typeof ProjectManagerCanvasRoute
+  ProjectManagerInboxRoute: typeof ProjectManagerInboxRoute
+  ProjectManagerMyIssuesRoute: typeof ProjectManagerMyIssuesRoute
+  ProjectManagerNotebooksRoute: typeof ProjectManagerNotebooksRoute
+  ProjectManagerNotesRoute: typeof ProjectManagerNotesRoute
+  ProjectManagerProjectsRoute: typeof ProjectManagerProjectsRoute
+  ProjectManagerTasksRoute: typeof ProjectManagerTasksRoute
+  ProjectManagerIndexRoute: typeof ProjectManagerIndexRoute
+  ProjectManagerTaskTaskIdRoute: typeof ProjectManagerTaskTaskIdRoute
+}
+
+const ProjectManagerRouteRouteChildren: ProjectManagerRouteRouteChildren = {
+  ProjectManagerProjectSlugRoute: ProjectManagerProjectSlugRoute,
+  ProjectManagerCanvasRoute: ProjectManagerCanvasRoute,
+  ProjectManagerInboxRoute: ProjectManagerInboxRoute,
+  ProjectManagerMyIssuesRoute: ProjectManagerMyIssuesRoute,
+  ProjectManagerNotebooksRoute: ProjectManagerNotebooksRoute,
+  ProjectManagerNotesRoute: ProjectManagerNotesRoute,
+  ProjectManagerProjectsRoute: ProjectManagerProjectsRoute,
+  ProjectManagerTasksRoute: ProjectManagerTasksRoute,
+  ProjectManagerIndexRoute: ProjectManagerIndexRoute,
+  ProjectManagerTaskTaskIdRoute: ProjectManagerTaskTaskIdRoute,
+}
+
+const ProjectManagerRouteRouteWithChildren =
+  ProjectManagerRouteRoute._addFileChildren(ProjectManagerRouteRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/finance-manager': typeof FinanceManagerRouteRouteWithChildren
+  '/project-manager': typeof ProjectManagerRouteRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/signup': typeof AuthSignupRoute
   '/content-manager/bulk-unsubscribe': typeof ContentManagerBulkUnsubscribeRoute
@@ -305,9 +489,19 @@ export interface FileRoutesByFullPath {
   '/content-manager/email': typeof ContentManagerEmailRoute
   '/content-manager/opportunities': typeof ContentManagerOpportunitiesRoute
   '/content-manager/people': typeof ContentManagerPeopleRoute
+  '/project-manager/$projectSlug': typeof ProjectManagerProjectSlugRoute
+  '/project-manager/canvas': typeof ProjectManagerCanvasRoute
+  '/project-manager/inbox': typeof ProjectManagerInboxRoute
+  '/project-manager/my-issues': typeof ProjectManagerMyIssuesRoute
+  '/project-manager/notebooks': typeof ProjectManagerNotebooksRoute
+  '/project-manager/notes': typeof ProjectManagerNotesRoute
+  '/project-manager/projects': typeof ProjectManagerProjectsRoute
+  '/project-manager/tasks': typeof ProjectManagerTasksRoute
   '/content-manager/': typeof ContentManagerIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/finance-manager/': typeof FinanceManagerIndexRoute
+  '/project-manager/': typeof ProjectManagerIndexRoute
+  '/project-manager/task/$taskId': typeof ProjectManagerTaskTaskIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -320,9 +514,19 @@ export interface FileRoutesByTo {
   '/content-manager/email': typeof ContentManagerEmailRoute
   '/content-manager/opportunities': typeof ContentManagerOpportunitiesRoute
   '/content-manager/people': typeof ContentManagerPeopleRoute
+  '/project-manager/$projectSlug': typeof ProjectManagerProjectSlugRoute
+  '/project-manager/canvas': typeof ProjectManagerCanvasRoute
+  '/project-manager/inbox': typeof ProjectManagerInboxRoute
+  '/project-manager/my-issues': typeof ProjectManagerMyIssuesRoute
+  '/project-manager/notebooks': typeof ProjectManagerNotebooksRoute
+  '/project-manager/notes': typeof ProjectManagerNotesRoute
+  '/project-manager/projects': typeof ProjectManagerProjectsRoute
+  '/project-manager/tasks': typeof ProjectManagerTasksRoute
   '/content-manager': typeof ContentManagerIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/finance-manager': typeof FinanceManagerIndexRoute
+  '/project-manager': typeof ProjectManagerIndexRoute
+  '/project-manager/task/$taskId': typeof ProjectManagerTaskTaskIdRoute
 }
 
 export interface FileRoutesById {
@@ -332,6 +536,7 @@ export interface FileRoutesById {
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/finance-manager': typeof FinanceManagerRouteRouteWithChildren
+  '/project-manager': typeof ProjectManagerRouteRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/signup': typeof AuthSignupRoute
   '/content-manager/bulk-unsubscribe': typeof ContentManagerBulkUnsubscribeRoute
@@ -339,9 +544,19 @@ export interface FileRoutesById {
   '/content-manager/email': typeof ContentManagerEmailRoute
   '/content-manager/opportunities': typeof ContentManagerOpportunitiesRoute
   '/content-manager/people': typeof ContentManagerPeopleRoute
+  '/project-manager/$projectSlug': typeof ProjectManagerProjectSlugRoute
+  '/project-manager/canvas': typeof ProjectManagerCanvasRoute
+  '/project-manager/inbox': typeof ProjectManagerInboxRoute
+  '/project-manager/my-issues': typeof ProjectManagerMyIssuesRoute
+  '/project-manager/notebooks': typeof ProjectManagerNotebooksRoute
+  '/project-manager/notes': typeof ProjectManagerNotesRoute
+  '/project-manager/projects': typeof ProjectManagerProjectsRoute
+  '/project-manager/tasks': typeof ProjectManagerTasksRoute
   '/content-manager/': typeof ContentManagerIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/finance-manager/': typeof FinanceManagerIndexRoute
+  '/project-manager/': typeof ProjectManagerIndexRoute
+  '/project-manager/task/$taskId': typeof ProjectManagerTaskTaskIdRoute
 }
 
 export interface FileRouteTypes {
@@ -352,6 +567,7 @@ export interface FileRouteTypes {
     | '/content-manager'
     | '/dashboard'
     | '/finance-manager'
+    | '/project-manager'
     | '/login'
     | '/signup'
     | '/content-manager/bulk-unsubscribe'
@@ -359,9 +575,19 @@ export interface FileRouteTypes {
     | '/content-manager/email'
     | '/content-manager/opportunities'
     | '/content-manager/people'
+    | '/project-manager/$projectSlug'
+    | '/project-manager/canvas'
+    | '/project-manager/inbox'
+    | '/project-manager/my-issues'
+    | '/project-manager/notebooks'
+    | '/project-manager/notes'
+    | '/project-manager/projects'
+    | '/project-manager/tasks'
     | '/content-manager/'
     | '/dashboard/'
     | '/finance-manager/'
+    | '/project-manager/'
+    | '/project-manager/task/$taskId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -373,9 +599,19 @@ export interface FileRouteTypes {
     | '/content-manager/email'
     | '/content-manager/opportunities'
     | '/content-manager/people'
+    | '/project-manager/$projectSlug'
+    | '/project-manager/canvas'
+    | '/project-manager/inbox'
+    | '/project-manager/my-issues'
+    | '/project-manager/notebooks'
+    | '/project-manager/notes'
+    | '/project-manager/projects'
+    | '/project-manager/tasks'
     | '/content-manager'
     | '/dashboard'
     | '/finance-manager'
+    | '/project-manager'
+    | '/project-manager/task/$taskId'
   id:
     | '__root__'
     | '/'
@@ -383,6 +619,7 @@ export interface FileRouteTypes {
     | '/content-manager'
     | '/dashboard'
     | '/finance-manager'
+    | '/project-manager'
     | '/_auth/login'
     | '/_auth/signup'
     | '/content-manager/bulk-unsubscribe'
@@ -390,9 +627,19 @@ export interface FileRouteTypes {
     | '/content-manager/email'
     | '/content-manager/opportunities'
     | '/content-manager/people'
+    | '/project-manager/$projectSlug'
+    | '/project-manager/canvas'
+    | '/project-manager/inbox'
+    | '/project-manager/my-issues'
+    | '/project-manager/notebooks'
+    | '/project-manager/notes'
+    | '/project-manager/projects'
+    | '/project-manager/tasks'
     | '/content-manager/'
     | '/dashboard/'
     | '/finance-manager/'
+    | '/project-manager/'
+    | '/project-manager/task/$taskId'
   fileRoutesById: FileRoutesById
 }
 
@@ -402,6 +649,7 @@ export interface RootRouteChildren {
   ContentManagerRouteRoute: typeof ContentManagerRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   FinanceManagerRouteRoute: typeof FinanceManagerRouteRouteWithChildren
+  ProjectManagerRouteRoute: typeof ProjectManagerRouteRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -410,6 +658,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContentManagerRouteRoute: ContentManagerRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   FinanceManagerRouteRoute: FinanceManagerRouteRouteWithChildren,
+  ProjectManagerRouteRoute: ProjectManagerRouteRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -426,7 +675,8 @@ export const routeTree = rootRoute
         "/_auth",
         "/content-manager",
         "/dashboard",
-        "/finance-manager"
+        "/finance-manager",
+        "/project-manager"
       ]
     },
     "/": {
@@ -462,6 +712,21 @@ export const routeTree = rootRoute
         "/finance-manager/"
       ]
     },
+    "/project-manager": {
+      "filePath": "project-manager/route.tsx",
+      "children": [
+        "/project-manager/$projectSlug",
+        "/project-manager/canvas",
+        "/project-manager/inbox",
+        "/project-manager/my-issues",
+        "/project-manager/notebooks",
+        "/project-manager/notes",
+        "/project-manager/projects",
+        "/project-manager/tasks",
+        "/project-manager/",
+        "/project-manager/task/$taskId"
+      ]
+    },
     "/_auth/login": {
       "filePath": "_auth/login.tsx",
       "parent": "/_auth"
@@ -490,6 +755,38 @@ export const routeTree = rootRoute
       "filePath": "content-manager/people.tsx",
       "parent": "/content-manager"
     },
+    "/project-manager/$projectSlug": {
+      "filePath": "project-manager/$projectSlug.tsx",
+      "parent": "/project-manager"
+    },
+    "/project-manager/canvas": {
+      "filePath": "project-manager/canvas.tsx",
+      "parent": "/project-manager"
+    },
+    "/project-manager/inbox": {
+      "filePath": "project-manager/inbox.tsx",
+      "parent": "/project-manager"
+    },
+    "/project-manager/my-issues": {
+      "filePath": "project-manager/my-issues.tsx",
+      "parent": "/project-manager"
+    },
+    "/project-manager/notebooks": {
+      "filePath": "project-manager/notebooks.tsx",
+      "parent": "/project-manager"
+    },
+    "/project-manager/notes": {
+      "filePath": "project-manager/notes.tsx",
+      "parent": "/project-manager"
+    },
+    "/project-manager/projects": {
+      "filePath": "project-manager/projects.tsx",
+      "parent": "/project-manager"
+    },
+    "/project-manager/tasks": {
+      "filePath": "project-manager/tasks.tsx",
+      "parent": "/project-manager"
+    },
     "/content-manager/": {
       "filePath": "content-manager/index.tsx",
       "parent": "/content-manager"
@@ -501,6 +798,14 @@ export const routeTree = rootRoute
     "/finance-manager/": {
       "filePath": "finance-manager/index.tsx",
       "parent": "/finance-manager"
+    },
+    "/project-manager/": {
+      "filePath": "project-manager/index.tsx",
+      "parent": "/project-manager"
+    },
+    "/project-manager/task/$taskId": {
+      "filePath": "project-manager/task/$taskId.tsx",
+      "parent": "/project-manager"
     }
   }
 }

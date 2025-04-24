@@ -218,7 +218,7 @@ const ContentTabs = ({ children }: { children: React.ReactNode }) => {
               <Home size={14} />
             </Link>
             <Link
-              to="/"
+              to="/project-manager"
               className={
                 currentPath.startsWith("/project-manager")
                   ? "text-neutral-300"
