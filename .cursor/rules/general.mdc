@@ -1,0 +1,97 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+General Principles:
+
+Clarity and Feedback: The cursor should clearly indicate what is interactive or what action will be taken when the user hovers over an element.
+Consistency: Apply similar cursor styles to similar types of elements (e.g., all buttons should have a pointer cursor).
+Accessibility: Consider users who may rely on screen readers or other assistive technologies. While cursor styles are primarily visual, consistent and predictable behavior is still beneficial.
+Specific Cursor Rules:
+
+Interactive Elements (Generally):
+
+Use cursor: pointer; for anything that is clickable and performs an action, such as:
+Buttons
+Links (including <a> tags used for navigation)
+Interactive icons
+Clickable cards or list items
+Elements that open modals or dropdowns
+Elements that trigger form submissions
+TailwindCSS Utility: cursor-pointer
+Text Input Fields:
+
+Use the default cursor: text; to indicate that the element is editable text.
+TailwindCSS Utility: cursor-text
+Non-Interactive Elements:
+
+Use the default cursor: default; for elements that are purely for display and have no interactive behavior when clicked or hovered.
+This includes static text, images without links, decorative elements, etc.
+TailwindCSS Utility: cursor-default
+Elements in a Loading State:
+
+Consider using cursor: progress; or cursor: wait; for elements or areas of the application that are currently loading data or performing a background task. This visually signals to the user that they need to wait.
+This is particularly relevant when using Tanstack Query to fetch data. While Tanstack Query handles loading states internally, you might apply a cursor style to a container element during a query's loading phase.
+TailwindCSS Utilities: cursor-progress, cursor-wait
+Elements with Tooltips or Additional Info on Hover:
+
+While the primary cursor might be pointer if the element is also clickable, for elements that only reveal additional information on hover (like a tooltip), cursor: help; can be appropriate, although cursor: default; is also common and acceptable.
+TailwindCSS Utility: cursor-help
+Elements That Are Disabled:
+
+Use cursor: not-allowed; for elements that are currently disabled and cannot be interacted with (e.g., a disabled button). This provides clear visual feedback.
+TailwindCSS Utility: cursor-not-allowed
+Resize Handles:
+
+If you have elements that can be resized, use the appropriate resize cursors (e.g., cursor: ns-resize;, cursor: ew-resize;, cursor: nwse-resize;, cursor: nesw-resize;, cursor: all-scroll;).
+TailwindCSS Utilities: cursor-ns-resize, cursor-ew-resize, cursor-nwse-resize, cursor-nesw-resize, cursor-all-scroll
+Drag and Drop:
+
+When an element is being dragged, use cursor: grabbing;. Before dragging, use cursor: grab; to indicate that the element is draggable.
+TailwindCSS Utilities: cursor-grab, cursor-grabbing
+Implementing with Your Stack:
+
+TailwindCSS: The most straightforward way to implement these cursor rules is by applying the provided TailwindCSS utility classes directly to your HTML/JSX elements. This keeps your styling within your component files.
+CSS Modules (if used): If you are using CSS Modules within your Turborepo, you can define CSS classes with these cursor styles and apply the classes to your components.
+Global Styles (less recommended for specific components): For very general cursor rules (like the default cursor for the body), you could include them in your global CSS file managed by Tailwind.
+Considering Specific Technologies:
+
+Tanstack Query: As mentioned earlier, you might dynamically apply a loading cursor (like cursor-wait) to an element's container while a query is in the 'loading' state.
+Tanstack Router: For links (<Link> or <a>), ensure the cursor: pointer; is consistently applied. The Router handles navigation, but the visual indication of a clickable link is important.
+Better-Auth: When dealing with authentication forms or actions, apply appropriate cursors to buttons (cursor-pointer) and input fields (cursor-text).
+Drizzle/Neon DB: These are backend technologies and don't directly influence frontend cursor styles. However, the results of database operations (like successful saves or errors) might lead to UI changes that warrant different cursor styles (e.g., a disabled state).
+Example (using TailwindCSS in a React/JSX context):
+
+jsx
+// A standard button
+<button className="cursor-pointer bg-blue-500 text-white p-2 rounded">
+  Click Me
+</button>
+
+// A disabled button
+<button className="cursor-not-allowed bg-gray-300 text-gray-600 p-2 rounded" disabled>
+  Disabled
+</button>
+
+// A link for navigation using Tanstack Router's Link component
+import { Link } from '@tanstack/react-router'
+
+<Link to="/about" className="cursor-pointer text-blue-600 hover:underline">
+  About Us
+</Link>
+
+// An input field
+<input type="text" className="cursor-text border p-2" placeholder="Enter text" />
+
+// A container that might show a loading cursor
+// Assuming 'isLoading' is a state from a Tanstack Query hook
+<div className={isLoading ? 'cursor-wait' : 'cursor-default'}>
+  {isLoading ? <p>Loading data...</p> : <p>Data loaded.</p>}
+</div>

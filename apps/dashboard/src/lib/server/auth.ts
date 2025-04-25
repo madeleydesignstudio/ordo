@@ -37,4 +37,12 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+
+  // https://www.better-auth.com/docs/concepts/users-accounts#delete-user
+  user: {
+    deleteUser: {
+      enabled: true,
+    
+    }
+  }
 });

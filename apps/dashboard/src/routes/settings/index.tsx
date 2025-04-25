@@ -1,17 +1,73 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { format } from 'date-fns'
 import { Button } from '~/components/ui/button'
 import authClient from '~/lib/auth-client'
+import { useMutation } from '@tanstack/react-query'
+import { useState } from 'react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '~/components/ui/alert-dialog'
 
 export const Route = createFileRoute('/settings/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { user, queryClient } = Route.useRouteContext()
-  const navigate = useNavigate()
+  const { user } = Route.useRouteContext()
+  const router = useRouter()
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
+  const deleteAccountMutation = useMutation({
+    mutationFn: async () => {
+      console.log('[Debug] deleteAccountMutation: mutationFn started')
+      await authClient.deleteUser()
+      console.log('[Debug] deleteAccountMutation: authClient.deleteUser() finished')
+    },
+    onSuccess: () => {
+      console.log('[Debug] deleteAccountMutation: onSuccess')
+      alert('Account deleted successfully.')
+      console.log('[Debug] Navigating directly after successful deletion...')
+      router.invalidate().then(() => router.navigate({ to: '/signup', replace: true }))
+    },
+    onError: (error: Error) => {
+      console.log('[Debug] deleteAccountMutation: onError')
+      console.error('Error deleting account:', error)
+      alert(`Error deleting account: ${error.message || 'Unknown error'}`)
+      setIsDeleteDialogOpen(false) // Close dialog on error
+    },
+  })
+
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.invalidate().then(() => router.navigate({ to: '/login' }))
+        },
+        onError: (error: unknown) => {
+          console.error('Logout error:', error)
+          let message = 'Failed to logout.';
+          if (error instanceof Error) {
+            message = `Logout failed: ${error.message}`;
+          } else if (typeof error === 'string') {
+            message = `Logout failed: ${error}`;
+          } else if (error && typeof error === 'object' && 'message' in error) {
+            message = `Logout failed: ${String(error.message)}`;
+          }
+          alert(message)
+        },
+      },
+    })
+  }
 
   if (!user) {
     return <div>Please log in to view your settings</div>
@@ -58,21 +114,46 @@ function RouteComponent() {
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <Button
-            variant="destructive"
-            className="mt-6 w-full"
-            onClick={async () => {
-              await authClient.signOut({}, {
-                onSuccess: async () => {
-                  await queryClient.invalidateQueries({ queryKey: ["user"] });
-                  navigate({ to: "/login" });
-                }
-              })
-            }}
-          >
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Account Actions</CardTitle>
+          <CardDescription>Manage your account session and data.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+          <Button variant="outline" onClick={handleLogout}>
             Log Out
           </Button>
+
+          <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">Delete Account</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete your
+                  account and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={deleteAccountMutation.isPending}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    console.log('[Debug] AlertDialogAction: onClick triggered')
+                    deleteAccountMutation.mutate()
+                  }}
+                  disabled={deleteAccountMutation.isPending}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {deleteAccountMutation.isPending ? 'Deleting...' : 'Yes, delete account'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
     </div>
