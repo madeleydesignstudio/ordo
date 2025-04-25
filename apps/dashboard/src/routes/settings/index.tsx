@@ -1,14 +1,17 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { format } from 'date-fns'
+import { Button } from '~/components/ui/button'
+import authClient from '~/lib/auth-client'
 
 export const Route = createFileRoute('/settings/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { user } = Route.useRouteContext()
+  const { user, queryClient } = Route.useRouteContext()
+  const navigate = useNavigate()
 
   if (!user) {
     return <div>Please log in to view your settings</div>
@@ -55,6 +58,21 @@ function RouteComponent() {
               </div>
             </div>
           </div>
+
+          <Button
+            variant="destructive"
+            className="mt-6 w-full"
+            onClick={async () => {
+              await authClient.signOut({}, {
+                onSuccess: async () => {
+                  await queryClient.invalidateQueries({ queryKey: ["user"] });
+                  navigate({ to: "/login" });
+                }
+              })
+            }}
+          >
+            Log Out
+          </Button>
         </CardContent>
       </Card>
     </div>
