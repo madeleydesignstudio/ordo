@@ -108,7 +108,6 @@ function AppLayout({ children }: { children: React.ReactNode }) {
     <>
       <MainContentProvider>
         <main className="w-full h-full rounded-md">
-
           {children}
         </main>
       </MainContentProvider>
