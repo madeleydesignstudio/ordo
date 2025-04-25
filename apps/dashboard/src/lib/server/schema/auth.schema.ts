@@ -1,4 +1,6 @@
 import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { project } from "./projects.schema"; // Import project schema
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -9,6 +11,11 @@ export const user = pgTable("user", {
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
 });
+
+// Relation: User can have many projects
+export const userRelations = relations(user, ({ many }) => ({
+  projects: many(project),
+}));
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
