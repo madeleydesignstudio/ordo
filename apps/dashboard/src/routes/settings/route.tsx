@@ -1,7 +1,15 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/settings')({
   component: RouteComponent,
+  loader: ({ context }) => {
+    if (!context.user) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+    return { user: context.user };
+  },
 })
 
 function RouteComponent() {

@@ -14,14 +14,12 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings/route'
 import { Route as ProjectManagerRouteImport } from './routes/project-manager/route'
 import { Route as FinanceManagerRouteImport } from './routes/finance-manager/route'
-import { Route as DashboardRouteImport } from './routes/dashboard/route'
 import { Route as ContentManagerRouteImport } from './routes/content-manager/route'
 import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as SettingsIndexImport } from './routes/settings/index'
 import { Route as ProjectManagerIndexImport } from './routes/project-manager/index'
 import { Route as FinanceManagerIndexImport } from './routes/finance-manager/index'
-import { Route as DashboardIndexImport } from './routes/dashboard/index'
 import { Route as ContentManagerIndexImport } from './routes/content-manager/index'
 import { Route as ProjectManagerTasksImport } from './routes/project-manager/tasks'
 import { Route as ProjectManagerProjectsImport } from './routes/project-manager/projects'
@@ -60,12 +58,6 @@ const FinanceManagerRouteRoute = FinanceManagerRouteImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DashboardRouteRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const ContentManagerRouteRoute = ContentManagerRouteImport.update({
   id: '/content-manager',
   path: '/content-manager',
@@ -99,12 +91,6 @@ const FinanceManagerIndexRoute = FinanceManagerIndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => FinanceManagerRouteRoute,
-} as any)
-
-const DashboardIndexRoute = DashboardIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardRouteRoute,
 } as any)
 
 const ContentManagerIndexRoute = ContentManagerIndexImport.update({
@@ -234,13 +220,6 @@ declare module '@tanstack/react-router' {
       path: '/content-manager'
       fullPath: '/content-manager'
       preLoaderRoute: typeof ContentManagerRouteImport
-      parentRoute: typeof rootRoute
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRoute
     }
     '/finance-manager': {
@@ -376,13 +355,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContentManagerIndexImport
       parentRoute: typeof ContentManagerRouteImport
     }
-    '/dashboard/': {
-      id: '/dashboard/'
-      path: '/'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof DashboardIndexImport
-      parentRoute: typeof DashboardRouteImport
-    }
     '/finance-manager/': {
       id: '/finance-manager/'
       path: '/'
@@ -451,18 +423,6 @@ const ContentManagerRouteRouteChildren: ContentManagerRouteRouteChildren = {
 const ContentManagerRouteRouteWithChildren =
   ContentManagerRouteRoute._addFileChildren(ContentManagerRouteRouteChildren)
 
-interface DashboardRouteRouteChildren {
-  DashboardIndexRoute: typeof DashboardIndexRoute
-}
-
-const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
-  DashboardIndexRoute: DashboardIndexRoute,
-}
-
-const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
-  DashboardRouteRouteChildren,
-)
-
 interface FinanceManagerRouteRouteChildren {
   FinanceManagerIndexRoute: typeof FinanceManagerIndexRoute
 }
@@ -519,7 +479,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
-  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/finance-manager': typeof FinanceManagerRouteRouteWithChildren
   '/project-manager': typeof ProjectManagerRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
@@ -539,7 +498,6 @@ export interface FileRoutesByFullPath {
   '/project-manager/projects': typeof ProjectManagerProjectsRoute
   '/project-manager/tasks': typeof ProjectManagerTasksRoute
   '/content-manager/': typeof ContentManagerIndexRoute
-  '/dashboard/': typeof DashboardIndexRoute
   '/finance-manager/': typeof FinanceManagerIndexRoute
   '/project-manager/': typeof ProjectManagerIndexRoute
   '/settings/': typeof SettingsIndexRoute
@@ -565,7 +523,6 @@ export interface FileRoutesByTo {
   '/project-manager/projects': typeof ProjectManagerProjectsRoute
   '/project-manager/tasks': typeof ProjectManagerTasksRoute
   '/content-manager': typeof ContentManagerIndexRoute
-  '/dashboard': typeof DashboardIndexRoute
   '/finance-manager': typeof FinanceManagerIndexRoute
   '/project-manager': typeof ProjectManagerIndexRoute
   '/settings': typeof SettingsIndexRoute
@@ -577,7 +534,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
-  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/finance-manager': typeof FinanceManagerRouteRouteWithChildren
   '/project-manager': typeof ProjectManagerRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
@@ -597,7 +553,6 @@ export interface FileRoutesById {
   '/project-manager/projects': typeof ProjectManagerProjectsRoute
   '/project-manager/tasks': typeof ProjectManagerTasksRoute
   '/content-manager/': typeof ContentManagerIndexRoute
-  '/dashboard/': typeof DashboardIndexRoute
   '/finance-manager/': typeof FinanceManagerIndexRoute
   '/project-manager/': typeof ProjectManagerIndexRoute
   '/settings/': typeof SettingsIndexRoute
@@ -610,7 +565,6 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/content-manager'
-    | '/dashboard'
     | '/finance-manager'
     | '/project-manager'
     | '/settings'
@@ -630,7 +584,6 @@ export interface FileRouteTypes {
     | '/project-manager/projects'
     | '/project-manager/tasks'
     | '/content-manager/'
-    | '/dashboard/'
     | '/finance-manager/'
     | '/project-manager/'
     | '/settings/'
@@ -655,7 +608,6 @@ export interface FileRouteTypes {
     | '/project-manager/projects'
     | '/project-manager/tasks'
     | '/content-manager'
-    | '/dashboard'
     | '/finance-manager'
     | '/project-manager'
     | '/settings'
@@ -665,7 +617,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_auth'
     | '/content-manager'
-    | '/dashboard'
     | '/finance-manager'
     | '/project-manager'
     | '/settings'
@@ -685,7 +636,6 @@ export interface FileRouteTypes {
     | '/project-manager/projects'
     | '/project-manager/tasks'
     | '/content-manager/'
-    | '/dashboard/'
     | '/finance-manager/'
     | '/project-manager/'
     | '/settings/'
@@ -697,7 +647,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   ContentManagerRouteRoute: typeof ContentManagerRouteRouteWithChildren
-  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   FinanceManagerRouteRoute: typeof FinanceManagerRouteRouteWithChildren
   ProjectManagerRouteRoute: typeof ProjectManagerRouteRouteWithChildren
   SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
@@ -707,7 +656,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   ContentManagerRouteRoute: ContentManagerRouteRouteWithChildren,
-  DashboardRouteRoute: DashboardRouteRouteWithChildren,
   FinanceManagerRouteRoute: FinanceManagerRouteRouteWithChildren,
   ProjectManagerRouteRoute: ProjectManagerRouteRouteWithChildren,
   SettingsRouteRoute: SettingsRouteRouteWithChildren,
@@ -726,7 +674,6 @@ export const routeTree = rootRoute
         "/",
         "/_auth",
         "/content-manager",
-        "/dashboard",
         "/finance-manager",
         "/project-manager",
         "/settings"
@@ -751,12 +698,6 @@ export const routeTree = rootRoute
         "/content-manager/opportunities",
         "/content-manager/people",
         "/content-manager/"
-      ]
-    },
-    "/dashboard": {
-      "filePath": "dashboard/route.tsx",
-      "children": [
-        "/dashboard/"
       ]
     },
     "/finance-manager": {
@@ -849,10 +790,6 @@ export const routeTree = rootRoute
     "/content-manager/": {
       "filePath": "content-manager/index.tsx",
       "parent": "/content-manager"
-    },
-    "/dashboard/": {
-      "filePath": "dashboard/index.tsx",
-      "parent": "/dashboard"
     },
     "/finance-manager/": {
       "filePath": "finance-manager/index.tsx",

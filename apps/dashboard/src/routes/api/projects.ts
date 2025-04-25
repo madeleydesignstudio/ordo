@@ -1,12 +1,24 @@
 import { json } from "@tanstack/react-start";
 import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { z } from 'zod'; // Import zod
 import { db } from "../../lib/server/db";
 import { project } from "../../lib/server/schema";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 // Revert type import, keep value import
 import { auth } from "../../lib/server/auth";
 // Import commented out as explicit typing failed
 // import { betterAuth } from "better-auth"; 
+
+// --- Zod Schemas for Validation ---
+const updateProjectSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).optional(), // Allow partial updates
+  description: z.string().optional().nullable(),
+});
+
+const deleteProjectSchema = z.object({
+  id: z.string().uuid(),
+});
 
 export const APIRoute = createAPIFileRoute("/api/projects")({
   GET: async ({ request }) => {
@@ -67,6 +79,95 @@ export const APIRoute = createAPIFileRoute("/api/projects")({
          return json({ error: "Failed to create project: Missing user association. Authentication required." }, { status: 500 });
       }
       return json({ error: "Failed to create project" }, { status: 500 });
+    }
+  },
+
+  // --- PUT Handler for Editing Projects ---
+  PUT: async ({ request }) => {
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session?.user?.id) {
+      return json({ error: "Authentication required to update a project." }, { status: 401 });
+    }
+    const userId = session.user.id;
+
+    try {
+      const body = await request.json();
+      const validation = updateProjectSchema.safeParse(body);
+
+      if (!validation.success) {
+        return json({ error: 'Invalid input', details: validation.error.formErrors }, { status: 400 });
+      }
+
+      const { id, ...updateData } = validation.data;
+
+      // Prepare data for update, filtering out undefined values
+      const dataToSet: Partial<Omit<typeof project.$inferInsert, 'id' | 'userId' | 'createdAt'>> & { updatedAt: Date } = {
+          updatedAt: new Date(),
+      };
+      if (updateData.name !== undefined) dataToSet.name = updateData.name;
+      if (updateData.description !== undefined) dataToSet.description = updateData.description;
+
+      if (Object.keys(dataToSet).length <= 1) {
+         return json({ error: 'No update fields provided' }, { status: 400 });
+      }
+
+      // Perform the update, ensuring the project belongs to the user
+      const [updatedProject] = await db
+        .update(project)
+        .set(dataToSet)
+        .where(and(eq(project.id, id), eq(project.userId, userId))) // Ensure user owns the project
+        .returning();
+
+      if (!updatedProject) {
+        // Could be not found OR not owned by user
+        return json({ error: 'Project not found or you do not have permission to update it' }, { status: 404 });
+      }
+
+      return json({ project: updatedProject });
+
+    } catch (error) {
+      console.error("Error updating project:", error);
+      return json({ error: "Failed to update project" }, { status: 500 });
+    }
+  },
+
+  // --- DELETE Handler for Deleting Projects ---
+  DELETE: async ({ request }) => {
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session?.user?.id) {
+      return json({ error: "Authentication required to delete a project." }, { status: 401 });
+    }
+    const userId = session.user.id;
+
+    try {
+      // Expect ID in request body for consistency
+      const body = await request.json(); 
+      const validation = deleteProjectSchema.safeParse(body);
+
+      if (!validation.success) {
+        return json({ error: 'Invalid input: ID is required', details: validation.error.formErrors }, { status: 400 });
+      }
+
+      const { id } = validation.data;
+
+      // Perform the delete, ensuring the project belongs to the user
+      const [deletedProject] = await db
+        .delete(project)
+        .where(and(eq(project.id, id), eq(project.userId, userId))) // Ensure user owns the project
+        .returning({ id: project.id }); // Return ID to confirm deletion
+
+      if (!deletedProject) {
+        // Could be not found OR not owned by user
+        return json({ error: 'Project not found or you do not have permission to delete it' }, { status: 404 });
+      }
+
+      return json({ message: "Project deleted successfully", deletedProjectId: deletedProject.id });
+
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      // Check for foreign key constraints if tasks depend on projects
+      // You might need more specific error handling based on DB errors
+      return json({ error: "Failed to delete project" }, { status: 500 });
     }
   },
 });
