@@ -2,7 +2,7 @@ import React from 'react';
 
 export function Header() {
   return (
-    <header className="w-full h-[50px] bg-zinc-50 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-50 border-b border-zinc-200 shadow-sm">
+    <header className="w-full h-[60px] bg-zinc-50 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-50 border-b border-zinc-200 ">
       {/* Logo Section - Left */}
       <div className="flex-shrink-0">
         {/* Replace with your actual Logo component or image */}
