@@ -12,7 +12,10 @@ const Hero = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/3 w-[90%] h-64 bg-zinc-50 rounded-xl z-10 p-6">
+      {/* Background overlapping card */}
+      <div className="absolute bottom-0 left-1/2 transform -translate-x-[calc(50%-5px)] translate-y-[calc(60%+5px)] w-[85%] h-[600px] bg-zinc-600 rounded-xl z-0 p-6" />
+      {/* Foreground overlapping card */}
+      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-[60%] w-[85%] h-[600px] bg-zinc-50 rounded-xl z-10 p-6">
         <h2 className="text-xl font-bold mb-2 text-center text-gray-800">Overlapping Card</h2>
         <p className="text-center text-gray-600">This card overlaps the section below.</p>
       </div>

@@ -2,7 +2,7 @@ import React from 'react';
 
 const FinanceManagement = () => {
   return (
-    <div className="h-screen w-screen bg-red-600">
+    <div className="h-screen w-screen bg-[#CFEDF3]">
       {/* Content for Finance Management */}
     </div>
   );
