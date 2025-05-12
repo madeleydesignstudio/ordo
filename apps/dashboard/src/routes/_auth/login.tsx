@@ -98,7 +98,7 @@ function LoginForm() {
             </span>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Button
+            {/* <Button
               variant="outline"
               className="w-full"
               type="button"
@@ -129,7 +129,7 @@ function LoginForm() {
                 />
               </svg>
               Login with GitHub
-            </Button>
+            </Button> */}
             <Button
               variant="outline"
               className="w-full"

@@ -1,11 +1,7 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import { format } from 'date-fns'
-import { Button } from '~/components/ui/button'
-import authClient from '~/lib/auth-client'
-import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { format } from "date-fns";
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,61 +12,73 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '~/components/ui/alert-dialog'
+} from "~/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import authClient from "~/lib/auth-client";
 
-export const Route = createFileRoute('/settings/')({
+export const Route = createFileRoute("/settings/")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  const { user } = Route.useRouteContext()
-  const router = useRouter()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const { user } = Route.useRouteContext();
+  const router = useRouter();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const deleteAccountMutation = useMutation({
     mutationFn: async () => {
-      console.log('[Debug] deleteAccountMutation: mutationFn started')
-      await authClient.deleteUser()
-      console.log('[Debug] deleteAccountMutation: authClient.deleteUser() finished')
+      console.log("[Debug] deleteAccountMutation: mutationFn started");
+      await authClient.deleteUser();
+      console.log("[Debug] deleteAccountMutation: authClient.deleteUser() finished");
     },
     onSuccess: () => {
-      console.log('[Debug] deleteAccountMutation: onSuccess')
-      alert('Account deleted successfully.')
-      console.log('[Debug] Navigating directly after successful deletion...')
-      router.invalidate().then(() => router.navigate({ to: '/signup', replace: true }))
+      console.log("[Debug] deleteAccountMutation: onSuccess");
+      alert("Account deleted successfully.");
+      console.log("[Debug] Navigating directly after successful deletion...");
+      router.invalidate().then(() => router.navigate({ to: "/login", replace: true }));
     },
     onError: (error: Error) => {
-      console.log('[Debug] deleteAccountMutation: onError')
-      console.error('Error deleting account:', error)
-      alert(`Error deleting account: ${error.message || 'Unknown error'}`)
-      setIsDeleteDialogOpen(false) // Close dialog on error
+      console.log("[Debug] deleteAccountMutation: onError");
+      console.error("Error deleting account:", error);
+      alert(`Error deleting account: ${error.message || "Unknown error"}`);
+      setIsDeleteDialogOpen(false); // Close dialog on error
     },
-  })
+  });
 
   const handleLogout = async () => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.invalidate().then(() => router.navigate({ to: '/login' }))
+          router
+            .invalidate()
+            .then(() => router.navigate({ to: "/login", replace: true }));
         },
         onError: (error: unknown) => {
-          console.error('Logout error:', error)
-          let message = 'Failed to logout.';
+          console.error("Logout error:", error);
+          let message = "Failed to logout.";
           if (error instanceof Error) {
             message = `Logout failed: ${error.message}`;
-          } else if (typeof error === 'string') {
+          } else if (typeof error === "string") {
             message = `Logout failed: ${error}`;
-          } else if (error && typeof error === 'object' && 'message' in error) {
+          } else if (error && typeof error === "object" && "message" in error) {
             message = `Logout failed: ${String(error.message)}`;
           }
-          alert(message)
+          alert(message);
         },
       },
-    })
-  }
+    });
+  };
 
   if (!user) {
-    return <div>Please log in to view your settings</div>
+    return <div>Please log in to view your settings</div>;
   }
 
   return (
@@ -81,7 +89,7 @@ function RouteComponent() {
           <CardDescription>Manage your account settings and preferences</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center space-x-4 mb-6">
+          <div className="mb-6 flex items-center space-x-4">
             <Avatar className="h-20 w-20">
               <AvatarImage src={user.image || undefined} />
               <AvatarFallback>{user.name?.[0]?.toUpperCase()}</AvatarFallback>
@@ -95,22 +103,30 @@ function RouteComponent() {
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Email Verification</h3>
-                <p className="text-sm">{user.emailVerified ? 'Verified' : 'Not verified'}</p>
+                <h3 className="text-muted-foreground text-sm font-medium">
+                  Email Verification
+                </h3>
+                <p className="text-sm">
+                  {user.emailVerified ? "Verified" : "Not verified"}
+                </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Account Created</h3>
-                <p className="text-sm">{format(new Date(user.createdAt), 'PPP')}</p>
+                <h3 className="text-muted-foreground text-sm font-medium">
+                  Account Created
+                </h3>
+                <p className="text-sm">{format(new Date(user.createdAt), "PPP")}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Last Updated</h3>
-                <p className="text-sm">{format(new Date(user.updatedAt), 'PPP')}</p>
+                <h3 className="text-muted-foreground text-sm font-medium">
+                  Last Updated
+                </h3>
+                <p className="text-sm">{format(new Date(user.updatedAt), "PPP")}</p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground">User ID</h3>
-                <p className="text-sm font-mono">{user.id}</p>
+                <h3 className="text-muted-foreground text-sm font-medium">User ID</h3>
+                <p className="font-mono text-sm">{user.id}</p>
               </div>
             </div>
           </div>
@@ -135,21 +151,25 @@ function RouteComponent() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete your
-                  account and remove your data from our servers.
+                  This action cannot be undone. This will permanently delete your account
+                  and remove your data from our servers.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel disabled={deleteAccountMutation.isPending}>Cancel</AlertDialogCancel>
+                <AlertDialogCancel disabled={deleteAccountMutation.isPending}>
+                  Cancel
+                </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => {
-                    console.log('[Debug] AlertDialogAction: onClick triggered')
-                    deleteAccountMutation.mutate()
+                    console.log("[Debug] AlertDialogAction: onClick triggered");
+                    deleteAccountMutation.mutate();
                   }}
                   disabled={deleteAccountMutation.isPending}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  {deleteAccountMutation.isPending ? 'Deleting...' : 'Yes, delete account'}
+                  {deleteAccountMutation.isPending
+                    ? "Deleting..."
+                    : "Yes, delete account"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -157,5 +177,5 @@ function RouteComponent() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
