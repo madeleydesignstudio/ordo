@@ -59,18 +59,7 @@ function SignupForm() {
 
   return (
     <div className="flex min-h-screen">
-      {/* Image Section - Left Half */}
-      <div className="hidden w-1/2 bg-gray-100 lg:block">
-        <div
-          className="h-full w-full bg-cover bg-center"
-          style={{ backgroundImage: "url('/auth-background.jpg')" }}
-        >
-          {/* You can also use an <img> tag instead of background-image if preferred */}
-          {/* <img src="/auth-background.jpg" alt="Authentication background" className="h-full w-full object-cover" /> */}
-        </div>
-      </div>
-
-      {/* Form Section - Right Half */}
+      {/* Form Section - Left Half */}
       <div className="flex w-full items-center justify-center px-4 py-12 sm:px-6 lg:w-1/2">
         <div className="w-full max-w-md space-y-6">
           <div className="flex flex-col space-y-2 text-center">
@@ -178,6 +167,7 @@ function SignupForm() {
                     },
                   )
                 }
+                className="w-full"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -199,6 +189,17 @@ function SignupForm() {
               Sign in
             </Link>
           </p>
+        </div>
+      </div>
+
+      {/* Image Section - Right Half */}
+      <div className="hidden w-1/2 bg-gray-100 lg:block">
+        <div
+          className="h-full w-full bg-cover bg-center"
+          style={{ backgroundImage: "url('/auth-background.jpg')" }}
+        >
+          {/* You can also use an <img> tag instead of background-image if preferred */}
+          {/* <img src="/auth-background.jpg" alt="Authentication background" className="h-full w-full object-cover" /> */}
         </div>
       </div>
     </div>
