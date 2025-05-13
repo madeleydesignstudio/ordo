@@ -17,7 +17,7 @@ import {
   Table2,
   Wallet
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TimeLocationDisplay from "~/components/time-location-display";
 import { Button } from "~/components/ui/button";
 import {
@@ -38,12 +38,39 @@ import {
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 import { Textarea } from "~/components/ui/textarea";
+import { ProjectLayoutView } from "~/components/project-manager/project-layout";
+// We'll import this conditionally in the ProjectManagerTabs component
+// import { useProjectLayout } from "~/components/project-manager/project-layout";
 
-const ContentTabs = ({ children }: { children: React.ReactNode }) => {
+type ContentTabsInnerProps = {
+  children: React.ReactNode;
+  currentView?: ProjectLayoutView;
+  setCurrentView?: (view: ProjectLayoutView) => void;
+};
+
+const ContentTabsInner = ({ 
+  children, 
+  currentView = "list", 
+  setCurrentView = () => {} 
+}: ContentTabsInnerProps) => {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  
+  // Track the active view locally for UI feedback
+  const [activeView, setActiveView] = useState<ProjectLayoutView>(currentView);
+  
+  // Update local state when receiving props
+  useEffect(() => {
+    setActiveView(currentView);
+  }, [currentView]);
+
+  // Handle view change with both local UI update and context update
+  const handleViewChange = (view: ProjectLayoutView) => {
+    setActiveView(view); // Update local UI immediately
+    setCurrentView(view); // Update context/send event
+  };
 
   // State for modals
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -286,32 +313,52 @@ const ContentTabs = ({ children }: { children: React.ReactNode }) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-5 w-5 p-0.5 text-neutral-400 hover:text-neutral-200"
+                  className={`h-5 w-5 p-0.5 ${
+                    activeView === "list" 
+                      ? "text-white bg-neutral-700" 
+                      : "text-neutral-400 hover:text-neutral-200"
+                  }`}
                   title="List view"
+                  onClick={() => handleViewChange("list")}
                 >
                   <LayoutList className="h-3 w-3" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-5 w-5 p-0.5 text-neutral-400 hover:text-neutral-200"
+                  className={`h-5 w-5 p-0.5 ${
+                    activeView === "kanban" 
+                      ? "text-white bg-neutral-700" 
+                      : "text-neutral-400 hover:text-neutral-200"
+                  }`}
                   title="Kanban view"
+                  onClick={() => handleViewChange("kanban")}
                 >
                   <LayoutGrid className="h-3 w-3" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-5 w-5 p-0.5 text-neutral-400 hover:text-neutral-200"
+                  className={`h-5 w-5 p-0.5 ${
+                    activeView === "calendar" 
+                      ? "text-white bg-neutral-700" 
+                      : "text-neutral-400 hover:text-neutral-200"
+                  }`}
                   title="Calendar view"
+                  onClick={() => handleViewChange("calendar")}
                 >
                   <Calendar className="h-3 w-3" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-5 w-5 p-0.5 text-neutral-400 hover:text-neutral-200"
+                  className={`h-5 w-5 p-0.5 ${
+                    activeView === "table" 
+                      ? "text-white bg-neutral-700" 
+                      : "text-neutral-400 hover:text-neutral-200"
+                  }`}
                   title="Table view"
+                  onClick={() => handleViewChange("table")}
                 >
                   <Table2 className="h-3 w-3" />
                 </Button>
@@ -480,6 +527,77 @@ const ContentTabs = ({ children }: { children: React.ReactNode }) => {
       </Dialog>
     </div>
   );
+};
+
+// Project Manager specific wrapper with proper context
+// import { useProjectLayout } from "~/components/project-manager/project-layout";
+
+// const ProjectManagerTabs = ({ children }: { children: React.ReactNode }) => {
+//   const { currentView, setCurrentView } = useProjectLayout();
+  
+//   return (
+//     <ContentTabsInner 
+//       currentView={currentView}
+//       setCurrentView={setCurrentView}
+//     >
+//       {children}
+//     </ContentTabsInner>
+//   );
+// };
+
+// Define a custom event for layout changes
+const triggerViewChange = (view: ProjectLayoutView) => {
+  // Create and dispatch a custom event that the ProjectLayoutProvider can listen for
+  const event = new CustomEvent('project-layout-view-change', { 
+    detail: { view },
+    bubbles: true 
+  });
+  document.dispatchEvent(event);
+};
+
+// Main component that checks if we're in project manager
+const ContentTabs = ({ children }: { children: React.ReactNode }) => {
+  const routerState = useRouterState();
+  const currentPath = routerState.location.pathname;
+  const [activeView, setActiveView] = useState<ProjectLayoutView>("list");
+  
+  // Listen for custom view change events to keep tabs in sync
+  useEffect(() => {
+    const handleViewChange = (event: CustomEvent<{ view: ProjectLayoutView }>) => {
+      setActiveView(event.detail.view);
+    };
+
+    document.addEventListener(
+      'project-layout-view-change', 
+      handleViewChange as EventListener
+    );
+
+    return () => {
+      document.removeEventListener(
+        'project-layout-view-change', 
+        handleViewChange as EventListener
+      );
+    };
+  }, []);
+  
+  // Custom event handler that also updates local state
+  const handleViewChange = (view: ProjectLayoutView) => {
+    setActiveView(view);
+    triggerViewChange(view);
+  };
+  
+  if (currentPath.startsWith("/project-manager")) {
+    return (
+      <ContentTabsInner 
+        currentView={activeView}
+        setCurrentView={handleViewChange}
+      >
+        {children}
+      </ContentTabsInner>
+    );
+  }
+  
+  return <ContentTabsInner>{children}</ContentTabsInner>;
 };
 
 export default ContentTabs;

@@ -277,7 +277,7 @@ function RouteComponent() {
           <p className="text-red-400">Error loading projects: {projectsError.message}</p>
         )}
 
-        {projectsData && projectsData.projects.length > 0 ? (
+        {projectsData?.projects && projectsData.projects.length > 0 ? (
           <div className="space-y-4">
             {projectsData.projects.map((project) => (
               <div

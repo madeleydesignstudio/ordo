@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { ProjectLayoutProvider } from "~/components/project-manager/project-layout";
 
 export const Route = createFileRoute("/project-manager")({
   component: RouteComponent,
@@ -14,8 +15,10 @@ export const Route = createFileRoute("/project-manager")({
 
 function RouteComponent() {
   return (
-    <div>
-      <Outlet />
-    </div>
+    <ProjectLayoutProvider>
+      <div>
+        <Outlet />
+      </div>
+    </ProjectLayoutProvider>
   );
 }
