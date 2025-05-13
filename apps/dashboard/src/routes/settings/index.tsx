@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { useState } from "react";
 import {
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/settings/")({
 
 function RouteComponent() {
   const { user } = Route.useRouteContext();
-  const router = useRouter();
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const deleteAccountMutation = useMutation({

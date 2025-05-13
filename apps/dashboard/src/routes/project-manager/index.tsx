@@ -1,9 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/project-manager/')({
+export const Route = createFileRoute("/project-manager/")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  return <div>Hello "/project-manager/"!</div>
+  return <Navigate to="/project-manager/inbox" />;
 }
