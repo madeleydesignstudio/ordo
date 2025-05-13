@@ -43,7 +43,7 @@ function RouteComponent() {
       console.log("[Debug] deleteAccountMutation: onSuccess");
       alert("Account deleted successfully.");
       console.log("[Debug] Navigating directly after successful deletion...");
-      router.invalidate().then(() => router.navigate({ to: "/login", replace: true }));
+      window.location.href = "/login";
     },
     onError: (error: Error) => {
       console.log("[Debug] deleteAccountMutation: onError");
@@ -54,27 +54,21 @@ function RouteComponent() {
   });
 
   const handleLogout = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router
-            .invalidate()
-            .then(() => router.navigate({ to: "/login", replace: true }));
-        },
-        onError: (error: unknown) => {
-          console.error("Logout error:", error);
-          let message = "Failed to logout.";
-          if (error instanceof Error) {
-            message = `Logout failed: ${error.message}`;
-          } else if (typeof error === "string") {
-            message = `Logout failed: ${error}`;
-          } else if (error && typeof error === "object" && "message" in error) {
-            message = `Logout failed: ${String(error.message)}`;
-          }
-          alert(message);
-        },
-      },
-    });
+    try {
+      await authClient.signOut();
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout error:", error);
+      let message = "Failed to logout.";
+      if (error instanceof Error) {
+        message = `Logout failed: ${error.message}`;
+      } else if (typeof error === "string") {
+        message = `Logout failed: ${error}`;
+      } else if (error && typeof error === "object" && "message" in error) {
+        message = `Logout failed: ${String(error.message)}`;
+      }
+      alert(message);
+    }
   };
 
   if (!user) {

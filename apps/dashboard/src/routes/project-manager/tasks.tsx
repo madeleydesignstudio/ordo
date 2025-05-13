@@ -39,14 +39,14 @@ function RouteComponent() {
   const [isLoadingTasks, setIsLoadingTasks] = useState(false);
   const [isLoadingProjects, setIsLoadingProjects] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Add submitting state
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form State
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [taskStatus, setTaskStatus] = useState<"todo" | "in_progress" | "done">("todo");
-  const [taskDueDate, setTaskDueDate] = useState(""); // Store as YYYY-MM-DD string
+  const [taskDueDate, setTaskDueDate] = useState("");
 
   // Fetch tasks function
   const fetchTasks = async () => {
@@ -143,154 +143,188 @@ function RouteComponent() {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "600px", margin: "auto" }}>
-      <h2>Create New Task</h2>
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "15px" }}
-      >
-        <div>
-          <label htmlFor="taskName" style={{ display: "block", marginBottom: "5px" }}>
-            Task Name:
-          </label>
-          <input
-            id="taskName"
-            type="text"
-            value={taskName}
-            onChange={(e) => setTaskName(e.target.value)}
-            required
-            disabled={isSubmitting}
-            style={{ width: "100%", padding: "8px" }}
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="taskDescription"
-            style={{ display: "block", marginBottom: "5px" }}
-          >
-            Description:
-          </label>
-          <textarea
-            id="taskDescription"
-            value={taskDescription}
-            onChange={(e) => setTaskDescription(e.target.value)}
-            disabled={isSubmitting}
-            style={{ width: "100%", padding: "8px", minHeight: "80px" }}
-          />
-        </div>
-        <div>
-          <label htmlFor="taskStatus" style={{ display: "block", marginBottom: "5px" }}>
-            Status:
-          </label>
-          <select
-            id="taskStatus"
-            value={taskStatus}
-            // Type assertion needed because TS doesn't know the event target value is one of the enum values
-            onChange={(e) => setTaskStatus(e.target.value as typeof taskStatus)}
-            disabled={isSubmitting}
-            style={{ width: "100%", padding: "8px" }}
-          >
-            {/* Use taskStatusEnum if imported, otherwise hardcode */}
-            {(taskStatusEnum?.enumValues || ["todo", "in_progress", "done"]).map(
-              (statusValue) => (
-                <option key={statusValue} value={statusValue}>
-                  {statusValue.replace("_", " ")} {/* Nicer display */}
-                </option>
-              ),
-            )}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="taskDueDate" style={{ display: "block", marginBottom: "5px" }}>
-            Due Date:
-          </label>
-          <input
-            id="taskDueDate"
-            type="date"
-            value={taskDueDate}
-            onChange={(e) => setTaskDueDate(e.target.value)}
-            disabled={isSubmitting}
-            style={{ width: "100%", padding: "8px" }}
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="projectSelect"
-            style={{ display: "block", marginBottom: "5px" }}
-          >
-            Assign to Project:
-          </label>
-          <select
-            id="projectSelect"
-            value={selectedProjectId ?? ""}
-            onChange={(e) => setSelectedProjectId(e.target.value || null)}
-            disabled={isLoadingProjects || isSubmitting}
-            style={{ width: "100%", padding: "8px" }}
-          >
-            <option value="">-- No Project --</option>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
-          </select>
-          {isLoadingProjects && (
-            <span style={{ fontSize: "0.8em", color: "#888" }}> Loading projects...</span>
-          )}
-        </div>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          style={{ padding: "10px 15px", cursor: isSubmitting ? "wait" : "pointer" }}
-        >
-          {isSubmitting ? "Creating..." : "Create Task"}
-        </button>
-      </form>
+    <div className="container mx-auto max-w-4xl px-4 py-8">
+      <h1 className="mb-6 text-2xl font-bold text-neutral-100">Tasks</h1>
 
-      {error && <p style={{ color: "red", marginTop: "15px" }}>Error: {error}</p>}
+      {/* Create Task Form */}
+      <div className="mb-8 rounded-lg border border-neutral-700 bg-neutral-800 p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-neutral-200">Create New Task</h2>
 
-      <hr style={{ margin: "30px 0" }} />
+        {error && <p className="mb-4 text-sm text-red-400">Error: {error}</p>}
 
-      <h2>Existing Tasks</h2>
-      {isLoadingTasks && <p>Loading tasks...</p>}
-      {!isLoadingTasks && !error && tasks.length === 0 && <p>No tasks found.</p>}
-      {!isLoadingTasks && !error && tasks.length > 0 && (
-        <ul
-          style={{
-            listStyle: "none",
-            padding: 0,
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-          }}
-        >
-          {tasks.map((task) => (
-            <li
-              key={task.id}
-              style={{ border: "1px solid #eee", padding: "10px", borderRadius: "5px" }}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label
+              htmlFor="taskName"
+              className="mb-1 block text-sm font-medium text-neutral-300"
             >
-              <strong>{task.title}</strong> ({task.status.replace("_", " ")})
-              {task.projectId && (
-                <span style={{ fontSize: "0.9em", color: "#555" }}>
-                  {" "}
-                  (Project: {projects.find((p) => p.id === task.projectId)?.name ?? "..."}
-                  )
-                </span>
+              Task Name
+            </label>
+            <input
+              id="taskName"
+              type="text"
+              value={taskName}
+              onChange={(e) => setTaskName(e.target.value)}
+              required
+              disabled={isSubmitting}
+              className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="taskDescription"
+              className="mb-1 block text-sm font-medium text-neutral-300"
+            >
+              Description
+            </label>
+            <textarea
+              id="taskDescription"
+              value={taskDescription}
+              onChange={(e) => setTaskDescription(e.target.value)}
+              disabled={isSubmitting}
+              className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              rows={3}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="taskStatus"
+              className="mb-1 block text-sm font-medium text-neutral-300"
+            >
+              Status
+            </label>
+            <select
+              id="taskStatus"
+              value={taskStatus}
+              onChange={(e) => setTaskStatus(e.target.value as typeof taskStatus)}
+              disabled={isSubmitting}
+              className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              {(taskStatusEnum?.enumValues || ["todo", "in_progress", "done"]).map(
+                (statusValue) => (
+                  <option key={statusValue} value={statusValue}>
+                    {statusValue.replace("_", " ")}
+                  </option>
+                ),
               )}
-              {task.dueDate && (
-                <span style={{ fontSize: "0.9em", color: "#555", marginLeft: "10px" }}>
-                  {" "}
-                  Due: {formatDateForInput(new Date(task.dueDate))}
-                </span>
-              )}
-              {task.description && (
-                <p style={{ marginTop: "5px", color: "#333" }}>{task.description}</p>
-              )}
-              {/* TODO: Add edit/delete buttons here */}
-            </li>
-          ))}
-        </ul>
-      )}
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="taskDueDate"
+              className="mb-1 block text-sm font-medium text-neutral-300"
+            >
+              Due Date
+            </label>
+            <input
+              id="taskDueDate"
+              type="date"
+              value={taskDueDate}
+              onChange={(e) => setTaskDueDate(e.target.value)}
+              disabled={isSubmitting}
+              className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="projectSelect"
+              className="mb-1 block text-sm font-medium text-neutral-300"
+            >
+              Assign to Project
+            </label>
+            <select
+              id="projectSelect"
+              value={selectedProjectId ?? ""}
+              onChange={(e) => setSelectedProjectId(e.target.value || null)}
+              disabled={isLoadingProjects || isSubmitting}
+              className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              <option value="">-- No Project --</option>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
+            {isLoadingProjects && (
+              <span className="text-xs text-neutral-500"> Loading projects...</span>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isSubmitting ? "Creating..." : "Create Task"}
+          </button>
+        </form>
+      </div>
+
+      {/* Task List */}
+      <div>
+        <h2 className="mb-4 text-xl font-semibold text-neutral-200">Task List</h2>
+
+        {isLoadingTasks && <p className="text-neutral-400">Loading tasks...</p>}
+        {!isLoadingTasks && !error && tasks.length === 0 && (
+          <p className="text-neutral-400 italic">No tasks found. Create one above!</p>
+        )}
+
+        {!isLoadingTasks && !error && tasks.length > 0 && (
+          <div className="space-y-4">
+            {tasks.map((task) => (
+              <div
+                key={task.id}
+                className="rounded-lg border border-neutral-700 bg-neutral-800 p-5 shadow-sm"
+              >
+                <div className="flex items-start justify-between">
+                  <h3 className="text-lg font-medium text-neutral-200">{task.title}</h3>
+                  <span className="rounded-full bg-neutral-700 px-2 py-1 text-xs text-neutral-300">
+                    {task.status.replace("_", " ")}
+                  </span>
+                </div>
+
+                {task.description && (
+                  <p className="mt-2 text-neutral-400">{task.description}</p>
+                )}
+
+                <div className="mt-3 flex flex-wrap gap-2 text-xs text-neutral-500">
+                  {task.projectId && (
+                    <span className="flex items-center">
+                      Project:{" "}
+                      {projects.find((p) => p.id === task.projectId)?.name ?? "..."}
+                    </span>
+                  )}
+
+                  {task.dueDate && (
+                    <span className="flex items-center">
+                      Due: {formatDateForInput(new Date(task.dueDate))}
+                    </span>
+                  )}
+
+                  <span className="flex items-center">
+                    Created: {new Date(task.createdAt).toLocaleString()}
+                  </span>
+                </div>
+
+                {/* TODO: Add edit/delete buttons here */}
+                <div className="mt-4 flex space-x-2">
+                  <button className="rounded-md bg-neutral-700 px-3 py-1.5 text-neutral-200 transition-colors hover:bg-neutral-600 focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 focus:outline-none">
+                    Edit
+                  </button>
+                  <button className="rounded-md border border-red-700 bg-neutral-800 px-3 py-1.5 text-red-400 transition-colors hover:bg-red-900 hover:text-red-300 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

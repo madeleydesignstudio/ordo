@@ -193,191 +193,217 @@ function RouteComponent() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Projects</h1>
+    <div className="container mx-auto max-w-4xl px-4 py-8">
+      <h1 className="mb-6 text-2xl font-bold text-neutral-100">Projects</h1>
 
       {/* Create Project Form */}
-      <form
-        onSubmit={handleCreateProject}
-        style={{
-          marginBottom: "20px",
-          padding: "15px",
-          border: "1px solid #ccc",
-          borderRadius: "5px",
-        }}
-      >
-        <h2>Create New Project</h2>
+      <div className="mb-8 rounded-lg border border-neutral-700 bg-neutral-800 p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-neutral-200">
+          Create New Project
+        </h2>
+
         {/* Display create/general errors here */}
         {formError && !editingProjectId && (
-          <p style={{ color: "red" }}>Error: {formError}</p>
+          <p className="mb-4 text-sm text-red-400">Error: {formError}</p>
         )}
         {createProjectMutation.isError && !editingProjectId && (
-          <p style={{ color: "red" }}>
+          <p className="mb-4 text-sm text-red-400">
             Create Error: {createProjectMutation.error.message}
           </p>
         )}
-        <div style={{ marginBottom: "10px" }}>
-          <label htmlFor="projectName" style={{ marginRight: "10px" }}>
-            Name:
-          </label>
-          <input
-            id="projectName"
-            type="text"
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-            required
-            style={{ padding: "5px" }}
+
+        <form onSubmit={handleCreateProject} className="space-y-4">
+          <div>
+            <label
+              htmlFor="projectName"
+              className="mb-1 block text-sm font-medium text-neutral-300"
+            >
+              Name
+            </label>
+            <input
+              id="projectName"
+              type="text"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              required
+              className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              disabled={createProjectMutation.isPending}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="projectDescription"
+              className="mb-1 block text-sm font-medium text-neutral-300"
+            >
+              Description
+            </label>
+            <textarea
+              id="projectDescription"
+              value={projectDescription}
+              onChange={(e) => setProjectDescription(e.target.value)}
+              className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              rows={3}
+              disabled={createProjectMutation.isPending}
+            />
+          </div>
+
+          <button
+            type="submit"
             disabled={createProjectMutation.isPending}
-          />
-        </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label htmlFor="projectDescription" style={{ marginRight: "10px" }}>
-            Description:
-          </label>
-          <textarea
-            id="projectDescription"
-            value={projectDescription}
-            onChange={(e) => setProjectDescription(e.target.value)}
-            style={{ padding: "5px", minWidth: "200px" }}
-            disabled={createProjectMutation.isPending}
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={createProjectMutation.isPending}
-          style={{ padding: "8px 15px" }}
-        >
-          {createProjectMutation.isPending ? "Creating..." : "Create Project"}
-        </button>
-      </form>
+            className="rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {createProjectMutation.isPending ? "Creating..." : "Create Project"}
+          </button>
+        </form>
+      </div>
 
       {/* Project List */}
-      <h2>Project List</h2>
-      {/* Display delete/update errors here? Or maybe below specific item? */}
-      {formError && editingProjectId && (
-        <p style={{ color: "red" }}>Error: {formError}</p>
-      )}
-      {deleteProjectMutation.isError && (
-        <p style={{ color: "red" }}>
-          Delete Error: {deleteProjectMutation.error.message}
-        </p>
-      )}
+      <div>
+        <h2 className="mb-4 text-xl font-semibold text-neutral-200">Project List</h2>
 
-      {isLoading && <p>Loading projects...</p>}
-      {projectsError && (
-        <p style={{ color: "red" }}>Error loading projects: {projectsError.message}</p>
-      )}
-      {projectsData && projectsData.projects.length > 0 ? (
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {projectsData.projects.map((project) => (
-            <li
-              key={project.id}
-              style={{
-                border: `1px solid ${editingProjectId === project.id ? "#007bff" : "#eee"}`,
-                marginBottom: "10px",
-                padding: "10px",
-                borderRadius: "5px",
-              }}
-            >
-              {editingProjectId === project.id ? (
-                // -- Editing View --
-                <div>
-                  <div style={{ marginBottom: "10px" }}>
-                    <label
-                      htmlFor={`editName-${project.id}`}
-                      style={{ marginRight: "10px" }}
-                    >
-                      Name:
-                    </label>
-                    <input
-                      id={`editName-${project.id}`}
-                      type="text"
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      required
-                      style={{ padding: "5px" }}
-                      disabled={updateProjectMutation.isPending}
-                    />
+        {/* Display delete/update errors here */}
+        {formError && editingProjectId && (
+          <p className="mb-4 text-sm text-red-400">Error: {formError}</p>
+        )}
+        {deleteProjectMutation.isError && (
+          <p className="mb-4 text-sm text-red-400">
+            Delete Error: {deleteProjectMutation.error.message}
+          </p>
+        )}
+
+        {isLoading && <p className="text-neutral-400">Loading projects...</p>}
+        {projectsError && (
+          <p className="text-red-400">Error loading projects: {projectsError.message}</p>
+        )}
+
+        {projectsData && projectsData.projects.length > 0 ? (
+          <div className="space-y-4">
+            {projectsData.projects.map((project) => (
+              <div
+                key={project.id}
+                className={`rounded-lg border shadow-sm ${
+                  editingProjectId === project.id
+                    ? "border-blue-500 bg-neutral-800"
+                    : "border-neutral-700 bg-neutral-800"
+                } p-5 transition-all`}
+              >
+                {editingProjectId === project.id ? (
+                  // -- Editing View --
+                  <div className="space-y-4">
+                    <div>
+                      <label
+                        htmlFor={`editName-${project.id}`}
+                        className="mb-1 block text-sm font-medium text-neutral-300"
+                      >
+                        Name
+                      </label>
+                      <input
+                        id={`editName-${project.id}`}
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        required
+                        className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        disabled={updateProjectMutation.isPending}
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor={`editDesc-${project.id}`}
+                        className="mb-1 block text-sm font-medium text-neutral-300"
+                      >
+                        Description
+                      </label>
+                      <textarea
+                        id={`editDesc-${project.id}`}
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                        className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        rows={3}
+                        disabled={updateProjectMutation.isPending}
+                      />
+                    </div>
+
+                    {/* Show specific update error for this item */}
+                    {updateProjectMutation.isError && editingProjectId === project.id && (
+                      <p className="text-sm text-red-400">
+                        Update Error: {updateProjectMutation.error.message}
+                      </p>
+                    )}
+
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleSaveEdit(project.id)}
+                        disabled={updateProjectMutation.isPending || !editName.trim()}
+                        className="rounded-md bg-blue-600 px-3 py-1.5 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {updateProjectMutation.isPending ? "Saving..." : "Save"}
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        disabled={updateProjectMutation.isPending}
+                        className="rounded-md bg-neutral-600 px-3 py-1.5 text-neutral-200 transition-colors hover:bg-neutral-700 focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
-                  <div style={{ marginBottom: "10px" }}>
-                    <label
-                      htmlFor={`editDesc-${project.id}`}
-                      style={{ marginRight: "10px" }}
-                    >
-                      Description:
-                    </label>
-                    <textarea
-                      id={`editDesc-${project.id}`}
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
-                      style={{ padding: "5px", minWidth: "200px" }}
-                      disabled={updateProjectMutation.isPending}
-                    />
-                  </div>
-                  {/* Show specific update error for this item */}
-                  {updateProjectMutation.isError && editingProjectId === project.id && (
-                    <p style={{ color: "red", fontSize: "0.9em" }}>
-                      Update Error: {updateProjectMutation.error.message}
-                    </p>
-                  )}
+                ) : (
+                  // -- Display View --
                   <div>
-                    <button
-                      onClick={() => handleSaveEdit(project.id)}
-                      disabled={updateProjectMutation.isPending || !editName.trim()}
-                      style={{ marginRight: "5px", padding: "5px 10px" }}
-                    >
-                      {updateProjectMutation.isPending ? "Saving..." : "Save"}
-                    </button>
-                    <button
-                      onClick={handleCancelEdit}
-                      disabled={updateProjectMutation.isPending}
-                      style={{ padding: "5px 10px" }}
-                    >
-                      Cancel
-                    </button>
+                    <h3 className="mb-2 text-lg font-medium text-neutral-200">
+                      {project.name}
+                    </h3>
+                    <p className="mb-3 text-neutral-400">
+                      {project.description || "No description"}
+                    </p>
+                    <p className="mb-4 text-xs text-neutral-500">
+                      Created: {new Date(project.createdAt).toLocaleString()}
+                    </p>
+
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEditClick(project)}
+                        disabled={
+                          deleteProjectMutation.isPending ||
+                          updateProjectMutation.isPending ||
+                          editingProjectId !== null
+                        }
+                        className="rounded-md bg-neutral-700 px-3 py-1.5 text-neutral-200 transition-colors hover:bg-neutral-600 focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(project.id, project.name)}
+                        disabled={
+                          deleteProjectMutation.isPending ||
+                          updateProjectMutation.isPending ||
+                          editingProjectId !== null
+                        }
+                        className="rounded-md border border-red-700 bg-neutral-800 px-3 py-1.5 text-red-400 transition-colors hover:bg-red-900 hover:text-red-300 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {deleteProjectMutation.isPending &&
+                        deleteProjectMutation.variables === project.id
+                          ? "Deleting..."
+                          : "Delete"}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                // -- Display View --
-                <div>
-                  <h3>{project.name}</h3>
-                  <p>{project.description || "No description"}</p>
-                  <small>Created: {new Date(project.createdAt).toLocaleString()}</small>
-                  <div style={{ marginTop: "10px" }}>
-                    <button
-                      style={{ marginRight: "5px" }}
-                      onClick={() => handleEditClick(project)}
-                      disabled={
-                        deleteProjectMutation.isPending ||
-                        updateProjectMutation.isPending ||
-                        editingProjectId !== null
-                      } // Disable if any mutation active or another item is being edited
-                    >
-                      Edit
-                    </button>
-                    <button
-                      style={{ color: "red" }}
-                      onClick={() => handleDeleteClick(project.id, project.name)}
-                      disabled={
-                        deleteProjectMutation.isPending ||
-                        updateProjectMutation.isPending ||
-                        editingProjectId !== null
-                      } // Disable if any mutation active or another item is being edited
-                    >
-                      {deleteProjectMutation.isPending &&
-                      deleteProjectMutation.variables === project.id
-                        ? "Deleting..."
-                        : "Delete"}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        !isLoading && !projectsError && <p>No projects found. Create one above!</p>
-      )}
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          !isLoading &&
+          !projectsError && (
+            <p className="text-neutral-400 italic">
+              No projects found. Create one above!
+            </p>
+          )
+        )}
+      </div>
     </div>
   );
 }
