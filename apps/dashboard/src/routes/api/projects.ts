@@ -14,6 +14,8 @@ const updateProjectSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1).optional(), // Allow partial updates
   description: z.string().optional().nullable(),
+  icon: z.string().optional(),
+  bannerImage: z.string().optional().nullable(),
 });
 
 const deleteProjectSchema = z.object({
@@ -66,6 +68,8 @@ export const APIRoute = createAPIFileRoute("/api/projects")({
         .values({
           name: body.name,
           description: body.description || null,
+          icon: body.icon || "📁", // Use provided icon or default
+          bannerImage: body.bannerImage || null, // Use provided banner or null
           userId: userId,
         })
         .returning();
@@ -106,6 +110,8 @@ export const APIRoute = createAPIFileRoute("/api/projects")({
       };
       if (updateData.name !== undefined) dataToSet.name = updateData.name;
       if (updateData.description !== undefined) dataToSet.description = updateData.description;
+      if (updateData.icon !== undefined) dataToSet.icon = updateData.icon;
+      if (updateData.bannerImage !== undefined) dataToSet.bannerImage = updateData.bannerImage;
 
       if (Object.keys(dataToSet).length <= 1) {
          return json({ error: 'No update fields provided' }, { status: 400 });

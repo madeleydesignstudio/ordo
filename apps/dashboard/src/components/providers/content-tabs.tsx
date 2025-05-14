@@ -1,7 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Link,
-  useNavigate,
   useRouterState
 } from "@tanstack/react-router";
 import {
@@ -18,6 +17,7 @@ import {
   Wallet
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { AddProjectDialog } from "./add-project";
 import TimeLocationDisplay from "~/components/time-location-display";
 import { Button } from "~/components/ui/button";
 import {
@@ -55,7 +55,6 @@ const ContentTabsInner = ({
 }: ContentTabsInnerProps) => {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   
   // Track the active view locally for UI feedback
@@ -75,12 +74,6 @@ const ContentTabsInner = ({
   // State for modals
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-
-  // State for new project
-  const [newProject, setNewProject] = useState({
-    name: "",
-    description: "",
-  });
 
   // State for new task
   const [newTask, setNewTask] = useState({
@@ -116,62 +109,47 @@ const ContentTabsInner = ({
     setIsTaskModalOpen(true);
   };
 
-  // Create project mutation
-  const createProject = async () => {
-    try {
-      const response = await fetch("/api/projects", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newProject),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create project");
-      }
-
-      const data = await response.json();
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      setIsProjectModalOpen(false);
-      setNewProject({ name: "", description: "" });
-
-      // Navigate to the new project
-      navigate({
-        to: "/",
-        params: { projectSlug: data.project.id },
-      });
-    } catch (error) {
-      console.error("Error creating project:", error);
-    }
-  };
-
   // Create task mutation
   const createTask = async () => {
     try {
-      const projectId = newTask.projectId || "1"; // Default to first project if none selected
+      if (!newTask.title) {
+        console.error("Task title is required");
+        return;
+      }
 
-      const response = await fetch(`/api/projects/${projectId}`, {
+      // Format the payload correctly
+      const payload = {
+        title: newTask.title,
+        description: newTask.description || "",
+        status: "todo",
+        // Only include projectId if it's not empty
+        ...(newTask.projectId ? { projectId: newTask.projectId } : {}),
+        // Format date properly if it exists
+        ...(newTask.dueDate 
+          ? { dueDate: new Date(newTask.dueDate).toISOString() } 
+          : { dueDate: null })
+      };
+
+      console.log("Sending task payload:", payload);
+
+      const response = await fetch(`/api/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          title: newTask.title,
-          description: newTask.description,
-          priority: newTask.priority,
-          dueDate: newTask.dueDate || null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("Server error response:", errorData);
         throw new Error(errorData.error || "Failed to create task");
       }
 
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      if (newTask.projectId) {
+        queryClient.invalidateQueries({ queryKey: ["project", newTask.projectId] });
+      }
       setIsTaskModalOpen(false);
       setNewTask({
         title: "",
@@ -376,53 +354,8 @@ const ContentTabsInner = ({
         {children}
       </div>
 
-      {/* Create Project Modal */}
-      <Dialog open={isProjectModalOpen} onOpenChange={setIsProjectModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Create New Project</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="name"
-                value={newProject.name}
-                onChange={(e) =>
-                  setNewProject({ ...newProject, name: e.target.value })
-                }
-                className="col-span-3"
-                required
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                value={newProject.description}
-                onChange={(e) =>
-                  setNewProject({ ...newProject, description: e.target.value })
-                }
-                className="col-span-3"
-                rows={3}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsProjectModalOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={createProject}>Create</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Create Project Modal - Now using the new external component */}
+      <AddProjectDialog isOpen={isProjectModalOpen} onOpenChange={setIsProjectModalOpen} />
 
       {/* Create Task Modal */}
       <Dialog open={isTaskModalOpen} onOpenChange={setIsTaskModalOpen}>
@@ -529,25 +462,7 @@ const ContentTabsInner = ({
   );
 };
 
-// Project Manager specific wrapper with proper context
-// import { useProjectLayout } from "~/components/project-manager/project-layout";
-
-// const ProjectManagerTabs = ({ children }: { children: React.ReactNode }) => {
-//   const { currentView, setCurrentView } = useProjectLayout();
-  
-//   return (
-//     <ContentTabsInner 
-//       currentView={currentView}
-//       setCurrentView={setCurrentView}
-//     >
-//       {children}
-//     </ContentTabsInner>
-//   );
-// };
-
-// Define a custom event for layout changes
 const triggerViewChange = (view: ProjectLayoutView) => {
-  // Create and dispatch a custom event that the ProjectLayoutProvider can listen for
   const event = new CustomEvent('project-layout-view-change', { 
     detail: { view },
     bubbles: true 

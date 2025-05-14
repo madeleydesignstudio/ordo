@@ -1,6 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { AddProjectDialog } from "~/components/providers/add-project";
+import { PlusIcon } from "lucide-react";
 
 // Define the type for a project based on schema/API response
 // Adjust based on the actual structure returned by your API
@@ -8,6 +10,7 @@ type Project = {
   id: string; // Assuming UUID string from schema
   name: string;
   description?: string | null;
+  banner?: string | null; // Added banner field
   createdAt: string; // Assuming ISO string from DB
   updatedAt: string; // Assuming ISO string from DB
   // tasks?: any[]; // Include if tasks are fetched and needed
@@ -22,388 +25,191 @@ const fetchProjects = async (): Promise<{ projects: Project[] }> => {
   return res.json();
 };
 
-// Function to create a project
-const createProject = async (newProject: {
-  name: string;
-  description?: string;
-}): Promise<{ project: Project }> => {
-  const res = await fetch("/api/projects", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(newProject),
-  });
-  if (!res.ok) {
-    // Attempt to read error message from API response
-    const errorData = await res
-      .json()
-      .catch(() => ({ error: "Failed to create project. Check server logs." }));
-    throw new Error(errorData?.error || "Failed to create project");
-  }
-  return res.json();
-};
-
-const updateProject = async (updatedData: {
-  id: string;
-  name?: string;
-  description?: string | null;
-}): Promise<{ project: Project }> => {
-  const res = await fetch("/api/projects", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updatedData),
-  });
-  if (!res.ok) {
-    const errorData = await res
-      .json()
-      .catch(() => ({ error: "Failed to update project. Check server logs." }));
-    throw new Error(errorData?.error || "Failed to update project");
-  }
-  return res.json();
-};
-
-const deleteProject = async (
-  projectId: string,
-): Promise<{ message: string; deletedProjectId: string }> => {
-  const res = await fetch("/api/projects", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id: projectId }), // Send ID in body as per API handler
-  });
-  if (!res.ok) {
-    const errorData = await res
-      .json()
-      .catch(() => ({ error: "Failed to delete project. Check server logs." }));
-    throw new Error(errorData?.error || "Failed to delete project");
-  }
-  return res.json();
-};
-
 export const Route = createFileRoute("/project-manager/projects")({
   component: RouteComponent,
+  loader: ({ context }) => {
+    // Prefetch projects data to ensure it's available immediately
+    context.queryClient.prefetchQuery({
+      queryKey: ["projects"],
+      queryFn: fetchProjects,
+    });
+    return {};
+  },
 });
 
 function RouteComponent() {
-  const queryClient = useQueryClient();
-  const [projectName, setProjectName] = useState("");
-  const [projectDescription, setProjectDescription] = useState("");
-  const [formError, setFormError] = useState<string | null>(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const projectsPerPage = 6;
 
-  // State for inline editing
-  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
-  const [editName, setEditName] = useState("");
-  const [editDescription, setEditDescription] = useState("");
+  // Dialog state
+  const [isAddProjectOpen, setIsAddProjectOpen] = useState(false);
 
-  // Query for fetching projects
+  // Query for fetching projects with minimal stale time to ensure fresh data
   const {
     data: projectsData,
     isLoading,
     error: projectsError,
+    refetch
   } = useQuery({
     queryKey: ["projects"],
     queryFn: fetchProjects,
+    staleTime: 0, // Always refetch when component mounts
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
-  // Common invalidation logic
-  const invalidateProjects = () => {
-    queryClient.invalidateQueries({ queryKey: ["projects"] });
-  };
+  // Ensure data is loaded when component mounts
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
-  // Mutation for creating projects
-  const createProjectMutation = useMutation({
-    mutationFn: createProject,
-    onSuccess: () => {
-      invalidateProjects();
-      setProjectName("");
-      setProjectDescription("");
-      setFormError(null);
-    },
-    onError: (error) => {
-      setFormError(`Create Error: ${error.message}`);
-    },
-  });
+  // Calculate pagination
+  const totalProjects = projectsData?.projects?.length || 0;
+  const totalPages = Math.ceil(totalProjects / projectsPerPage);
+  
+  // Get current projects for this page
+  const currentProjects = projectsData?.projects?.slice(
+    (currentPage - 1) * projectsPerPage,
+    currentPage * projectsPerPage
+  ) || [];
 
-  // Mutation for updating projects
-  const updateProjectMutation = useMutation({
-    mutationFn: updateProject,
-    onSuccess: () => {
-      invalidateProjects();
-      setEditingProjectId(null); // Exit editing mode
-    },
-    onError: (error) => {
-      // Display error specific to the item being edited?
-      // For now, setting general form error
-      setFormError(`Update Error: ${error.message}`);
-    },
-  });
-
-  // Mutation for deleting projects
-  const deleteProjectMutation = useMutation({
-    mutationFn: deleteProject,
-    onSuccess: () => {
-      invalidateProjects();
-    },
-    onError: (error) => {
-      setFormError(`Delete Error: ${error.message}`);
-    },
-  });
-
-  const handleCreateProject = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError(null);
-    if (!projectName.trim()) {
-      setFormError("Project name is required.");
-      return;
-    }
-    createProjectMutation.mutate({ name: projectName, description: projectDescription });
-  };
-
-  const handleEditClick = (project: Project) => {
-    setEditingProjectId(project.id);
-    setEditName(project.name);
-    setEditDescription(project.description || "");
-    setFormError(null); // Clear errors when starting edit
-  };
-
-  const handleCancelEdit = () => {
-    setEditingProjectId(null);
-  };
-
-  const handleSaveEdit = (projectId: string) => {
-    if (!editName.trim()) {
-      setFormError("Project name cannot be empty.");
-      return;
-    }
-    updateProjectMutation.mutate({
-      id: projectId,
-      name: editName,
-      description: editDescription,
-    });
-  };
-
-  const handleDeleteClick = (projectId: string, projectName: string) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the project "${projectName}"? This cannot be undone.`,
-      )
-    ) {
-      deleteProjectMutation.mutate(projectId);
-    }
-  };
+  // Make sure we always show exactly 6 card placeholders, even when loading
+  const displayProjects = isLoading
+    ? Array(projectsPerPage).fill(null)
+    : currentProjects.length < projectsPerPage
+    ? [...currentProjects, ...Array(projectsPerPage - currentProjects.length).fill(null)]
+    : currentProjects;
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
+    <div className="container mx-auto w-[90%] px-4 py-8">
       <h1 className="mb-6 text-2xl font-bold text-neutral-100">Projects</h1>
-
-      {/* Create Project Form */}
-      <div className="mb-8 rounded-lg border border-neutral-700 bg-neutral-800 p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-neutral-200">
-          Create New Project
-        </h2>
-
-        {/* Display create/general errors here */}
-        {formError && !editingProjectId && (
-          <p className="mb-4 text-sm text-red-400">Error: {formError}</p>
-        )}
-        {createProjectMutation.isError && !editingProjectId && (
-          <p className="mb-4 text-sm text-red-400">
-            Create Error: {createProjectMutation.error.message}
-          </p>
-        )}
-
-        <form onSubmit={handleCreateProject} className="space-y-4">
-          <div>
-            <label
-              htmlFor="projectName"
-              className="mb-1 block text-sm font-medium text-neutral-300"
-            >
-              Name
-            </label>
-            <input
-              id="projectName"
-              type="text"
-              value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
-              required
-              className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              disabled={createProjectMutation.isPending}
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="projectDescription"
-              className="mb-1 block text-sm font-medium text-neutral-300"
-            >
-              Description
-            </label>
-            <textarea
-              id="projectDescription"
-              value={projectDescription}
-              onChange={(e) => setProjectDescription(e.target.value)}
-              className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              rows={3}
-              disabled={createProjectMutation.isPending}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={createProjectMutation.isPending}
-            className="rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {createProjectMutation.isPending ? "Creating..." : "Create Project"}
-          </button>
-        </form>
-      </div>
-
+     
       {/* Project List */}
-      <div>
+      <div className="h-full">
         <h2 className="mb-4 text-xl font-semibold text-neutral-200">Project List</h2>
 
-        {/* Display delete/update errors here */}
-        {formError && editingProjectId && (
-          <p className="mb-4 text-sm text-red-400">Error: {formError}</p>
-        )}
-        {deleteProjectMutation.isError && (
-          <p className="mb-4 text-sm text-red-400">
-            Delete Error: {deleteProjectMutation.error.message}
-          </p>
-        )}
-
-        {isLoading && <p className="text-neutral-400">Loading projects...</p>}
         {projectsError && (
-          <p className="text-red-400">Error loading projects: {projectsError.message}</p>
+          <p className="mb-4 text-red-400">Error loading projects: {projectsError.message}</p>
         )}
 
-        {projectsData?.projects && projectsData.projects.length > 0 ? (
-          <div className="space-y-4">
-            {projectsData.projects.map((project) => (
-              <div
-                key={project.id}
-                className={`rounded-lg border shadow-sm ${
-                  editingProjectId === project.id
-                    ? "border-blue-500 bg-neutral-800"
-                    : "border-neutral-700 bg-neutral-800"
-                } p-5 transition-all`}
-              >
-                {editingProjectId === project.id ? (
-                  // -- Editing View --
-                  <div className="space-y-4">
-                    <div>
-                      <label
-                        htmlFor={`editName-${project.id}`}
-                        className="mb-1 block text-sm font-medium text-neutral-300"
-                      >
-                        Name
-                      </label>
-                      <input
-                        id={`editName-${project.id}`}
-                        type="text"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        required
-                        className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        disabled={updateProjectMutation.isPending}
-                      />
-                    </div>
+        {isLoading && <p className="text-neutral-400 cursor-wait">Loading projects...</p>}
 
-                    <div>
-                      <label
-                        htmlFor={`editDesc-${project.id}`}
-                        className="mb-1 block text-sm font-medium text-neutral-300"
-                      >
-                        Description
-                      </label>
-                      <textarea
-                        id={`editDesc-${project.id}`}
-                        value={editDescription}
-                        onChange={(e) => setEditDescription(e.target.value)}
-                        className="w-full rounded-md border border-neutral-600 bg-neutral-700 px-3 py-2 text-neutral-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        rows={3}
-                        disabled={updateProjectMutation.isPending}
-                      />
-                    </div>
-
-                    {/* Show specific update error for this item */}
-                    {updateProjectMutation.isError && editingProjectId === project.id && (
-                      <p className="text-sm text-red-400">
-                        Update Error: {updateProjectMutation.error.message}
-                      </p>
-                    )}
-
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleSaveEdit(project.id)}
-                        disabled={updateProjectMutation.isPending || !editName.trim()}
-                        className="rounded-md bg-blue-600 px-3 py-1.5 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {updateProjectMutation.isPending ? "Saving..." : "Save"}
-                      </button>
-                      <button
-                        onClick={handleCancelEdit}
-                        disabled={updateProjectMutation.isPending}
-                        className="rounded-md bg-neutral-600 px-3 py-1.5 text-neutral-200 transition-colors hover:bg-neutral-700 focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        Cancel
-                      </button>
-                    </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-[calc(100vh-250px)] max-h-[800px] overflow-hidden">
+          {displayProjects.map((project, index) => (
+            <div
+              key={project?.id || `placeholder-${index}`}
+              className="rounded-lg border shadow-sm border-neutral-700 bg-neutral-800 transition-all overflow-hidden h-[280px] flex flex-col"
+            >
+              {isLoading ? (
+                // Loading placeholder
+                <div className="animate-pulse flex flex-col h-full">
+                  <div className="h-32 bg-neutral-700"></div>
+                  <div className="p-5 flex-1">
+                    <div className="h-5 bg-neutral-700 rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-neutral-700 rounded w-1/4 mb-4"></div>
+                    <div className="h-4 bg-neutral-700 rounded w-full mb-3"></div>
+                    <div className="h-3 bg-neutral-700 rounded w-2/3 mb-5"></div>
                   </div>
-                ) : (
-                  // -- Display View --
-                  <div>
-                    <h3 className="mb-2 text-lg font-medium text-neutral-200">
-                      {project.name}
-                    </h3>
-                    <p className="mb-3 text-neutral-400">
+                </div>
+              ) : project === null ? (
+                // Empty card placeholder that opens add project dialog when clicked
+                <div 
+                  onClick={() => setIsAddProjectOpen(true)}
+                  className="flex flex-col items-center justify-center h-full border-dashed border-2 border-neutral-700 bg-neutral-800/50 hover:bg-neutral-700/30 transition-colors cursor-pointer"
+                >
+                  <PlusIcon className="h-10 w-10 text-neutral-500 mb-2" />
+                  <p className="text-neutral-500">Add project</p>
+                </div>
+              ) : (
+                // Project card display
+                <>
+                  {/* Banner */}
+                  <div className="relative h-32 bg-gradient-to-r from-blue-600 to-purple-600 cursor-pointer">
+                    {project.banner && (
+                      <img 
+                        src={project.banner} 
+                        alt={`${project.name} banner`} 
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    )}
+                    {/* Clickable overlay for the entire card */}
+                    <Link 
+                      to="/project-manager/project/$projectId" 
+                      params={{ projectId: project.id }}
+                      className="absolute inset-0 w-full h-full z-10"
+                    >
+                      <span className="sr-only">View project {project.name}</span>
+                    </Link>
+                  </div>
+                  
+                  <div className="p-5 flex flex-col flex-1">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="text-lg font-medium text-neutral-200 line-clamp-1">
+                          {project.name}
+                        </h3>
+                        <p className="text-xs text-neutral-500 mb-1">
+                          ID: {project.id.substring(0, 8)}...
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <p className="mb-3 text-neutral-400 line-clamp-2">
                       {project.description || "No description"}
                     </p>
-                    <p className="mb-4 text-xs text-neutral-500">
-                      Created: {new Date(project.createdAt).toLocaleString()}
+                    <p className="text-xs text-neutral-500 mb-2">
+                      Created: {new Date(project.createdAt).toLocaleDateString()}
                     </p>
-
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleEditClick(project)}
-                        disabled={
-                          deleteProjectMutation.isPending ||
-                          updateProjectMutation.isPending ||
-                          editingProjectId !== null
-                        }
-                        className="rounded-md bg-neutral-700 px-3 py-1.5 text-neutral-200 transition-colors hover:bg-neutral-600 focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(project.id, project.name)}
-                        disabled={
-                          deleteProjectMutation.isPending ||
-                          updateProjectMutation.isPending ||
-                          editingProjectId !== null
-                        }
-                        className="rounded-md border border-red-700 bg-neutral-800 px-3 py-1.5 text-red-400 transition-colors hover:bg-red-900 hover:text-red-300 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {deleteProjectMutation.isPending &&
-                        deleteProjectMutation.variables === project.id
-                          ? "Deleting..."
-                          : "Delete"}
-                      </button>
-                    </div>
                   </div>
-                )}
-              </div>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+        
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-8 space-x-1">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 rounded-md bg-neutral-700 text-neutral-200 hover:bg-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Previous
+            </button>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-1 rounded-md ${
+                  currentPage === page
+                    ? "bg-blue-600 text-white"
+                    : "bg-neutral-700 text-neutral-200 hover:bg-neutral-600"
+                } cursor-pointer`}
+              >
+                {page}
+              </button>
             ))}
+            
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 rounded-md bg-neutral-700 text-neutral-200 hover:bg-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Next
+            </button>
           </div>
-        ) : (
-          !isLoading &&
-          !projectsError && (
-            <p className="text-neutral-400 italic">
-              No projects found. Create one above!
-            </p>
-          )
         )}
       </div>
+      
+      {/* Add Project Dialog */}
+      <AddProjectDialog 
+        isOpen={isAddProjectOpen} 
+        onOpenChange={setIsAddProjectOpen} 
+      />
     </div>
   );
 }

@@ -7,6 +7,8 @@ export const project = pgTable("project", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   description: text("description"),
+  icon: text("icon").default("📁"), // Default folder emoji
+  bannerImage: text("banner_image"), // URL to the banner image
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
