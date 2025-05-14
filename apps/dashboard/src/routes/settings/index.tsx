@@ -22,6 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { UserLoginMapSection } from "~/components/settings/user-login-map-section";
 import authClient from "~/lib/auth-client";
 
 export const Route = createFileRoute("/settings/")({
@@ -124,6 +125,16 @@ function RouteComponent() {
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Your Location</CardTitle>
+          <CardDescription>We've detected your current country</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <UserLoginMapSection />
         </CardContent>
       </Card>
 

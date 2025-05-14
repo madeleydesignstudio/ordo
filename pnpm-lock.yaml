@@ -32,6 +32,9 @@ importers:
       '@nivo/core':
         specifier: ^0.96.0
         version: 0.96.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@nivo/geo':
+        specifier: ^0.96.0
+        version: 0.96.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@radix-ui/react-accordion':
         specifier: ^1.2.8
         version: 1.2.10(@types/react-dom@19.1.4(@types/react@19.1.3))(@types/react@19.1.3)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -137,6 +140,9 @@ importers:
       vinxi:
         specifier: ^0.5.4
         version: 0.5.6(@types/node@22.15.17)(db0@0.3.2(drizzle-orm@0.43.1(kysely@0.27.6)(postgres@3.4.5)))(drizzle-orm@0.43.1(kysely@0.27.6)(postgres@3.4.5))(ioredis@5.6.1)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1)
+      world-atlas:
+        specifier: ^2.0.2
+        version: 2.0.2
       zod:
         specifier: ^3.23.8
         version: 3.24.4
@@ -1530,6 +1536,11 @@ packages:
 
   '@nivo/core@0.96.0':
     resolution: {integrity: sha512-iMwNyaY+XHAyTTs+GhGrdnnsDe4XAdern0+2YQca3cxyIN1pOAWbV8fUoc02VC470xoF1RkVt1C7WGUpeZCsGg==}
+    peerDependencies:
+      react: '>= 16.14.0 < 20.0.0'
+
+  '@nivo/geo@0.96.0':
+    resolution: {integrity: sha512-OnphgEsw06CSj1vzC8z2FLAGJ0ne2u3V/V1Q6r8nUaLFQIfOllRp4oz6N+Sh/CL3WfVCdSPaMxWzM8QHlQZMnw==}
     peerDependencies:
       react: '>= 16.14.0 < 20.0.0'
 
@@ -3628,6 +3639,9 @@ packages:
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
 
+  d3-array@1.2.4:
+    resolution: {integrity: sha512-KHW6M86R+FUPYGb3R5XiYjXPq7VzwxZ22buHhAEVG5ztoEcZZMLov530mmccaqA1GghZArjQV46fuc8kUqhhHw==}
+
   d3-array@2.12.1:
     resolution: {integrity: sha512-B0ErZK/66mHtEsR1TkPEEkwdy+WDesimkM5gpZr5Dsg54BiTA5RXtYW5qTLIAcekaS9xfZrzBLF/OAkB3Qn1YQ==}
 
@@ -3649,6 +3663,9 @@ packages:
   d3-format@3.1.0:
     resolution: {integrity: sha512-YyUI6AEuY/Wpt8KWLgZHsIU86atmikuoOmCfommt0LYHiQSPjvX2AcFc38PX0CBpr2RCyZhjex+NS/LPOv6YqA==}
     engines: {node: '>=12'}
+
+  d3-geo@1.12.1:
+    resolution: {integrity: sha512-XG4d1c/UJSEX9NfU02KwBL6BYPj8YKHxgBEw5om2ZnTRSbIcego6dhHwcxuSR3clxh0EpE38os1DVPOmnYtTPg==}
 
   d3-interpolate@3.0.1:
     resolution: {integrity: sha512-3bYs1rOD33uo8aqJfKP3JWPAibgw8Zm2+L9vBKEHJ2Rg+viTR7o5Mmv5mZcieN+FRYaAOWX5SJATX6k1PWz72g==}
@@ -7397,6 +7414,9 @@ packages:
   wordwrap@1.0.0:
     resolution: {integrity: sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==}
 
+  world-atlas@2.0.2:
+    resolution: {integrity: sha512-IXfV0qwlKXpckz1FhwXVwKRjiIhOnWttOskm5CtxMsjgE/MXAYRHWJqgXOpM8IkcPBoXnyTU5lFHcYa5ChG0LQ==}
+
   wrap-ansi@6.2.0:
     resolution: {integrity: sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==}
     engines: {node: '>=8'}
@@ -8577,6 +8597,20 @@ snapshots:
       d3-scale-chromatic: 3.1.0
       d3-shape: 3.2.0
       d3-time-format: 3.0.0
+      lodash: 4.17.21
+      react: 19.1.0
+    transitivePeerDependencies:
+      - react-dom
+
+  '@nivo/geo@0.96.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@nivo/colors': 0.96.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@nivo/core': 0.96.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@nivo/legends': 0.96.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@nivo/theming': 0.96.0(react@19.1.0)
+      '@nivo/tooltip': 0.96.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      d3-format: 1.4.5
+      d3-geo: 1.12.1
       lodash: 4.17.21
       react: 19.1.0
     transitivePeerDependencies:
@@ -11230,6 +11264,8 @@ snapshots:
 
   csstype@3.1.3: {}
 
+  d3-array@1.2.4: {}
+
   d3-array@2.12.1:
     dependencies:
       internmap: 1.0.1
@@ -11245,6 +11281,10 @@ snapshots:
   d3-format@1.4.5: {}
 
   d3-format@3.1.0: {}
+
+  d3-geo@1.12.1:
+    dependencies:
+      d3-array: 1.2.4
 
   d3-interpolate@3.0.1:
     dependencies:
@@ -15548,6 +15588,8 @@ snapshots:
   word-wrap@1.2.5: {}
 
   wordwrap@1.0.0: {}
+
+  world-atlas@2.0.2: {}
 
   wrap-ansi@6.2.0:
     dependencies:
