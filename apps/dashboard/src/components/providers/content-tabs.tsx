@@ -192,7 +192,7 @@ const ContentTabsInner = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col pb-2.5 pr-2.5">
+    <div className="w-full h-screen flex flex-col pb-2.5 pr-2.5 ">
       <div className="h-[30px] flex justify-between">
         <div className=" flex gap-2 items-center">
           <div className="h-full py-1">
@@ -350,7 +350,7 @@ const ContentTabsInner = ({
         </div>
       </div>
 
-      <div className="flex-1 bg-neutral-800/10 backdrop-blur-2xl border border-neutral-600 relative  rounded-md">
+      <div className="h-full backdrop-blur-2xl border border-neutral-600 relative rounded-md  overflow-auto cursor-auto">
         {children}
       </div>
 

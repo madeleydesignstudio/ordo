@@ -8,7 +8,7 @@ const MainContentProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     
     <SidebarProvider>
-      <div className="flex h-screen w-screen">
+      <div className="flex h-screen w-screen overflow-hidden">
         <AppSidebar />
         <SmallAppSideBar />
         <ContentTabs>
