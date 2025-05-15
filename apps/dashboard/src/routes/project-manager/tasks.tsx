@@ -35,11 +35,11 @@ function RouteComponent() {
   });
   
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 max-w-4xl">
       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
       
       {/* Tasks List */}
-      <Card className="bg-neutral-950 border-neutral-800">
+      <Card className=" border-neutral-800">
         <CardHeader>
           <CardTitle>Your Tasks</CardTitle>
         </CardHeader>
@@ -51,7 +51,7 @@ function RouteComponent() {
           ) : (
             <div className="space-y-2">
               {tasks.map((task) => (
-                <div key={task.id} className="p-3 border border-neutral-800 rounded-md cursor-pointer hover:bg-neutral-900">
+                <div key={task.id} className="p-3 border border-neutral-800 rounded-md cursor-pointer ">
                   <h3 className="font-medium">{task.title}</h3>
                   {task.description && <p className="text-sm text-neutral-400">{task.description}</p>}
                   <div className="flex justify-between mt-2">
