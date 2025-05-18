@@ -1,6 +1,6 @@
 import { json } from "@tanstack/react-start";
 import { createAPIFileRoute } from "@tanstack/react-start/api";
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { auth } from "~/lib/server/auth"; // Import auth like in projects.ts
 import { db } from "~/lib/server/db"; // Assuming db client is here
@@ -42,6 +42,7 @@ export const APIRoute = createAPIFileRoute("/api/tasks")({
       const url = new URL(request.url);
       const startDateParam = url.searchParams.get("startDate");
       const endDateParam = url.searchParams.get("endDate");
+      const projectIdParam = url.searchParams.get("projectId");
 
       let startDate: Date | undefined;
       let endDate: Date | undefined;
@@ -64,23 +65,30 @@ export const APIRoute = createAPIFileRoute("/api/tasks")({
         endDate.setHours(23, 59, 59, 999);
       }
 
-      // Build query conditions
-      const conditions = [eq(task.userId, userId)]; // Filter by current user
-
-      // Handle cases where only one date is provided or both
-      if (startDate && endDate) {
-        conditions.push(and(gte(task.dueDate, startDate), lte(task.dueDate, endDate)));
-      } else if (startDate) {
-        conditions.push(gte(task.dueDate, startDate));
-      } else if (endDate) {
-        conditions.push(lte(task.dueDate, endDate));
+      // Build base query conditions
+      const conditions = [eq(task.userId, userId)];
+      
+      // Add projectId filter if provided
+      if (projectIdParam) {
+        conditions.push(eq(task.projectId, projectIdParam));
+      }
+      
+      // Fetch tasks based on conditions
+      const tasks = await db.select().from(task).where(and(...conditions));
+      
+      // Apply client-side date filtering if needed
+      let filteredTasks = tasks;
+      if (startDate || endDate) {
+        filteredTasks = filteredTasks.filter(t => {
+          if (!t.dueDate) return false;
+          const taskDate = new Date(t.dueDate);
+          if (startDate && taskDate < startDate) return false;
+          if (endDate && taskDate > endDate) return false;
+          return true;
+        });
       }
 
-      // Fetch tasks based on conditions
-      const finalConditions = and(...conditions);
-      const tasks = await db.select().from(task).where(finalConditions);
-
-      return json(tasks);
+      return json(filteredTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
       return json({ error: "Failed to fetch tasks" }, { status: 500 });
