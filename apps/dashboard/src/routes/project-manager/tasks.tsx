@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 // Define Task type based on the schema
@@ -28,11 +28,16 @@ const fetchTasks = async (): Promise<Task[]> => {
 };
 
 function RouteComponent() {
+  const navigate = useNavigate();
   // Query for fetching tasks
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['tasks'],
     queryFn: fetchTasks,
   });
+  
+  const handleTaskClick = (taskId: string) => {
+    navigate({ to: '/project-manager/task/$taskId', params: { taskId } });
+  };
   
   return (
     <div className="container mx-auto p-4 max-w-4xl">
@@ -51,7 +56,11 @@ function RouteComponent() {
           ) : (
             <div className="space-y-2">
               {tasks.map((task) => (
-                <div key={task.id} className="p-3 border border-neutral-800 rounded-md cursor-pointer ">
+                <div 
+                  key={task.id} 
+                  className="p-3 border border-neutral-800 rounded-md cursor-pointer hover:bg-neutral-900/30 transition-colors" 
+                  onClick={() => handleTaskClick(task.id)}
+                >
                   <h3 className="font-medium">{task.title}</h3>
                   {task.description && <p className="text-sm text-neutral-400">{task.description}</p>}
                   <div className="flex justify-between mt-2">

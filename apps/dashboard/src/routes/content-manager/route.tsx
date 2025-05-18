@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/content-manager')({
   component: RouteComponent,
@@ -13,5 +13,7 @@ export const Route = createFileRoute('/content-manager')({
 })
 
 function RouteComponent() {
-  return <div>Hello "/content-manager"!</div>
+  return <div>
+  <Outlet />
+</div>
 }
