@@ -13,7 +13,7 @@ interface NewsItem {
 }
 
 const fetchNews = async () => {
-  const apiKey = import.meta.env.VITE_FINNHUB_API_KEY;
+  const apiKey = import.meta.env.FINNHUB_API_KEY;
   
   if (!apiKey) {
     console.error('Finnhub API key is not configured');
