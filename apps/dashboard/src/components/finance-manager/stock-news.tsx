@@ -20,6 +20,13 @@ const fetchNews = async () => {
     throw new Error('API key not configured');
   }
 
+  // Log the first few characters of the API key to verify format (for debugging)
+  console.log('API Key format check:', {
+    length: apiKey.length,
+    startsWith: apiKey.substring(0, 4),
+    format: /^[a-zA-Z0-9]+$/.test(apiKey) ? 'valid' : 'invalid'
+  });
+
   try {
     const response = await fetch(
       `https://finnhub.io/api/v1/news?category=general&token=${apiKey}`
@@ -30,7 +37,8 @@ const fetchNews = async () => {
       console.error('Finnhub API error:', {
         status: response.status,
         statusText: response.statusText,
-        error: errorText
+        error: errorText,
+        url: response.url.replace(apiKey, 'REDACTED') // Log URL with redacted API key
       });
       throw new Error(`Failed to fetch news: ${response.statusText}`);
     }
