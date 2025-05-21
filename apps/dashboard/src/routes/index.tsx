@@ -1,10 +1,11 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import { useDate } from "~/components/date-context";
 import DateSlider from "~/components/home/date-slider";
 import HomeHeader from "~/components/home/home-header";
 import HomeMainContent from "~/components/home/home-main-content";
+import { WelcomeDialog } from "~/components/home/welcome-dialog";
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -14,7 +15,7 @@ const LoadingFallback = () => (
 );
 
 export const Route = createFileRoute("/")({
-  component: Home,
+  component: Index,
   loader: async ({ context }) => {
     if (!context.user) {
       throw redirect({
@@ -34,11 +35,26 @@ export const Route = createFileRoute("/")({
   ),
 });
 
-function Home() {
+function Index() {
   const { currentDate, setCurrentDate } = useDate();
+  const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
+
+  useEffect(() => {
+    // Check if this is the user's first visit
+    const hasCompletedOnboarding = localStorage.getItem("hasCompletedOnboarding");
+    if (!hasCompletedOnboarding) {
+      setShowWelcomeDialog(true);
+    }
+  }, []);
+
+  const handleWelcomeDialogClose = () => {
+    localStorage.setItem("hasCompletedOnboarding", "true");
+    setShowWelcomeDialog(false);
+  };
 
   return (
     <div className="flex items-center justify-center h-full w-full rounded-md flex-col">
+      <WelcomeDialog isOpen={showWelcomeDialog} onClose={handleWelcomeDialogClose} />
       <HomeHeader currentDate={currentDate} onDateChange={setCurrentDate} />
       <Suspense fallback={<LoadingFallback />}>
         <HomeMainContent />
