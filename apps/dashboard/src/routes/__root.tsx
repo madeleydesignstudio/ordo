@@ -21,7 +21,6 @@ import appCss from "~/lib/styles/app.css?url";
 const getUser = createServerFn({ method: "GET" }).handler(async () => {
   const { headers } = getWebRequest()!;
   const session = await auth.api.getSession({ headers });
-
   return session?.user || null;
 });
 
@@ -30,11 +29,16 @@ export const Route = createRootRouteWithContext<{
   user: Awaited<ReturnType<typeof getUser>>;
 }>()({
   beforeLoad: async ({ context }) => {
-    const user = await context.queryClient.fetchQuery({
-      queryKey: ["user"],
-      queryFn: ({ signal }) => getUser({ signal }),
-    }); // we're using react-query for caching, see router.tsx
-    return { user };
+    // Only fetch user if not already in context
+    if (!context.user) {
+      const user = await context.queryClient.fetchQuery({
+        queryKey: ["user"],
+        queryFn: ({ signal }) => getUser({ signal }),
+        staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+      });
+      return { user };
+    }
+    return { user: context.user };
   },
   head: () => ({
     meta: [
@@ -61,6 +65,7 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   const { pathname } = useLocation();
   const isAuthRoute = pathname === '/login' || pathname === '/signup';
+  const isDev = process.env.NODE_ENV === 'development';
 
   return (
     <RootDocument>
@@ -70,6 +75,12 @@ function RootComponent() {
         <AppLayout>
           <Outlet />
         </AppLayout>
+      )}
+      {isDev && (
+        <>
+          <ReactQueryDevtools buttonPosition="bottom-left" />
+          <TanStackRouterDevtools position="bottom-right" />
+        </>
       )}
     </RootDocument>
   );
@@ -92,9 +103,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
         </ScriptOnce>
 
         {children}
-
-        <ReactQueryDevtools buttonPosition="bottom-left" />
-        <TanStackRouterDevtools position="bottom-right" />
 
           <Scripts />
         </body>

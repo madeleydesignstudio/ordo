@@ -11,7 +11,9 @@ export function createRouter() {
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
-        staleTime: 1000 * 60, // 1 minute
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        gcTime: 1000 * 60 * 30, // 30 minutes
+        retry: 1,
       },
     },
   });
@@ -21,11 +23,12 @@ export function createRouter() {
       routeTree,
       context: { queryClient, user: null },
       defaultPreload: "intent",
-      defaultPreloadStaleTime: 0,
+      defaultPreloadStaleTime: 1000 * 60, // 1 minute
       defaultErrorComponent: DefaultCatchBoundary,
       defaultNotFoundComponent: NotFound,
       scrollRestoration: true,
       defaultStructuralSharing: true,
+      defaultPendingComponent: () => null, // Disable default loading state
     }),
     queryClient,
   );
