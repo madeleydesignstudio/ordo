@@ -13,13 +13,34 @@ interface NewsItem {
 }
 
 const fetchNews = async () => {
-  const response = await fetch(
-    `https://finnhub.io/api/v1/news?category=general&token=${import.meta.env.VITE_FINNHUB_API_KEY}`
-  );
-  if (!response.ok) {
-    throw new Error("Failed to fetch news");
+  const apiKey = import.meta.env.VITE_FINNHUB_API_KEY;
+  
+  if (!apiKey) {
+    console.error('Finnhub API key is not configured');
+    throw new Error('API key not configured');
   }
-  return response.json();
+
+  try {
+    const response = await fetch(
+      `https://finnhub.io/api/v1/news?category=general&token=${apiKey}`
+    );
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Finnhub API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
+      throw new Error(`Failed to fetch news: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching news:', error);
+    throw error;
+  }
 };
 
 const StockNews = () => {
@@ -27,6 +48,8 @@ const StockNews = () => {
     queryKey: ["stockNews"],
     queryFn: fetchNews,
     refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
+    retry: 2, // Only retry twice
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
 
   if (isLoading) {
@@ -34,12 +57,21 @@ const StockNews = () => {
   }
 
   if (error) {
-    return <div className="text-red-400">Error loading news</div>;
+    return (
+      <div className="text-red-400">
+        <p>Error loading news</p>
+        <p className="text-xs mt-1">{error instanceof Error ? error.message : 'Unknown error'}</p>
+      </div>
+    );
+  }
+
+  if (!news || news.length === 0) {
+    return <div className="text-neutral-400">No news available</div>;
   }
 
   return (
     <div className="space-y-4">
-      {news?.slice(0, 5).map((item) => (
+      {news.slice(0, 5).map((item) => (
         <div
           key={item.id}
           className="p-3 rounded-md border border-neutral-700 hover:border-neutral-500 transition-colors"
@@ -50,6 +82,9 @@ const StockNews = () => {
                 src={item.image}
                 alt={item.headline}
                 className="w-16 h-16 object-cover rounded-md"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             )}
             <div className="flex-1">
