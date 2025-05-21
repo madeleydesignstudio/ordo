@@ -35,9 +35,9 @@ const router = createRouter();
 const initPostHog = () => {
   try {
     return {
-      apiKey: import.meta.env.PUBLIC_POSTHOG_KEY,
+      apiKey: import.meta.env.VITE_PUBLIC_POSTHOG_KEY,
       options: {
-        api_host: import.meta.env.PUBLIC_POSTHOG_HOST,
+        api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
         debug: import.meta.env.MODE === "development",
         loaded: (posthog: PostHog) => {
           if (import.meta.env.MODE === "development") {

@@ -13,23 +13,18 @@ interface NewsItem {
 }
 
 const fetchNews = async () => {
-  const apiKey = import.meta.env.FINNHUB_API_KEY;
+  const apiKey = import.meta.env.VITE_FINNHUB_API_KEY;
   
   if (!apiKey) {
     console.error('Finnhub API key is not configured');
     throw new Error('API key not configured');
   }
 
-  // Log the first few characters of the API key to verify format (for debugging)
-  console.log('API Key format check:', {
-    length: apiKey.length,
-    startsWith: apiKey.substring(0, 4),
-    format: /^[a-zA-Z0-9]+$/.test(apiKey) ? 'valid' : 'invalid'
-  });
+
 
   try {
     const response = await fetch(
-      `https://finnhub.io/api/v1/news?category=general&token=d0n3h19r01qmjqmkful0d0n3h19r01qmjqmkfulg`
+      `https://finnhub.io/api/v1/news?category=general&token=${apiKey}`
     );
     
     if (!response.ok) {
