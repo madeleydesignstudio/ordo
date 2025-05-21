@@ -29,7 +29,7 @@ const fetchNews = async () => {
 
   try {
     const response = await fetch(
-      `https://finnhub.io/api/v1/news?category=general&token=${apiKey}`
+      `https://finnhub.io/api/v1/news?category=general&token=d0n3h19r01qmjqmkful0d0n3h19r01qmjqmkfulg`
     );
     
     if (!response.ok) {
