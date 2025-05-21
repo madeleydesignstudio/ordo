@@ -2,6 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { useState } from "react";
+import toast, { Toaster } from 'react-hot-toast';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +24,8 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { UserLoginMapSection } from "~/components/settings/user-login-map-section";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import authClient from "~/lib/auth-client";
 
 export const Route = createFileRoute("/settings/")({
@@ -31,8 +34,10 @@ export const Route = createFileRoute("/settings/")({
 
 function RouteComponent() {
   const { user } = Route.useRouteContext();
-
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [confirmationName, setConfirmationName] = useState("");
+  const [confirmationText, setConfirmationText] = useState("");
+  const [confirmationError, setConfirmationError] = useState("");
 
   const deleteAccountMutation = useMutation({
     mutationFn: async () => {
@@ -42,15 +47,16 @@ function RouteComponent() {
     },
     onSuccess: () => {
       console.log("[Debug] deleteAccountMutation: onSuccess");
-      alert("Account deleted successfully.");
-      console.log("[Debug] Navigating directly after successful deletion...");
-      window.location.href = "/login";
+      toast.success("Account deleted successfully. Redirecting to login...");
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 2000);
     },
     onError: (error: Error) => {
       console.log("[Debug] deleteAccountMutation: onError");
       console.error("Error deleting account:", error);
-      alert(`Error deleting account: ${error.message || "Unknown error"}`);
-      setIsDeleteDialogOpen(false); // Close dialog on error
+      toast.error(`Error deleting account: ${error.message || "Unknown error"}`);
+      setIsDeleteDialogOpen(false);
     },
   });
 
@@ -72,12 +78,40 @@ function RouteComponent() {
     }
   };
 
+  const handleDeleteConfirmation = () => {
+    setConfirmationError("");
+    
+    if (!confirmationName || !confirmationText) {
+      setConfirmationError("Please fill in all fields");
+      return;
+    }
+
+    if (confirmationName.toLowerCase() !== user?.name?.toLowerCase()) {
+      setConfirmationError("Name does not match your account name");
+      return;
+    }
+
+    if (confirmationText !== "DELETE") {
+      setConfirmationError("Please type DELETE in all caps");
+      return;
+    }
+
+    deleteAccountMutation.mutate();
+  };
+
+  const resetConfirmationForm = () => {
+    setConfirmationName("");
+    setConfirmationText("");
+    setConfirmationError("");
+  };
+
   if (!user) {
     return <div>Please log in to view your settings</div>;
   }
 
   return (
     <div className="container mx-auto py-8">
+      <Toaster position="top-right" />
       <Card>
         <CardHeader>
           <CardTitle>Profile Settings</CardTitle>
@@ -130,16 +164,6 @@ function RouteComponent() {
 
       <Card className="mt-8">
         <CardHeader>
-          <CardTitle>Your Location</CardTitle>
-          <CardDescription>We've detected your current country</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <UserLoginMapSection />
-        </CardContent>
-      </Card>
-
-      <Card className="mt-8">
-        <CardHeader>
           <CardTitle>Account Actions</CardTitle>
           <CardDescription>Manage your account session and data.</CardDescription>
         </CardHeader>
@@ -148,7 +172,13 @@ function RouteComponent() {
             Log Out
           </Button>
 
-          <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialog 
+            open={isDeleteDialogOpen} 
+            onOpenChange={(open) => {
+              setIsDeleteDialogOpen(open);
+              if (!open) resetConfirmationForm();
+            }}
+          >
             <AlertDialogTrigger asChild>
               <Button variant="destructive">Delete Account</Button>
             </AlertDialogTrigger>
@@ -160,15 +190,39 @@ function RouteComponent() {
                   and remove your data from our servers.
                 </AlertDialogDescription>
               </AlertDialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Enter your full name to confirm</Label>
+                  <Input
+                    id="name"
+                    value={confirmationName}
+                    onChange={(e) => setConfirmationName(e.target.value)}
+                    placeholder="Enter your name"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="delete">Type DELETE to confirm</Label>
+                  <Input
+                    id="delete"
+                    value={confirmationText}
+                    onChange={(e) => setConfirmationText(e.target.value)}
+                    placeholder="Type DELETE"
+                  />
+                </div>
+
+                {confirmationError && (
+                  <p className="text-sm text-red-500">{confirmationError}</p>
+                )}
+              </div>
+
               <AlertDialogFooter>
                 <AlertDialogCancel disabled={deleteAccountMutation.isPending}>
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => {
-                    console.log("[Debug] AlertDialogAction: onClick triggered");
-                    deleteAccountMutation.mutate();
-                  }}
+                  onClick={handleDeleteConfirmation}
                   disabled={deleteAccountMutation.isPending}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
