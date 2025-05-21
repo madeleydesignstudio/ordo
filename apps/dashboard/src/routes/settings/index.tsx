@@ -47,6 +47,7 @@ function RouteComponent() {
     },
     onSuccess: async () => {
       console.log("[Debug] deleteAccountMutation: onSuccess");
+      
       // Clear all local storage and session data
       localStorage.clear();
       sessionStorage.clear();
@@ -54,11 +55,19 @@ function RouteComponent() {
       // Sign out to clear any auth tokens
       await authClient.signOut();
       
-      toast.success("Account deleted successfully. Redirecting to login...");
+      toast.success("Account deleted successfully. Redirecting to signup...");
       
-      // Force reload the page to clear any cached state
+      // Force reload and redirect to signup
       setTimeout(() => {
-        window.location.href = "/login";
+        // Clear any remaining auth state
+        document.cookie.split(";").forEach((c) => {
+          document.cookie = c
+            .replace(/^ +/, "")
+            .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
+        
+        // Redirect to signup with a clean state
+        window.location.href = "/signup";
         window.location.reload();
       }, 2000);
     },
