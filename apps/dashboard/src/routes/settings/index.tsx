@@ -45,11 +45,21 @@ function RouteComponent() {
       await authClient.deleteUser();
       console.log("[Debug] deleteAccountMutation: authClient.deleteUser() finished");
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       console.log("[Debug] deleteAccountMutation: onSuccess");
+      // Clear all local storage and session data
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Sign out to clear any auth tokens
+      await authClient.signOut();
+      
       toast.success("Account deleted successfully. Redirecting to login...");
+      
+      // Force reload the page to clear any cached state
       setTimeout(() => {
         window.location.href = "/login";
+        window.location.reload();
       }, 2000);
     },
     onError: (error: Error) => {
