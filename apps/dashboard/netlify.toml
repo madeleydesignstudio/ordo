@@ -7,6 +7,13 @@
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps"
 
+# Handle API routes
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# Handle client-side routing
 [[redirects]]
   from = "/*"
   to = "/index.html"
