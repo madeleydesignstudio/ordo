@@ -19,9 +19,12 @@ const redis = new Redis({
 // Create a rate limiter that allows 20 requests per day
 const ratelimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(20, '24h'),
+  limiter: Ratelimit.slidingWindow(50, '24h'),
   analytics: true,
 })
+
+// Cache key for storing news data
+const NEWS_CACHE_KEY = 'news:latest'
 
 export const APIRoute = createAPIFileRoute('/api/news')({
   GET: async ({ request }) => {
@@ -32,6 +35,17 @@ export const APIRoute = createAPIFileRoute('/api/news')({
         return json({ error: 'Unauthorized' }, { status: 401 })
       }
 
+      // Try to get cached news data first
+      const cachedNews = await redis.get(NEWS_CACHE_KEY)
+      if (cachedNews) {
+        return json(cachedNews, {
+          headers: {
+            'Cache-Control': 'public, max-age=3600', // 1 hour cache
+            'X-Cache': 'HIT'
+          }
+        })
+      }
+
       // Get user's profile to get their country
       const [userProfile] = await db.select().from(user).where(eq(user.id, session.user.id))
       const userCountry = userProfile?.country || 'US'
@@ -40,6 +54,20 @@ export const APIRoute = createAPIFileRoute('/api/news')({
       const { success, limit, reset, remaining } = await ratelimit.limit(session.user.id)
       
       if (!success) {
+        // If rate limited, try to return cached data even if it's stale
+        const staleCache = await redis.get(NEWS_CACHE_KEY)
+        if (staleCache) {
+          return json(staleCache, {
+            headers: {
+              'Cache-Control': 'public, max-age=3600',
+              'X-Cache': 'STALE',
+              'X-RateLimit-Limit': limit.toString(),
+              'X-RateLimit-Remaining': remaining.toString(),
+              'X-RateLimit-Reset': reset.toString()
+            }
+          })
+        }
+
         return json({ 
           error: 'Rate limit exceeded',
           message: 'You can only fetch news 20 times per day',
@@ -98,9 +126,12 @@ export const APIRoute = createAPIFileRoute('/api/news')({
         throw new Error('Unexpected response format from Currents API')
       }
 
+      // Cache the news data for 1 hour
+      await redis.set(NEWS_CACHE_KEY, data, { ex: 3600 })
+
       return json(data, {
         headers: {
-          'Cache-Control': 'public, max-age=86400',
+          'Cache-Control': 'public, max-age=3600',
           'X-Cache': 'MISS',
           'X-RateLimit-Limit': limit.toString(),
           'X-RateLimit-Remaining': remaining.toString(),
