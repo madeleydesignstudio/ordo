@@ -3,8 +3,23 @@ import { createAPIFileRoute } from "@tanstack/react-start/api";
 import { auth } from "~/lib/server/auth";
 import fs from 'fs/promises';
 import path from 'path';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 const CACHE_FILE = path.join(process.cwd(), '.news-cache.json');
+
+// Initialize Upstash Redis client
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+// Create a rate limiter that allows 1 request per day
+const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(1, '24h'),
+  analytics: true,
+});
 
 // Cache for storing the daily news
 let cachedNews: {
@@ -135,12 +150,33 @@ export const APIRoute = createAPIFileRoute("/api/news")({
         return json({ error: "Unauthorized" }, { status: 401 });
       }
 
+      // Check rate limit
+      const { success, limit, reset, remaining } = await ratelimit.limit(session.user.id);
+      
+      if (!success) {
+        return json({ 
+          error: "Rate limit exceeded",
+          message: "You can only fetch news once per day",
+          reset: new Date(reset).toISOString()
+        }, { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': limit.toString(),
+            'X-RateLimit-Remaining': remaining.toString(),
+            'X-RateLimit-Reset': reset.toString()
+          }
+        });
+      }
+
       // Check if we have valid cached news
       if (isCacheValid() && cachedNews) {
         return json(cachedNews, {
           headers: {
-            'Cache-Control': 'public, max-age=86400', // 24 hours
-            'X-Cache': 'HIT'
+            'Cache-Control': 'public, max-age=86400',
+            'X-Cache': 'HIT',
+            'X-RateLimit-Limit': limit.toString(),
+            'X-RateLimit-Remaining': remaining.toString(),
+            'X-RateLimit-Reset': reset.toString()
           }
         });
       }
@@ -152,8 +188,11 @@ export const APIRoute = createAPIFileRoute("/api/news")({
 
       return json(news, {
         headers: {
-          'Cache-Control': 'public, max-age=86400', // 24 hours
-          'X-Cache': 'MISS'
+          'Cache-Control': 'public, max-age=86400',
+          'X-Cache': 'MISS',
+          'X-RateLimit-Limit': limit.toString(),
+          'X-RateLimit-Remaining': remaining.toString(),
+          'X-RateLimit-Reset': reset.toString()
         }
       });
     } catch (error) {
@@ -171,11 +210,32 @@ export const APIRoute = createAPIFileRoute("/api/news")({
       return json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Check rate limit
+    const { success, limit, reset, remaining } = await ratelimit.limit(session.user.id);
+    
+    if (!success) {
+      return json({ 
+        error: "Rate limit exceeded",
+        message: "You can only fetch news once per day",
+        reset: new Date(reset).toISOString()
+      }, { 
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': limit.toString(),
+          'X-RateLimit-Remaining': remaining.toString(),
+          'X-RateLimit-Reset': reset.toString()
+        }
+      });
+    }
+
     if (isCacheValid() && cachedNews) {
       return json(cachedNews, {
         headers: {
           'Cache-Control': 'public, max-age=86400',
-          'X-Cache': 'HIT'
+          'X-Cache': 'HIT',
+          'X-RateLimit-Limit': limit.toString(),
+          'X-RateLimit-Remaining': remaining.toString(),
+          'X-RateLimit-Reset': reset.toString()
         }
       });
     }
@@ -187,7 +247,10 @@ export const APIRoute = createAPIFileRoute("/api/news")({
     return json(news, {
       headers: {
         'Cache-Control': 'public, max-age=86400',
-        'X-Cache': 'MISS'
+        'X-Cache': 'MISS',
+        'X-RateLimit-Limit': limit.toString(),
+        'X-RateLimit-Remaining': remaining.toString(),
+        'X-RateLimit-Reset': reset.toString()
       }
     });
   }
