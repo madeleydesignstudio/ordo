@@ -1,9 +1,16 @@
 [build]
-  command = "npm run build"
-  publish = "dist"
+  command = "pnpm run build"
+  publish = ".vinxi/build/client"
+  base = "apps/dashboard"
 
 [build.environment]
   NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 [[headers]]
   for = "/*"
