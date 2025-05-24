@@ -7,8 +7,8 @@ export const Route = createFileRoute("/project-manager/inbox")({
 
 function RouteComponent() {
   return (
-    <div className="h-full">
-      <ScrollArea className="h-full">
+    <div className="h-full flex flex-col">
+      <ScrollArea className="flex-1">
         <div className="p-6">
           <h2 className="text-xl font-bold text-neutral-100 mb-4">Project Inbox</h2>
           <p className="text-neutral-400">Content goes here...</p>
