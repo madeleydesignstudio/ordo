@@ -1,30 +1,3 @@
-[build]
-  command = "pnpm run build"
-  publish = ".vinxi/build/client"
-  base = "apps/dashboard"
-
-[build.environment]
-  NODE_VERSION = "20"
-  NPM_FLAGS = "--legacy-peer-deps"
-
-# Handle static assets
-[[redirects]]
-  from = "/_build/*"
-  to = "/_build/:splat"
-  status = 200
-
-# Handle API routes
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
-  status = 200
-
-# Handle all other routes
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
 [[headers]]
   for = "/*"
   [headers.values]
