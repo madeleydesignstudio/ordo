@@ -1,10 +1,10 @@
 [build]
   command = "pnpm run build"
-  publish = ".vinxi/build/client"
+  publish = ".vinxi/build"
   base = "apps/dashboard"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
 
 # Handle API routes
@@ -13,10 +13,10 @@
   to = "/.netlify/functions/api/:splat"
   status = 200
 
-# Handle client-side routing
+# Handle server-side rendering
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/.netlify/functions/ssr/:splat"
   status = 200
 
 [[headers]]
