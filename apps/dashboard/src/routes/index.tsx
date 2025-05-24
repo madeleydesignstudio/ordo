@@ -3,7 +3,6 @@ import { Suspense, useEffect, useState } from "react";
 
 import { useDate } from "~/components/date-context";
 import DateSlider from "~/components/home/date-slider";
-import HomeHeader from "~/components/home/home-header";
 import HomeMainContent from "~/components/home/home-main-content";
 import { WelcomeDialog } from "~/components/home/welcome-dialog";
 
@@ -55,10 +54,11 @@ function Index() {
   return (
     <div className="flex items-center justify-center h-full w-full rounded-md flex-col">
       <WelcomeDialog isOpen={showWelcomeDialog} onClose={handleWelcomeDialogClose} />
-      <HomeHeader currentDate={currentDate} onDateChange={setCurrentDate} />
-      <Suspense fallback={<LoadingFallback />}>
-        <HomeMainContent />
-      </Suspense>
+      <div className="flex-1 w-full">
+        <Suspense fallback={<LoadingFallback />}>
+          <HomeMainContent currentDate={currentDate} onDateChange={setCurrentDate} />
+        </Suspense>
+      </div>
       <DateSlider currentDate={currentDate} onDateChange={setCurrentDate} />
     </div>
   );
