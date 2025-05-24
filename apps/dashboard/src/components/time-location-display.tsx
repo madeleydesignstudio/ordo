@@ -2,23 +2,20 @@ import { useState, useEffect } from "react";
 
 const TimeLocationDisplay = () => {
   const [currentTime, setCurrentTime] = useState(() => new Date());
-  const [timezone, setTimezone] = useState(() => "");
+  const [timezone] = useState(() => {
+    try {
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return timeZone.split("/").pop()?.replace(/_/g, " ") || "";
+    } catch {
+      return "Unknown City";
+    }
+  });
 
   useEffect(() => {
     // Update time every second
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
-    // Get timezone information
-    try {
-      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      // Get only the city part after the last '/'
-      const city = timeZone.split("/").pop()?.replace(/_/g, " ") || "";
-      setTimezone(city);
-    } catch {
-      setTimezone("Unknown City");
-    }
 
     return () => clearInterval(timer);
   }, []);
