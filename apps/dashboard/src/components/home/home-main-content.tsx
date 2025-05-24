@@ -47,10 +47,10 @@ const HomeMainContent = ({ currentDate, onDateChange }: HomeHeaderProps) => {
           <h2>{getGreeting()} Daniel Madeley</h2>
           <h3>{datePrefix} {formattedDate}</h3>
         </div>
-        <div className="bg-neutral-800/50 rounded-md border border-neutral-600 h-[20%] flex flex-col"> 
+        <div className="bg-neutral-800/50 rounded-md border border-neutral-600 h-[15%] flex flex-col"> 
           Chat
         </div>
-        <div className="flex justify-between w-full h-[10%] gap-2.5">
+        <div className="flex justify-between w-full h-[15%] gap-2.5">
           <div className="bg-neutral-800/50 rounded-md border border-neutral-600 h-full w-1/3"><WeatherDisplay /></div>
           <div className="bg-neutral-800/50 rounded-md border border-neutral-600 h-full w-1/3"><NewsDisplay /></div>
           <div className="bg-neutral-800/50 rounded-md border border-neutral-600 h-full w-1/3">Summary</div>

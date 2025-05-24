@@ -7,7 +7,7 @@ import ContentTabs from "./content-tabs";
 const MainContentProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-screen overflow-hidden">
+      <div className="flex h-screen w-screen">
         <AppSidebar />
         <SmallAppSideBar />
         <div className="flex flex-col flex-1">

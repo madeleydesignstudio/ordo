@@ -347,7 +347,7 @@ const ContentTabsInner = ({
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 flex flex-col min-h-0 ">
         <div className="flex-1 border border-neutral-600 relative rounded-md overflow-hidden">
           {children}
         </div>

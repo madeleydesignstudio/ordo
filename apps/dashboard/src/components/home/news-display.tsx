@@ -1,64 +1,91 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { fetchNews } from "~/lib/client/news";
 
-interface NewsResponse {
-  headline: string;
-  summary: string;
-  timestamp: number;
+interface NewsArticle {
+  title: string;
+  description: string;
+  url: string;
+  image: string;
+  published: string;
+  source: string;
 }
 
-const fetchNews = async (): Promise<NewsResponse> => {
-  const response = await fetch("/api/news", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    if (response.status === 401) {
-      throw new Error("Please log in to view news");
-    }
-    throw new Error("Failed to fetch news");
-  }
-
-  return response.json();
-};
+interface NewsResponse {
+  status: string;
+  news: NewsArticle[];
+}
 
 const NewsDisplay = () => {
-  const { data, isLoading, error } = useQuery<NewsResponse>({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["news"],
     queryFn: fetchNews,
-    refetchInterval: 1000 * 60 * 60 * 24, // Refetch once per day
-    staleTime: 1000 * 60 * 60 * 24, // Consider data stale after 24 hours
-    gcTime: 1000 * 60 * 60 * 24, // Keep in cache for 24 hours
+    refetchInterval: 1000 * 60 * 60, // Refetch every hour
   });
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-2 p-4">
-        <div className="h-4 w-3/4 bg-neutral-700/50 animate-pulse rounded" />
-        <div className="h-3 w-full bg-neutral-700/50 animate-pulse rounded" />
+      <div className="flex h-full">
+        <div className="w-1/3 h-full bg-neutral-700/50 animate-pulse rounded-l-md" />
+        <div className="flex-1 p-2 flex flex-col gap-1">
+          <div className="h-4 w-3/4 bg-neutral-700/50 animate-pulse rounded" />
+          <div className="h-3 w-full bg-neutral-700/50 animate-pulse rounded" />
+          <div className="h-3 w-2/3 bg-neutral-700/50 animate-pulse rounded" />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 text-neutral-400 text-sm">
-        {error instanceof Error ? error.message : "Failed to load news. Please try again later."}
+      <div className="p-2 text-neutral-400 text-xs">
+        {error instanceof Error ? error.message : "Failed to load news"}
       </div>
     );
   }
 
-  if (!data) {
-    return null;
+  if (!data?.news?.length) {
+    return <div className="p-2 text-neutral-400 text-xs">No news available</div>;
   }
 
+  const article = data.news[0];
+
   return (
-    <div className="flex flex-col gap-2 p-4">
-      <h3 className="text-neutral-200 font-medium text-lg">{data.headline}</h3>
-      <p className="text-neutral-400 text-sm leading-relaxed">{data.summary}</p>
+    <div className="flex flex-col h-full">
+      <div className="flex-1 p-2">
+        <Link
+          to="/news/article/$articleId"
+          params={{ articleId: "0" }}
+          className="block h-full hover:bg-neutral-800/50 rounded-md transition-colors"
+        >
+          <div className="flex h-full">
+            {article.image && (
+              <div className="w-1/3 h-full">
+                <img
+                  src={article.image}
+                  alt={article.title}
+                  className="w-full h-full object-cover rounded-l-md"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            <div className="flex-1 p-2 flex flex-col">
+              <h3 className="text-sm font-medium line-clamp-1">{article.title}</h3>
+              <p className="text-xs text-neutral-400 line-clamp-2 mt-1">{article.description}</p>
+            </div>
+          </div>
+        </Link>
+      </div>
+      <div className="p-2 ">
+        <Link
+          to="/news"
+          className="text-xs text-neutral-400 hover:text-neutral-200 transition-colors"
+        >
+          More News →
+        </Link>
+      </div>
     </div>
   );
 };

@@ -1,162 +1,48 @@
-import { json } from "@tanstack/react-start";
-import { createAPIFileRoute } from "@tanstack/react-start/api";
-import { auth } from "~/lib/server/auth";
-import fs from 'fs/promises';
-import path from 'path';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
+import { json } from '@tanstack/react-start'
+import { createAPIFileRoute } from '@tanstack/react-start/api'
+import { auth } from '~/lib/server/auth'
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
+import { db } from '~/lib/server/db'
+import { user } from '~/lib/server/schema/auth.schema'
+import { eq } from 'drizzle-orm'
 
-const CACHE_FILE = path.join(process.cwd(), '.news-cache.json');
+const CURRENTS_API_KEY = process.env.CURRENTS_API_KEY
+const CURRENTS_API_URL = 'https://api.currentsapi.services/v1'
 
 // Initialize Upstash Redis client
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
+})
 
-// Create a rate limiter that allows 1 request per day
+// Create a rate limiter that allows 20 requests per day
 const ratelimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(1, '24h'),
+  limiter: Ratelimit.slidingWindow(20, '24h'),
   analytics: true,
-});
+})
 
-// Cache for storing the daily news
-let cachedNews: {
-  headline: string;
-  summary: string;
-  timestamp: number;
-} | null = null;
-
-// Load cache from file
-const loadCache = async () => {
-  try {
-    const data = await fs.readFile(CACHE_FILE, 'utf-8');
-    cachedNews = JSON.parse(data);
-  } catch (error) {
-    console.error('Failed to load news cache:', error);
-    // If file doesn't exist or is invalid, start with null cache
-    cachedNews = null;
-  }
-};
-
-// Save cache to file
-const saveCache = async (news: typeof cachedNews) => {
-  try {
-    await fs.writeFile(CACHE_FILE, JSON.stringify(news));
-  } catch (error) {
-    console.error('Failed to save news cache:', error);
-  }
-};
-
-// Function to check if cache is valid (less than 24 hours old)
-const isCacheValid = () => {
-  if (!cachedNews) return false;
-  const now = Date.now();
-  const cacheAge = now - cachedNews.timestamp;
-  return cacheAge < 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-};
-
-// Function to fetch news from Perplexity
-const fetchNewsFromPerplexity = async () => {
-  if (!process.env.PERPLEXITY_API_KEY) {
-    throw new Error('Missing PERPLEXITY_API_KEY');
-  }
-
-  const options = {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: "sonar",
-      messages: [
-        {
-          role: "system",
-          content: "You are a helpful assistant that provides news headlines and summaries. Always respond in valid JSON format with 'headline' and 'summary' fields."
-        },
-        {
-          role: "user",
-          content: "Give me a brief, interesting news headline from today with a one-sentence summary."
-        }
-      ],
-      max_tokens: 200,
-      temperature: 0.2,
-      top_p: 0.9,
-      search_domain_filter: ["news.com", "reuters.com", "bbc.com"],
-      return_images: false,
-      return_related_questions: false,
-      search_recency_filter: "day",
-      top_k: 0,
-      stream: false,
-      presence_penalty: 0,
-      frequency_penalty: 1,
-      web_search_options: {
-        search_context_size: "low"
-      }
-    })
-  };
-
-  const response = await fetch('https://api.perplexity.ai/chat/completions', options);
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Perplexity API error: ${errorText}`);
-  }
-
-  const data = await response.json();
-  
-  if (!data.choices?.[0]?.message?.content) {
-    throw new Error('Unexpected response format from Perplexity API');
-  }
-  
-  const content = data.choices[0].message.content;
-  
-  try {
-    const parsedContent = JSON.parse(content);
-    // Clean and format the content
-    const headline = parsedContent.headline.replace(/["{}]/g, '').trim();
-    const summary = parsedContent.summary.replace(/["{}]/g, '').trim();
-    
-    return {
-      headline,
-      summary,
-      timestamp: Date.now()
-    };
-  } catch (parseError) {
-    console.error('Failed to parse news content:', parseError);
-    // Clean the raw content
-    const cleanContent = content.replace(/["{}]/g, '').trim();
-    return {
-      headline: "Latest News",
-      summary: cleanContent,
-      timestamp: Date.now()
-    };
-  }
-};
-
-export const APIRoute = createAPIFileRoute("/api/news")({
+export const APIRoute = createAPIFileRoute('/api/news')({
   GET: async ({ request }) => {
     try {
-      // Load cache if not already loaded
-      if (!cachedNews) {
-        await loadCache();
+      // Check authentication
+      const session = await auth.api.getSession({ headers: request.headers })
+      if (!session?.user?.id) {
+        return json({ error: 'Unauthorized' }, { status: 401 })
       }
 
-      // Check authentication
-      const session = await auth.api.getSession({ headers: request.headers });
-      if (!session?.user?.id) {
-        return json({ error: "Unauthorized" }, { status: 401 });
-      }
+      // Get user's profile to get their country
+      const [userProfile] = await db.select().from(user).where(eq(user.id, session.user.id))
+      const userCountry = userProfile?.country || 'US'
 
       // Check rate limit
-      const { success, limit, reset, remaining } = await ratelimit.limit(session.user.id);
+      const { success, limit, reset, remaining } = await ratelimit.limit(session.user.id)
       
       if (!success) {
         return json({ 
-          error: "Rate limit exceeded",
-          message: "You can only fetch news once per day",
+          error: 'Rate limit exceeded',
+          message: 'You can only fetch news 20 times per day',
           reset: new Date(reset).toISOString()
         }, { 
           status: 429,
@@ -165,28 +51,54 @@ export const APIRoute = createAPIFileRoute("/api/news")({
             'X-RateLimit-Remaining': remaining.toString(),
             'X-RateLimit-Reset': reset.toString()
           }
-        });
+        })
       }
 
-      // Check if we have valid cached news
-      if (isCacheValid() && cachedNews) {
-        return json(cachedNews, {
-          headers: {
-            'Cache-Control': 'public, max-age=86400',
-            'X-Cache': 'HIT',
-            'X-RateLimit-Limit': limit.toString(),
-            'X-RateLimit-Remaining': remaining.toString(),
-            'X-RateLimit-Reset': reset.toString()
-          }
-        });
+      if (!CURRENTS_API_KEY) {
+        throw new Error('CURRENTS_API_KEY is not configured in environment variables')
       }
 
-      // Fetch new news if cache is invalid
-      const news = await fetchNewsFromPerplexity();
-      cachedNews = news;
-      await saveCache(news);
+      // Get optional keywords from query params
+      const url = new URL(request.url)
+      const keywords = url.searchParams.get('keywords')
 
-      return json(news, {
+      // Log the first few characters of the API key to verify it's being loaded (for debugging)
+      console.log('API Key prefix:', CURRENTS_API_KEY.substring(0, 4) + '...')
+
+      // Construct URL with query parameters
+      const apiUrl = new URL(`${CURRENTS_API_URL}/latest-news`)
+      apiUrl.searchParams.append('language', 'en')
+      apiUrl.searchParams.append('apiKey', CURRENTS_API_KEY)
+      apiUrl.searchParams.append('country', userCountry)
+      if (keywords) {
+        apiUrl.searchParams.append('keywords', keywords)
+      }
+
+      console.log('Fetching news from:', apiUrl.toString())
+
+      // Create a new Request object as shown in the documentation
+      const req = new Request(apiUrl.toString())
+      const response = await fetch(req)
+
+      if (!response.ok) {
+        const errorData = await response.text()
+        console.error('API Error Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData,
+        })
+        throw new Error(`Failed to fetch news: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      
+      // Check if the response has the expected format
+      if (data.status !== 'ok' || !data.news) {
+        console.error('Unexpected API response format:', data)
+        throw new Error('Unexpected response format from Currents API')
+      }
+
+      return json(data, {
         headers: {
           'Cache-Control': 'public, max-age=86400',
           'X-Cache': 'MISS',
@@ -194,64 +106,14 @@ export const APIRoute = createAPIFileRoute("/api/news")({
           'X-RateLimit-Remaining': remaining.toString(),
           'X-RateLimit-Reset': reset.toString()
         }
-      });
-    } catch (error) {
-      console.error("Error in news API:", error);
-      return json({ 
-        error: "Internal server error",
-        details: error instanceof Error ? error.message : String(error)
-      }, { status: 500 });
+      })
+    } catch (error: Error | unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      console.error('News API Error:', errorMessage)
+      return json(
+        { error: 'Failed to fetch news', details: errorMessage },
+        { status: 500 }
+      )
     }
   },
-  POST: async ({ request }) => {
-    // Reuse the same logic as GET
-    const session = await auth.api.getSession({ headers: request.headers });
-    if (!session?.user?.id) {
-      return json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Check rate limit
-    const { success, limit, reset, remaining } = await ratelimit.limit(session.user.id);
-    
-    if (!success) {
-      return json({ 
-        error: "Rate limit exceeded",
-        message: "You can only fetch news once per day",
-        reset: new Date(reset).toISOString()
-      }, { 
-        status: 429,
-        headers: {
-          'X-RateLimit-Limit': limit.toString(),
-          'X-RateLimit-Remaining': remaining.toString(),
-          'X-RateLimit-Reset': reset.toString()
-        }
-      });
-    }
-
-    if (isCacheValid() && cachedNews) {
-      return json(cachedNews, {
-        headers: {
-          'Cache-Control': 'public, max-age=86400',
-          'X-Cache': 'HIT',
-          'X-RateLimit-Limit': limit.toString(),
-          'X-RateLimit-Remaining': remaining.toString(),
-          'X-RateLimit-Reset': reset.toString()
-        }
-      });
-    }
-
-    const news = await fetchNewsFromPerplexity();
-    cachedNews = news;
-    await saveCache(news);
-
-    return json(news, {
-      headers: {
-        'Cache-Control': 'public, max-age=86400',
-        'X-Cache': 'MISS',
-        'X-RateLimit-Limit': limit.toString(),
-        'X-RateLimit-Remaining': remaining.toString(),
-        'X-RateLimit-Reset': reset.toString()
-      }
-    });
-  }
-});
+})

@@ -45,6 +45,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "currentsapi": "^0.1.0",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.43.0",
     "emoji-picker-react": "^4.12.2",

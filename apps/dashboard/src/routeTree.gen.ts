@@ -13,12 +13,14 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings/route'
 import { Route as ProjectManagerRouteImport } from './routes/project-manager/route'
+import { Route as NewsRouteImport } from './routes/news/route'
 import { Route as FinanceManagerRouteImport } from './routes/finance-manager/route'
 import { Route as ContentManagerRouteImport } from './routes/content-manager/route'
 import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as SettingsIndexImport } from './routes/settings/index'
 import { Route as ProjectManagerIndexImport } from './routes/project-manager/index'
+import { Route as NewsIndexImport } from './routes/news/index'
 import { Route as FinanceManagerIndexImport } from './routes/finance-manager/index'
 import { Route as ContentManagerIndexImport } from './routes/content-manager/index'
 import { Route as ProjectManagerTasksImport } from './routes/project-manager/tasks'
@@ -37,6 +39,7 @@ import { Route as AuthSignupImport } from './routes/_auth/signup'
 import { Route as AuthLoginImport } from './routes/_auth/login'
 import { Route as ProjectManagerTaskTaskIdImport } from './routes/project-manager/task/$taskId'
 import { Route as ProjectManagerProjectProjectIdImport } from './routes/project-manager/project/$projectId'
+import { Route as NewsArticleArticleIdImport } from './routes/news/article/$articleId'
 import { Route as ProjectManagerProjectProjectIdSettingsImport } from './routes/project-manager/project/$projectId/settings'
 
 // Create/Update Routes
@@ -50,6 +53,12 @@ const SettingsRouteRoute = SettingsRouteImport.update({
 const ProjectManagerRouteRoute = ProjectManagerRouteImport.update({
   id: '/project-manager',
   path: '/project-manager',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const NewsRouteRoute = NewsRouteImport.update({
+  id: '/news',
+  path: '/news',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -86,6 +95,12 @@ const ProjectManagerIndexRoute = ProjectManagerIndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProjectManagerRouteRoute,
+} as any)
+
+const NewsIndexRoute = NewsIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NewsRouteRoute,
 } as any)
 
 const FinanceManagerIndexRoute = FinanceManagerIndexImport.update({
@@ -199,6 +214,12 @@ const ProjectManagerProjectProjectIdRoute =
     getParentRoute: () => ProjectManagerRouteRoute,
   } as any)
 
+const NewsArticleArticleIdRoute = NewsArticleArticleIdImport.update({
+  id: '/article/$articleId',
+  path: '/article/$articleId',
+  getParentRoute: () => NewsRouteRoute,
+} as any)
+
 const ProjectManagerProjectProjectIdSettingsRoute =
   ProjectManagerProjectProjectIdSettingsImport.update({
     id: '/settings',
@@ -236,6 +257,13 @@ declare module '@tanstack/react-router' {
       path: '/finance-manager'
       fullPath: '/finance-manager'
       preLoaderRoute: typeof FinanceManagerRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/news': {
+      id: '/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRoute
     }
     '/project-manager': {
@@ -364,6 +392,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinanceManagerIndexImport
       parentRoute: typeof FinanceManagerRouteImport
     }
+    '/news/': {
+      id: '/news/'
+      path: '/'
+      fullPath: '/news/'
+      preLoaderRoute: typeof NewsIndexImport
+      parentRoute: typeof NewsRouteImport
+    }
     '/project-manager/': {
       id: '/project-manager/'
       path: '/'
@@ -377,6 +412,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/'
       preLoaderRoute: typeof SettingsIndexImport
       parentRoute: typeof SettingsRouteImport
+    }
+    '/news/article/$articleId': {
+      id: '/news/article/$articleId'
+      path: '/article/$articleId'
+      fullPath: '/news/article/$articleId'
+      preLoaderRoute: typeof NewsArticleArticleIdImport
+      parentRoute: typeof NewsRouteImport
     }
     '/project-manager/project/$projectId': {
       id: '/project-manager/project/$projectId'
@@ -450,6 +492,20 @@ const FinanceManagerRouteRouteChildren: FinanceManagerRouteRouteChildren = {
 const FinanceManagerRouteRouteWithChildren =
   FinanceManagerRouteRoute._addFileChildren(FinanceManagerRouteRouteChildren)
 
+interface NewsRouteRouteChildren {
+  NewsIndexRoute: typeof NewsIndexRoute
+  NewsArticleArticleIdRoute: typeof NewsArticleArticleIdRoute
+}
+
+const NewsRouteRouteChildren: NewsRouteRouteChildren = {
+  NewsIndexRoute: NewsIndexRoute,
+  NewsArticleArticleIdRoute: NewsArticleArticleIdRoute,
+}
+
+const NewsRouteRouteWithChildren = NewsRouteRoute._addFileChildren(
+  NewsRouteRouteChildren,
+)
+
 interface ProjectManagerProjectProjectIdRouteChildren {
   ProjectManagerProjectProjectIdSettingsRoute: typeof ProjectManagerProjectProjectIdSettingsRoute
 }
@@ -512,6 +568,7 @@ export interface FileRoutesByFullPath {
   '': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
   '/finance-manager': typeof FinanceManagerRouteRouteWithChildren
+  '/news': typeof NewsRouteRouteWithChildren
   '/project-manager': typeof ProjectManagerRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/login': typeof AuthLoginRoute
@@ -530,8 +587,10 @@ export interface FileRoutesByFullPath {
   '/project-manager/tasks': typeof ProjectManagerTasksRoute
   '/content-manager/': typeof ContentManagerIndexRoute
   '/finance-manager/': typeof FinanceManagerIndexRoute
+  '/news/': typeof NewsIndexRoute
   '/project-manager/': typeof ProjectManagerIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/news/article/$articleId': typeof NewsArticleArticleIdRoute
   '/project-manager/project/$projectId': typeof ProjectManagerProjectProjectIdRouteWithChildren
   '/project-manager/task/$taskId': typeof ProjectManagerTaskTaskIdRoute
   '/project-manager/project/$projectId/settings': typeof ProjectManagerProjectProjectIdSettingsRoute
@@ -556,8 +615,10 @@ export interface FileRoutesByTo {
   '/project-manager/tasks': typeof ProjectManagerTasksRoute
   '/content-manager': typeof ContentManagerIndexRoute
   '/finance-manager': typeof FinanceManagerIndexRoute
+  '/news': typeof NewsIndexRoute
   '/project-manager': typeof ProjectManagerIndexRoute
   '/settings': typeof SettingsIndexRoute
+  '/news/article/$articleId': typeof NewsArticleArticleIdRoute
   '/project-manager/project/$projectId': typeof ProjectManagerProjectProjectIdRouteWithChildren
   '/project-manager/task/$taskId': typeof ProjectManagerTaskTaskIdRoute
   '/project-manager/project/$projectId/settings': typeof ProjectManagerProjectProjectIdSettingsRoute
@@ -569,6 +630,7 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
   '/finance-manager': typeof FinanceManagerRouteRouteWithChildren
+  '/news': typeof NewsRouteRouteWithChildren
   '/project-manager': typeof ProjectManagerRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
@@ -587,8 +649,10 @@ export interface FileRoutesById {
   '/project-manager/tasks': typeof ProjectManagerTasksRoute
   '/content-manager/': typeof ContentManagerIndexRoute
   '/finance-manager/': typeof FinanceManagerIndexRoute
+  '/news/': typeof NewsIndexRoute
   '/project-manager/': typeof ProjectManagerIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/news/article/$articleId': typeof NewsArticleArticleIdRoute
   '/project-manager/project/$projectId': typeof ProjectManagerProjectProjectIdRouteWithChildren
   '/project-manager/task/$taskId': typeof ProjectManagerTaskTaskIdRoute
   '/project-manager/project/$projectId/settings': typeof ProjectManagerProjectProjectIdSettingsRoute
@@ -601,6 +665,7 @@ export interface FileRouteTypes {
     | ''
     | '/content-manager'
     | '/finance-manager'
+    | '/news'
     | '/project-manager'
     | '/settings'
     | '/login'
@@ -619,8 +684,10 @@ export interface FileRouteTypes {
     | '/project-manager/tasks'
     | '/content-manager/'
     | '/finance-manager/'
+    | '/news/'
     | '/project-manager/'
     | '/settings/'
+    | '/news/article/$articleId'
     | '/project-manager/project/$projectId'
     | '/project-manager/task/$taskId'
     | '/project-manager/project/$projectId/settings'
@@ -644,8 +711,10 @@ export interface FileRouteTypes {
     | '/project-manager/tasks'
     | '/content-manager'
     | '/finance-manager'
+    | '/news'
     | '/project-manager'
     | '/settings'
+    | '/news/article/$articleId'
     | '/project-manager/project/$projectId'
     | '/project-manager/task/$taskId'
     | '/project-manager/project/$projectId/settings'
@@ -655,6 +724,7 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/content-manager'
     | '/finance-manager'
+    | '/news'
     | '/project-manager'
     | '/settings'
     | '/_auth/login'
@@ -673,8 +743,10 @@ export interface FileRouteTypes {
     | '/project-manager/tasks'
     | '/content-manager/'
     | '/finance-manager/'
+    | '/news/'
     | '/project-manager/'
     | '/settings/'
+    | '/news/article/$articleId'
     | '/project-manager/project/$projectId'
     | '/project-manager/task/$taskId'
     | '/project-manager/project/$projectId/settings'
@@ -686,6 +758,7 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   ContentManagerRouteRoute: typeof ContentManagerRouteRouteWithChildren
   FinanceManagerRouteRoute: typeof FinanceManagerRouteRouteWithChildren
+  NewsRouteRoute: typeof NewsRouteRouteWithChildren
   ProjectManagerRouteRoute: typeof ProjectManagerRouteRouteWithChildren
   SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
 }
@@ -695,6 +768,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   ContentManagerRouteRoute: ContentManagerRouteRouteWithChildren,
   FinanceManagerRouteRoute: FinanceManagerRouteRouteWithChildren,
+  NewsRouteRoute: NewsRouteRouteWithChildren,
   ProjectManagerRouteRoute: ProjectManagerRouteRouteWithChildren,
   SettingsRouteRoute: SettingsRouteRouteWithChildren,
 }
@@ -713,6 +787,7 @@ export const routeTree = rootRoute
         "/_auth",
         "/content-manager",
         "/finance-manager",
+        "/news",
         "/project-manager",
         "/settings"
       ]
@@ -742,6 +817,13 @@ export const routeTree = rootRoute
       "filePath": "finance-manager/route.tsx",
       "children": [
         "/finance-manager/"
+      ]
+    },
+    "/news": {
+      "filePath": "news/route.tsx",
+      "children": [
+        "/news/",
+        "/news/article/$articleId"
       ]
     },
     "/project-manager": {
@@ -829,6 +911,10 @@ export const routeTree = rootRoute
       "filePath": "finance-manager/index.tsx",
       "parent": "/finance-manager"
     },
+    "/news/": {
+      "filePath": "news/index.tsx",
+      "parent": "/news"
+    },
     "/project-manager/": {
       "filePath": "project-manager/index.tsx",
       "parent": "/project-manager"
@@ -836,6 +922,10 @@ export const routeTree = rootRoute
     "/settings/": {
       "filePath": "settings/index.tsx",
       "parent": "/settings"
+    },
+    "/news/article/$articleId": {
+      "filePath": "news/article/$articleId.tsx",
+      "parent": "/news"
     },
     "/project-manager/project/$projectId": {
       "filePath": "project-manager/project/$projectId.tsx",
