@@ -10,8 +10,6 @@ import {
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-// import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import { DateProvider } from "~/components/date-context";
 import MainContentProvider from "~/components/providers/MainContentProvider";
@@ -65,7 +63,6 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   const { pathname } = useLocation();
   const isAuthRoute = pathname === '/login' || pathname === '/signup';
-  const isDev = process.env.NODE_ENV === 'development';
 
   return (
     <RootDocument>
@@ -76,12 +73,7 @@ function RootComponent() {
           <Outlet />
         </AppLayout>
       )}
-      {isDev && (
-        <>
-          {/* <ReactQueryDevtools buttonPosition="bottom-left" />
-          <TanStackRouterDevtools position="bottom-right" /> */}
-        </>
-      )}
+    
     </RootDocument>
   );
 }
