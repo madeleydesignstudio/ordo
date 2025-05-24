@@ -46,23 +46,8 @@ const HomeMainContent = ({ currentDate, onDateChange }: HomeHeaderProps) => {
           <h2>{getGreeting()} Daniel Madeley</h2>
           <h3>{datePrefix} {formattedDate}</h3>
         </div>
-        <div className="bg-neutral-800/50 rounded-md border border-neutral-600 h-[20%]"> 
-          <div className="flex items-end justify-center gap-1">
-            <span className="text-sm">
-              {currentDate
-                .toLocaleDateString("en-US", {
-                  day: "numeric",
-                  month: "long",
-                })
-                .replace(/(\d+)/, (match) => {
-                  const day = parseInt(match);
-                  const suffix = ["th", "st", "nd", "rd"][
-                    day % 10 > 3 ? 0 : day % 10
-                  ];
-                  return `${day}${suffix}`;
-                })}
-            </span>
-          </div>
+        <div className="bg-neutral-800/50 rounded-md border border-neutral-600 h-[20%] flex flex-col"> 
+          Chat
         </div>
         <div className="flex justify-between w-full h-[10%] gap-2.5">
           <div className="bg-neutral-800/50 rounded-md border border-neutral-600 h-full w-1/3"><WeatherDisplay /></div>

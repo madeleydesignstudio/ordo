@@ -192,8 +192,8 @@ const ContentTabsInner = ({
   };
 
   return (
-    <div className="w-full h-screen flex flex-col pb-2.5 pr-2.5 ">
-      <div className="h-[30px] flex justify-between">
+    <div className="w-full h-screen flex flex-col pr-2.5 ">
+      <div className="h-[30px] flex justify-between ">
         <div className=" flex gap-2 items-center">
           <div className="h-full py-1">
             <Separator orientation="vertical" className="bg-neutral-700" />
@@ -343,17 +343,20 @@ const ContentTabsInner = ({
               </div>
             </>
           )}
-          <div className="h-full py-1">
-            <Separator orientation="vertical" className="bg-neutral-600" />
-          </div>
-          <TimeLocationDisplay />
+         
         </div>
       </div>
 
-      <div className="h-full backdrop-blur-2xl border border-neutral-600 relative rounded-md  overflow-auto cursor-auto">
-        {children}
+      <div className="flex-1 flex flex-col">
+        <div className="flex-1 backdrop-blur-2xl border border-neutral-600 relative rounded-md overflow-auto cursor-auto">
+          {children}
+        </div>
+       
       </div>
-
+      <div className="h-[20px] flex items-center justify-end ">
+     
+          <TimeLocationDisplay />
+        </div>
       {/* Create Project Modal - Now using the new external component */}
       <AddProjectDialog isOpen={isProjectModalOpen} onOpenChange={setIsProjectModalOpen} />
 

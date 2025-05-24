@@ -10,8 +10,8 @@ import {
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+// import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import { DateProvider } from "~/components/date-context";
 import MainContentProvider from "~/components/providers/MainContentProvider";
@@ -78,8 +78,8 @@ function RootComponent() {
       )}
       {isDev && (
         <>
-          <ReactQueryDevtools buttonPosition="bottom-left" />
-          <TanStackRouterDevtools position="bottom-right" />
+          {/* <ReactQueryDevtools buttonPosition="bottom-left" />
+          <TanStackRouterDevtools position="bottom-right" /> */}
         </>
       )}
     </RootDocument>

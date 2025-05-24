@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
 const TimeLocationDisplay = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [timezone, setTimezone] = useState("");
+  const [currentTime, setCurrentTime] = useState(() => new Date());
+  const [timezone, setTimezone] = useState(() => "");
 
   useEffect(() => {
     // Update time every second
@@ -16,7 +16,7 @@ const TimeLocationDisplay = () => {
       // Get only the city part after the last '/'
       const city = timeZone.split("/").pop()?.replace(/_/g, " ") || "";
       setTimezone(city);
-    } catch (error) {
+    } catch {
       setTimezone("Unknown City");
     }
 
@@ -41,10 +41,10 @@ const TimeLocationDisplay = () => {
   };
 
   return (
-    <div className="flex text-neutral-300 justify-end items-center gap-4 h-full">
-      <div className="text-xs text-neutral-500 text-center">{timezone}</div>
-      <div className="text-xs text-center">{formatDay(currentTime)}</div>
-      <div className="text-xs font-bold text-center">
+    <div className="flex text-[10px] justify-end items-center gap-4 h-full">
+      <div className="text-neutral-500 text-center">{timezone}</div>
+      <div className="text-neutral-400 text-center">{formatDay(currentTime)}</div>
+      <div className="text-neutral-400 text-center">
         {formatTime(currentTime)}
       </div>
     </div>
