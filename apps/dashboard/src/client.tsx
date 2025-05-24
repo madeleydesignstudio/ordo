@@ -5,7 +5,6 @@ import { hydrateRoot } from "react-dom/client";
 import { createRouter } from "./router.js";
 import { PostHogProvider } from "posthog-js/react";
 import type { PostHog } from 'posthog-js';
-// @ts-expect-error - Module resolution issue with react-error-boundary
 import { ErrorBoundary } from "react-error-boundary";
 
 // Create a loading fallback component
@@ -34,19 +33,39 @@ const router = createRouter();
 // Initialize PostHog with better error handling
 const initPostHog = () => {
   try {
+    const apiKey = import.meta.env.VITE_PUBLIC_POSTHOG_KEY;
+    const apiHost = import.meta.env.VITE_PUBLIC_POSTHOG_HOST;
+
+    if (!apiKey || !apiHost) {
+      console.warn('PostHog configuration is incomplete. Analytics will be disabled.');
+      return null;
+    }
+
     return {
-      apiKey: import.meta.env.VITE_PUBLIC_POSTHOG_KEY,
+      apiKey,
       options: {
-        api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+        api_host: apiHost,
         debug: import.meta.env.MODE === "development",
         loaded: (posthog: PostHog) => {
           if (import.meta.env.MODE === "development") {
             posthog.debug();
           }
+          // Log successful initialization
+          console.log('PostHog initialized successfully');
         },
         capture_pageview: true,
         persistence: 'localStorage' as const,
         disable_session_recording: import.meta.env.MODE === "development",
+        autocapture: true,
+        capture_pageleave: true,
+        // Add production-specific settings
+        bootstrap: {
+          distinctID: localStorage.getItem('ph_' + apiKey + '_posthog')?.split('"')[3] || undefined,
+        },
+        // Ensure proper error handling
+        on_error: (error: Error) => {
+          console.error('PostHog error:', error);
+        }
       },
     };
   } catch (error) {

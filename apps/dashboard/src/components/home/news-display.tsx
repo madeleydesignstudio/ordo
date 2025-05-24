@@ -3,15 +3,16 @@ import { useQuery } from "@tanstack/react-query";
 interface NewsResponse {
   headline: string;
   summary: string;
+  timestamp: number;
 }
 
 const fetchNews = async (): Promise<NewsResponse> => {
   const response = await fetch("/api/news", {
-    method: "POST",
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include", // Include credentials for authentication
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -28,8 +29,9 @@ const NewsDisplay = () => {
   const { data, isLoading, error } = useQuery<NewsResponse>({
     queryKey: ["news"],
     queryFn: fetchNews,
-    refetchInterval: 1000 * 60 * 60, // Refetch every hour
-    staleTime: 1000 * 60 * 30, // Consider data stale after 30 minutes
+    refetchInterval: 1000 * 60 * 60 * 24, // Refetch once per day
+    staleTime: 1000 * 60 * 60 * 24, // Consider data stale after 24 hours
+    gcTime: 1000 * 60 * 60 * 24, // Keep in cache for 24 hours
   });
 
   if (isLoading) {
@@ -49,10 +51,14 @@ const NewsDisplay = () => {
     );
   }
 
+  if (!data) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-2 p-4">
-      <h3 className="text-neutral-200 font-medium">{data?.headline}</h3>
-      <p className="text-neutral-400 text-sm">{data?.summary}</p>
+      <h3 className="text-neutral-200 font-medium text-lg">{data.headline}</h3>
+      <p className="text-neutral-400 text-sm leading-relaxed">{data.summary}</p>
     </div>
   );
 };
