@@ -1,7 +1,7 @@
+import { Button } from "@ordo/ui-web/components/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@ordo/ui-web/components/button";
 import authClient from "../../auth/auth-client";
 
 export const Route = createFileRoute("/_auth/login")({
@@ -25,11 +25,17 @@ function LoginForm() {
           className="w-full"
           type="button"
           disabled={isLoading}
-          onClick={() =>
+          onClick={() => {
+            // Determine the correct callback URL based on environment
+            const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const callbackURL = isDevelopment 
+              ? "http://localhost:3001/" 
+              : "https://ordo-dashboard.netlify.app/";
+            
             authClient.signIn.social(
               {
                 provider: "google",
-                callbackURL: "http://localhost:3001/",
+                callbackURL,
               },
               {
                 onRequest: () => {
@@ -42,7 +48,7 @@ function LoginForm() {
                 },
               },
             )
-          }
+          }}
         >
           {isLoading && <LoaderCircle className="animate-spin" />}
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

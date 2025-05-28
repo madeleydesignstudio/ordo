@@ -27,15 +27,15 @@ export function createAuth(db: ReturnType<typeof createDb>, env: any) {
     trustedOrigins,
     
     // Add advanced CORS configuration
-    // advanced: {
-    //   crossSubDomainCookies: {
-    //     enabled: true,
-    //   },
-    //   defaultCookieAttributes: {
-    //     sameSite: isDev ? "lax" : "none", // Use "none" for production cross-origin
-    //     secure: !isDev, // Use secure cookies in production
-    //   },
-    // },
+    advanced: {
+      crossSubDomainCookies: {
+        enabled: true,
+      },
+      defaultCookieAttributes: {
+        sameSite: isDev ? "lax" : "none", // Use "none" for production cross-origin
+        secure: !isDev, // Use secure cookies in production
+      },
+    },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
     plugins: [reactStartCookies()],

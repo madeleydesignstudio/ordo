@@ -8,7 +8,7 @@ import {
 import { PostHogProvider } from 'posthog-js/react'
 import { QueryClient } from '@tanstack/react-query'
 
-interface RouterContext {
+export interface RouterContext {
   queryClient: QueryClient
   user: any | null
   authClient: any
