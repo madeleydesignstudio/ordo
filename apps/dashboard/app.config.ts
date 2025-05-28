@@ -12,6 +12,5 @@ export default defineConfig({
   },
   server: {
     preset: 'netlify',
-    
   },
 }) as ReturnType<typeof defineConfig>
