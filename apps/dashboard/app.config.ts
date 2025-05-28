@@ -12,9 +12,6 @@ export default defineConfig({
   },
   server: {
     preset: 'netlify',
-    prerender: {
-      routes: ['/'], // Add other routes you want to prerender
-      ignore: ['/api/**'], // Ignore API routes
-    },
+    
   },
 })
