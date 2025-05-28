@@ -1,0 +1,8 @@
+{
+    "name": "@ordo/auth",
+    "type": "module",
+    "dependencies": {
+        "better-auth": "^1.2.8",
+        "@ordo/neon-db": "workspace:*"
+    }
+}

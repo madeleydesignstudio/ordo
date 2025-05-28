@@ -1,0 +1,10 @@
+{
+    "extends": "@ordo/typescript-config/react-library.json",
+    "compilerOptions": {
+      "baseUrl": ".",
+      
+    },
+    "include": ["."],
+    "exclude": ["node_modules", "dist"]
+  }
+  

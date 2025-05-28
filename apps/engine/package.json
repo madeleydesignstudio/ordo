@@ -1,0 +1,18 @@
+{
+  "name": "@ordo/engine",
+  "scripts": {
+    "dev": "NODE_ENV=development wrangler dev src/index.ts --port 4321",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+  },
+  "dependencies": {
+    "hono": "^4.7.10",
+    "@ordo/auth": "workspace:*",
+    "@ordo/neon-db": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250525.0",
+    "@types/bun": "^1.2.14",
+    "wrangler": "^4.16.1"
+  }
+}
