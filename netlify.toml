@@ -4,7 +4,7 @@
   publish = "apps/dashboard/.output/public"
 
 [build.environment]
-  NODE_VERSION = "24"
+ NODE_VERSION = "20"
   NPM_FLAGS = "--prefix=/dev/null"
 
 # Redirect all routes to index.html for SPA
