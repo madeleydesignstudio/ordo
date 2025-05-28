@@ -1,15 +1,10 @@
 [build]
   base = "apps/dashboard"
   command = "cd ../.. && bun install && bun run build --filter=@ordo/dashboard"
-  publish = "apps/dashboard/.output/public"
 
 [build.environment]
  NODE_VERSION = "20"
   NPM_FLAGS = "--prefix=/dev/null"
 
-# Redirect all routes to index.html for SPA
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+
 
