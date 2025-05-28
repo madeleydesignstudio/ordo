@@ -4,15 +4,36 @@ import { reactStartCookies } from "better-auth/react-start";
 import type { createDb } from "@ordo/neon-db/db";
 
 export function createAuth(db: ReturnType<typeof createDb>, env: any) {
+  // Determine environment and set appropriate URLs
+  const isDev = env.DEV_BASE_URL && env.DEV_BASE_URL.includes('localhost');
+  const baseURL = isDev ? env.DEV_BASE_URL : env.PROD_BASE_URL;
+  
+  // Set trusted origins based on environment
+  const trustedOrigins = isDev 
+    ? ["http://localhost:3001"] // Development dashboard
+    : [" https://engine.dev-0af.workers.dev"]; // Production dashboard - update this with your actual domain
+  
+  console.log('Auth config:', { isDev, baseURL, trustedOrigins });
+
   return betterAuth({
-    baseURL: env.BASE_URL,
+    baseURL,
     database: drizzleAdapter(db, {
       provider: "pg",
     }),
 
     // Allow requests from dashboard
-    trustedOrigins: ["http://localhost:3001"],
+    trustedOrigins,
     
+    // Add advanced CORS configuration
+    // advanced: {
+    //   crossSubDomainCookies: {
+    //     enabled: true,
+    //   },
+    //   defaultCookieAttributes: {
+    //     sameSite: isDev ? "lax" : "none", // Use "none" for production cross-origin
+    //     secure: !isDev, // Use secure cookies in production
+    //   },
+    // },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
     plugins: [reactStartCookies()],

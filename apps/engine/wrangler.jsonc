@@ -6,7 +6,8 @@
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     "DATABASE_URL": "postgresql://neon-ordo_owner:npg_NTLrRjHI62UZ@ep-muddy-night-aba4aq3j-pooler.eu-west-2.aws.neon.tech/neon-ordo?sslmode=require",
-    "BASE_URL": "http://localhost:4321",
+    "DEV_BASE_URL": "http://localhost:4321",
+    "PROD_BASE_URL": "https://engine.dev-0af.workers.dev",
     "GOOGLE_CLIENT_ID": "1043030213057-4llu58gbh1o9euehtckilu6l7esikvpj.apps.googleusercontent.com",
     "GOOGLE_CLIENT_SECRET": "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"
   },
