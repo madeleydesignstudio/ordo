@@ -1,0 +1,5 @@
+# Handle client-side routing for SPA
+/*    /index.html   200
+
+# API routes (if any)
+/api/*  /api/:splat  200 

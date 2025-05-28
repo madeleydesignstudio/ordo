@@ -1,0 +1,1 @@
+import{j as o}from"./client-DTMXrvQ9.js";const e=function(){return o.jsx("div",{children:'Hello "/(home)/settings"!'})};export{e as component};
