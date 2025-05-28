@@ -1,1 +1,0 @@
-import{c as n,R as o,j as r,d as a,e as s}from"./client-DTMXrvQ9.js";const u=s("app_routes_home_index_tsx--updateCount_createServerFn_handler","/_server"),c=a({method:"POST"}).handler(u),i=function(){const e=n(),t=o.useLoaderData();return r.jsxs("button",{type:"button",onClick:()=>{c({data:1}).then(()=>{e.invalidate()})},children:["Add 1 to ",t,"?"]})};export{i as component};

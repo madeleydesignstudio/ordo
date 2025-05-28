@@ -1,3 +1,8 @@
+[build]
+  base = "/"
+  command = "bun run build --filter=@ordo/dashboard"
+  publish = "apps/dashboard/dist"
+
 [[headers]]
   for = "/*"
   [headers.values]
