@@ -4,14 +4,16 @@ import { reactStartCookies } from "better-auth/react-start";
 import type { createDb } from "@ordo/neon-db/db";
 
 export function createAuth(db: ReturnType<typeof createDb>, env: any) {
-  // Determine environment and set appropriate URLs
-  const isDev = env.DEV_BASE_URL && env.DEV_BASE_URL.includes('localhost');
+  // Use explicit environment variable to determine environment
+  const isDev = env.ENVIRONMENT === 'development';
+  
+  // Use production URL for deployed workers, dev URL for local development
   const baseURL = isDev ? env.DEV_BASE_URL : env.PROD_BASE_URL;
   
   // Set trusted origins based on environment
   const trustedOrigins = isDev 
     ? ["http://localhost:3001"] // Development dashboard
-    : [" https://engine.dev-0af.workers.dev"]; // Production dashboard - update this with your actual domain
+    : ["https://ordo-dashboard.netlify.app"]; // Production dashboard
   
   console.log('Auth config:', { isDev, baseURL, trustedOrigins });
 
