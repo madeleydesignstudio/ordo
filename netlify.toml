@@ -1,0 +1,13 @@
+[build]
+  command = "bun install && bun run build --filter=@ordo/dashboard"
+  publish = "apps/dashboard/.output/public"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Handle SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
