@@ -21,6 +21,9 @@
   "dependencies": {
     "@ordo/auth": "workspace:*",
     "@ordo/ui-web": "workspace:*",
+    "@ordo/neon-db": "workspace:*",
+    "@ordo/eslint-config": "workspace:^",
+    "@ordo/typescript-config": "workspace:*",
     "@tanstack/react-query": "^5.77.2",
     "@tanstack/react-router": "^1.120.10",
     "@tanstack/react-router-with-query": "^1.120.11",

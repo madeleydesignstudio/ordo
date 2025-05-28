@@ -14,4 +14,4 @@ export default defineConfig({
     preset: 'netlify',
     
   },
-})
+}) as ReturnType<typeof defineConfig>

@@ -1,0 +1,1 @@
+export { default } from "@ordo/ui-web/postcss.config";
