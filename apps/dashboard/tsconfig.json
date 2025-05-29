@@ -7,8 +7,11 @@
     "target": "ES2022",
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "paths": {
-      "@": ["./src/*"]
+    
+       "paths": {
+      "@/*": ["./*"],
+      "@ordo/ui-web/*": ["../../packages/ui-web/src/*"]
+   
     }
   },
   "include": [

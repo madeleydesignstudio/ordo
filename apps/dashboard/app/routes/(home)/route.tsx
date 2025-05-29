@@ -35,10 +35,11 @@ function ProtectedLayout() {
       }
       
       navigate({ to: '/login' })
-    } catch (error) {
-      console.error('Logout error:', error)
-      navigate({ to: '/login' })
-    }
+} catch (error) {
+   console.error('Logout error:', error)
+  setLoggingOut(false)
+   navigate({ to: '/login' })
+ }
   }
 
   // Debug: Log the user to see what we're getting
