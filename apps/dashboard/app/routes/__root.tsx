@@ -37,6 +37,12 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         title: 'TanStack Start Starter',
       },
     ],
+    links: [
+      {
+        rel: 'stylesheet',
+        href: '@ordo/ui-web/styles/globals.css',
+      }
+    ]
   }),
   component: RootComponent,
 })
