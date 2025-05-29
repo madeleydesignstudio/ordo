@@ -13,7 +13,9 @@
     "@types/react": "^19.1.5",
     "@types/react-dom": "^19.1.5",
     "@vitejs/plugin-react": "^4.5.0",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "@ordo/eslint-config": "workspace:^",
+    "@ordo/typescript-config": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5.8.3"
@@ -22,8 +24,6 @@
     "@ordo/auth": "workspace:*",
     "@ordo/ui-web": "workspace:*",
     "@ordo/neon-db": "workspace:*",
-    "@ordo/eslint-config": "workspace:^",
-    "@ordo/typescript-config": "workspace:*",
     "@tanstack/react-query": "^5.77.2",
     "@tanstack/react-router": "^1.120.10",
     "@tanstack/react-router-with-query": "^1.120.11",

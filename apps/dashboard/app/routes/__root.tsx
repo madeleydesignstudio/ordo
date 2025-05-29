@@ -11,6 +11,7 @@ import type { ReactNode } from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
 import authClient from '../auth/auth-client'
 import { usePostHog } from 'posthog-js/react'
+import "@ordo/ui-web/styles/globals.css"
 
 export interface RouterContext {
   queryClient: QueryClient
