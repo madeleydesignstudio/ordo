@@ -11,7 +11,7 @@ import type { ReactNode } from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
 import authClient from '../auth/auth-client'
 import { usePostHog } from 'posthog-js/react'
-import "@ordo/ui-web/styles/globals.css"
+import "@ordo/ui-web/globals.css"
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -37,12 +37,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         title: 'TanStack Start Starter',
       },
     ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: '@ordo/ui-web/styles/globals.css',
-      }
-    ]
   }),
   component: RootComponent,
 })

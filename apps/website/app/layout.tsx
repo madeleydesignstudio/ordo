@@ -1,6 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google"
 
-import "@ordo/ui-web/styles/globals.css"
+import "@ordo/ui-web/globals.css"
 import { Providers } from "@ordo/ui-web/components/website/providers/app-provider"
 
 const fontSans = Geist({
