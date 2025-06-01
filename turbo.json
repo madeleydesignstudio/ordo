@@ -16,11 +16,6 @@
     "dev": {
       "cache": false,
       "persistent": true
-    },
-    "@ordo/engine#dev": {
-      "cache": false,
-      "persistent": true,
-      "env": ["NODE_ENV"]
     }
   }
 }

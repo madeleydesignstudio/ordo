@@ -1,24 +1,18 @@
 {
-  "extends": "@ordo/typescript-config/nextjs.json",
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "moduleResolution": "Bundler",
-    "module": "ESNext",
-    "target": "ES2022",
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./*"],
-      "@ordo/ui-web/*": ["../../packages/ui-web/src/*"]
-    }
-  },
-  "include": [
-    "next-env.d.ts",
-    "next.config.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": ["node_modules"]
-}
+    "extends": "@workspace/typescript-config/react-library.json",
+    "compilerOptions": {
+      "jsx": "react-jsx",
+      "moduleResolution": "Bundler",
+      "module": "ESNext",
+      "target": "ES2022",
+      "skipLibCheck": true,
+      "strictNullChecks": true,
+      "baseUrl": ".",
+      "paths": {
+        "@workspace/ui/*": ["./src/*"],
+        "@/*": ["./app/*"]
+      }
+    },
+    "include": ["."],
+    "exclude": ["node_modules", "dist"]
+  }

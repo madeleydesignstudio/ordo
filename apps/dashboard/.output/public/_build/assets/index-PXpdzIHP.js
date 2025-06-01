@@ -1,0 +1,1 @@
+import{j as o}from"./client-D9HN6d7N.js";import{B as n}from"./button-DJ-jVnrd.js";const i=function(){return o.jsxs("div",{children:[o.jsx("h1",{children:"Home"}),o.jsx(n,{children:"Click me"})]})};export{i as component};

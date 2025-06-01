@@ -1,34 +1,22 @@
 {
-  "name": "@ordo/root",
+  "name": "shadcn-ui-monorepo",
   "version": "0.0.1",
   "private": true,
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "dev:engine": "turbo dev --filter=@ordo/engine",
-    "dev:dashboard": "turbo dev --filter=@ordo/dashboard",
-    "dev:website": "turbo dev --filter=@ordo/website",
-    "dev:mobile": "turbo dev --filter=@ordo/mobile",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "clean:cache": "bun run scripts/clean-cache.ts",
-    "clean:cache:dry": "bun run scripts/clean-cache.ts --dry-run",
-    "clean:cache:deep": "bun run scripts/clean-cache.ts --deep",
-    "update:deps": "bun run scripts/update-dependencies.ts",
-    "update:deps:check": "bun run scripts/update-dependencies.ts --check-only",
-    "update:deps:interactive": "bun run scripts/update-dependencies.ts --interactive",
-    "update:deps:clean": "bun run scripts/update-dependencies.ts --clean-first"
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@ordo/eslint-config": "workspace:*",
-    "@ordo/typescript-config": "workspace:*",
-    "glob": "^11.0.2",
-    "prettier": "^3.5.3",
-    "turbo": "^2.5.3",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "prettier": "^3.5.1",
+    "turbo": "^2.4.2",
     "typescript": "5.7.3"
   },
-  "packageManager": "bun@1.2.14",
+  "packageManager": "bun@1.2.4",
   "engines": {
     "node": ">=20"
   }

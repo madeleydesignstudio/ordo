@@ -11,7 +11,6 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as DebugImport } from './routes/debug'
 import { Route as ContentManagerRouteImport } from './routes/content-manager/route'
 import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as homeRouteImport } from './routes/(home)/route'
@@ -53,12 +52,6 @@ import { Route as homeNotificationsImport } from './routes/(home)/notifications'
 import { Route as homeNewsImport } from './routes/(home)/news'
 
 // Create/Update Routes
-
-const DebugRoute = DebugImport.update({
-  id: '/debug',
-  path: '/debug',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const ContentManagerRouteRoute = ContentManagerRouteImport.update({
   id: '/content-manager',
@@ -319,13 +312,6 @@ declare module '@tanstack/react-router' {
       path: '/content-manager'
       fullPath: '/content-manager'
       preLoaderRoute: typeof ContentManagerRouteImport
-      parentRoute: typeof rootRoute
-    }
-    '/debug': {
-      id: '/debug'
-      path: '/debug'
-      fullPath: '/debug'
-      preLoaderRoute: typeof DebugImport
       parentRoute: typeof rootRoute
     }
     '/(home)/news': {
@@ -646,7 +632,6 @@ export interface FileRoutesByFullPath {
   '/': typeof homeIndexRoute
   '': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
-  '/debug': typeof DebugRoute
   '/news': typeof homeNewsRoute
   '/notifications': typeof homeNotificationsRoute
   '/settings': typeof homeSettingsRoute
@@ -686,7 +671,6 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '': typeof AuthRouteRouteWithChildren
-  '/debug': typeof DebugRoute
   '/news': typeof homeNewsRoute
   '/notifications': typeof homeNotificationsRoute
   '/settings': typeof homeSettingsRoute
@@ -730,7 +714,6 @@ export interface FileRoutesById {
   '/(home)': typeof homeRouteRouteWithChildren
   '/_auth': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
-  '/debug': typeof DebugRoute
   '/(home)/news': typeof homeNewsRoute
   '/(home)/notifications': typeof homeNotificationsRoute
   '/(home)/settings': typeof homeSettingsRoute
@@ -775,7 +758,6 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/content-manager'
-    | '/debug'
     | '/news'
     | '/notifications'
     | '/settings'
@@ -814,7 +796,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
-    | '/debug'
     | '/news'
     | '/notifications'
     | '/settings'
@@ -856,7 +837,6 @@ export interface FileRouteTypes {
     | '/(home)'
     | '/_auth'
     | '/content-manager'
-    | '/debug'
     | '/(home)/news'
     | '/(home)/notifications'
     | '/(home)/settings'
@@ -900,7 +880,6 @@ export interface RootRouteChildren {
   homeRouteRoute: typeof homeRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   ContentManagerRouteRoute: typeof ContentManagerRouteRouteWithChildren
-  DebugRoute: typeof DebugRoute
   FinanceManagerBudgetingRoute: typeof FinanceManagerBudgetingRoute
   FinanceManagerDashboardRoute: typeof FinanceManagerDashboardRoute
   FinanceManagerNewsRoute: typeof FinanceManagerNewsRoute
@@ -929,7 +908,6 @@ const rootRouteChildren: RootRouteChildren = {
   homeRouteRoute: homeRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   ContentManagerRouteRoute: ContentManagerRouteRouteWithChildren,
-  DebugRoute: DebugRoute,
   FinanceManagerBudgetingRoute: FinanceManagerBudgetingRoute,
   FinanceManagerDashboardRoute: FinanceManagerDashboardRoute,
   FinanceManagerNewsRoute: FinanceManagerNewsRoute,
@@ -967,7 +945,6 @@ export const routeTree = rootRoute
         "/(home)",
         "/_auth",
         "/content-manager",
-        "/debug",
         "/finance-manager/budgeting",
         "/finance-manager/dashboard",
         "/finance-manager/news",
@@ -1020,9 +997,6 @@ export const routeTree = rootRoute
         "/content-manager/reports",
         "/content-manager/"
       ]
-    },
-    "/debug": {
-      "filePath": "debug.tsx"
     },
     "/(home)/news": {
       "filePath": "(home)/news.tsx",

@@ -1,6 +1,6 @@
 // app/routes/index.tsx
 import { createFileRoute } from '@tanstack/react-router'
-import { Button } from '@ordo/ui-web/components/button'
+import { Button } from '@workspace/ui/components/button'
 
 
 export const Route = createFileRoute('/(home)/')({

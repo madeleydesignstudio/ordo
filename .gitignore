@@ -34,6 +34,3 @@ npm-debug.log*
 # Misc
 .DS_Store
 *.pem
-
-# Local Netlify folder
-.netlify

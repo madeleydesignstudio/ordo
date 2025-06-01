@@ -1,8 +1,10 @@
 // app.config.ts
 import { defineConfig } from '@tanstack/react-start/config'
 import tsConfigPaths from 'vite-tsconfig-paths'
+import { cloudflare } from 'unenv'
+import nitroCloudflareBindings from "nitro-cloudflare-dev";
 
-export default defineConfig({
+const config = defineConfig({
   vite: {
     plugins: [
       tsConfigPaths({
@@ -11,6 +13,10 @@ export default defineConfig({
     ],
   },
   server: {
-    preset: 'netlify',
+    preset: "cloudflare-module",
+    unenv: cloudflare,
+    modules: [nitroCloudflareBindings],
   },
-}) as ReturnType<typeof defineConfig>
+})
+
+export default config

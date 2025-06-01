@@ -8,7 +8,7 @@ const app = new Hono()
 app.use('*', cors({
   origin: [
     'http://localhost:3001', // Local dashboard URL
-    'https://ordo-dashboard.netlify.app' // Production dashboard URL
+    'https://dashboard.dev-0af.workers.dev' //  // Production dashboard URL
   ],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],

@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@ordo/ui-web/components/button";
-import { Input } from "@ordo/ui-web/components/input";
-import { Label } from "@ordo/ui-web/components/label";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
 import authClient from "../../auth/auth-client";
 
 export const Route = createFileRoute("/_auth/signup")({

@@ -1,0 +1,6 @@
+{
+    "name": "@ordo/storage-client",
+    "main": "index.ts",
+    "types": "index.ts"
+  }
+  
