@@ -1,17 +1,17 @@
 {
   "/Users/mxdeley/madeleydesignstudio/projects/ordo/apps/dashboard/app/styles/app.css": {
-    "file": "assets/app-BOWzWfsN.css",
+    "file": "assets/app-DYFsPAmN.css",
     "src": "/Users/mxdeley/madeleydesignstudio/projects/ordo/apps/dashboard/app/styles/app.css"
   },
-  "_button-DJ-jVnrd.js": {
-    "file": "assets/button-DJ-jVnrd.js",
+  "_button-BdtRkY6Q.js": {
+    "file": "assets/button-BdtRkY6Q.js",
     "name": "button",
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
-  "_client-D9HN6d7N.js": {
-    "file": "assets/client-D9HN6d7N.js",
+  "_client-FBX9dFbx.js": {
+    "file": "assets/client-FBX9dFbx.js",
     "name": "client",
     "dynamicImports": [
       "app/routes/content-manager/route.tsx?tsr-split=component",
@@ -55,379 +55,379 @@
       "app/routes/(home)/news.tsx?tsr-split=component"
     ],
     "assets": [
-      "assets/app-BOWzWfsN.css"
+      "assets/app-DYFsPAmN.css"
     ]
   },
-  "_loader-circle-C8FY5qOw.js": {
-    "file": "assets/loader-circle-C8FY5qOw.js",
+  "_loader-circle-Od1gXPil.js": {
+    "file": "assets/loader-circle-Od1gXPil.js",
     "name": "loader-circle",
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/(home)/index.tsx?tsr-split=component": {
-    "file": "assets/index-PXpdzIHP.js",
+    "file": "assets/index-DOUGuMOs.js",
     "name": "index",
     "src": "app/routes/(home)/index.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js",
-      "_button-DJ-jVnrd.js"
+      "_client-FBX9dFbx.js",
+      "_button-BdtRkY6Q.js"
     ]
   },
   "app/routes/(home)/news.tsx?tsr-split=component": {
-    "file": "assets/news-BVQqWXfC.js",
+    "file": "assets/news-BrwENd9j.js",
     "name": "news",
     "src": "app/routes/(home)/news.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/(home)/notifications.tsx?tsr-split=component": {
-    "file": "assets/notifications-BR9GUExF.js",
+    "file": "assets/notifications-BK78AThR.js",
     "name": "notifications",
     "src": "app/routes/(home)/notifications.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/(home)/route.tsx?tsr-split=component": {
-    "file": "assets/route-BNBevB_B.js",
+    "file": "assets/route-BnTdFrCx.js",
     "name": "route",
     "src": "app/routes/(home)/route.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/(home)/settings.tsx?tsr-split=component": {
-    "file": "assets/settings-CNQZwE0P.js",
+    "file": "assets/settings-D_cmRzcH.js",
     "name": "settings",
     "src": "app/routes/(home)/settings.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/_auth/login.tsx?tsr-split=component": {
-    "file": "assets/login-CXdlKXtm.js",
+    "file": "assets/login-ByfnJWdC.js",
     "name": "login",
     "src": "app/routes/_auth/login.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js",
-      "_button-DJ-jVnrd.js",
-      "_loader-circle-C8FY5qOw.js"
+      "_client-FBX9dFbx.js",
+      "_button-BdtRkY6Q.js",
+      "_loader-circle-Od1gXPil.js"
     ]
   },
   "app/routes/_auth/route.tsx?tsr-split=component": {
-    "file": "assets/route-DB9xMCKX.js",
+    "file": "assets/route-C6T_m2vJ.js",
     "name": "route",
     "src": "app/routes/_auth/route.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/_auth/signup.tsx?tsr-split=component": {
-    "file": "assets/signup-UDODm-c2.js",
+    "file": "assets/signup-DimNVUcs.js",
     "name": "signup",
     "src": "app/routes/_auth/signup.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js",
-      "_button-DJ-jVnrd.js",
-      "_loader-circle-C8FY5qOw.js"
+      "_client-FBX9dFbx.js",
+      "_button-BdtRkY6Q.js",
+      "_loader-circle-Od1gXPil.js"
     ]
   },
   "app/routes/content-manager/company.tsx?tsr-split=component": {
-    "file": "assets/company-ocmFMM6T.js",
+    "file": "assets/company-CK_tU6Wy.js",
     "name": "company",
     "src": "app/routes/content-manager/company.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/content-manager/dashboard.tsx?tsr-split=component": {
-    "file": "assets/dashboard-DO3URkr3.js",
+    "file": "assets/dashboard-ChXjOiB4.js",
     "name": "dashboard",
     "src": "app/routes/content-manager/dashboard.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/content-manager/email.tsx?tsr-split=component": {
-    "file": "assets/email-ByU67CjU.js",
+    "file": "assets/email-Cu58cKAr.js",
     "name": "email",
     "src": "app/routes/content-manager/email.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/content-manager/inbox-zero.tsx?tsr-split=component": {
-    "file": "assets/inbox-zero-BzHS3toi.js",
+    "file": "assets/inbox-zero-CmCoxkxK.js",
     "name": "inbox-zero",
     "src": "app/routes/content-manager/inbox-zero.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/content-manager/inbox.tsx?tsr-split=component": {
-    "file": "assets/inbox-bYhcM4hy.js",
+    "file": "assets/inbox-CmfT1t-K.js",
     "name": "inbox",
     "src": "app/routes/content-manager/inbox.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/content-manager/index.tsx?tsr-split=component": {
-    "file": "assets/index-DbaK3FgD.js",
+    "file": "assets/index-ZrpF-B3W.js",
     "name": "index",
     "src": "app/routes/content-manager/index.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/content-manager/people.tsx?tsr-split=component": {
-    "file": "assets/people-CBRTOyt5.js",
+    "file": "assets/people-O0XSQkcy.js",
     "name": "people",
     "src": "app/routes/content-manager/people.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/content-manager/reports.tsx?tsr-split=component": {
-    "file": "assets/reports-Csfo9V14.js",
+    "file": "assets/reports-B0-Et24y.js",
     "name": "reports",
     "src": "app/routes/content-manager/reports.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/content-manager/route.tsx?tsr-split=component": {
-    "file": "assets/route-1UqjFuS6.js",
+    "file": "assets/route-C6ry3r6x.js",
     "name": "route",
     "src": "app/routes/content-manager/route.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/finance-manager/budgeting.tsx?tsr-split=component": {
-    "file": "assets/budgeting-BzGEBDDQ.js",
+    "file": "assets/budgeting-C7pOOIGc.js",
     "name": "budgeting",
     "src": "app/routes/finance-manager/budgeting.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/finance-manager/dashboard.tsx?tsr-split=component": {
-    "file": "assets/dashboard-CJNexe5-.js",
+    "file": "assets/dashboard-D3RK4_ff.js",
     "name": "dashboard",
     "src": "app/routes/finance-manager/dashboard.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/finance-manager/index.tsx?tsr-split=component": {
-    "file": "assets/index-7b1mKEo-.js",
+    "file": "assets/index-BTFfKdr6.js",
     "name": "index",
     "src": "app/routes/finance-manager/index.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/finance-manager/news.tsx?tsr-split=component": {
-    "file": "assets/news-CrE74dlf.js",
+    "file": "assets/news-DOQ8Un6a.js",
     "name": "news",
     "src": "app/routes/finance-manager/news.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/finance-manager/portfolio.tsx?tsr-split=component": {
-    "file": "assets/portfolio-CvDS3Wig.js",
+    "file": "assets/portfolio-BVpUPI2M.js",
     "name": "portfolio",
     "src": "app/routes/finance-manager/portfolio.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/finance-manager/reports.tsx?tsr-split=component": {
-    "file": "assets/reports-BaMbhrFO.js",
+    "file": "assets/reports-D5eD3bq-.js",
     "name": "reports",
     "src": "app/routes/finance-manager/reports.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/finance-manager/router.tsx?tsr-split=component": {
-    "file": "assets/router-D2HsVUzu.js",
+    "file": "assets/router-B3FMBS2E.js",
     "name": "router",
     "src": "app/routes/finance-manager/router.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/finance-manager/transactions.tsx?tsr-split=component": {
-    "file": "assets/transactions-DJExTPNz.js",
+    "file": "assets/transactions-iokcH5HW.js",
     "name": "transactions",
     "src": "app/routes/finance-manager/transactions.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/health-manager/dashboard.tsx?tsr-split=component": {
-    "file": "assets/dashboard-Dc9MnDY8.js",
+    "file": "assets/dashboard-DSX8d153.js",
     "name": "dashboard",
     "src": "app/routes/health-manager/dashboard.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/health-manager/fitness-tracker.tsx?tsr-split=component": {
-    "file": "assets/fitness-tracker-BE-VYbP-.js",
+    "file": "assets/fitness-tracker-DQqTelyd.js",
     "name": "fitness-tracker",
     "src": "app/routes/health-manager/fitness-tracker.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/health-manager/index.tsx?tsr-split=component": {
-    "file": "assets/index-D8ts1kxX.js",
+    "file": "assets/index-By0GKkm8.js",
     "name": "index",
     "src": "app/routes/health-manager/index.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/health-manager/journal.tsx?tsr-split=component": {
-    "file": "assets/journal-CPaEmtmR.js",
+    "file": "assets/journal-Cn210sha.js",
     "name": "journal",
     "src": "app/routes/health-manager/journal.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/health-manager/router.tsx?tsr-split=component": {
-    "file": "assets/router-DcP7SREn.js",
+    "file": "assets/router-BXmXFe6B.js",
     "name": "router",
     "src": "app/routes/health-manager/router.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/health-manager/supplement-tracker.tsx?tsr-split=component": {
-    "file": "assets/supplement-tracker-CWXYU6Eu.js",
+    "file": "assets/supplement-tracker-fVM7FA1q.js",
     "name": "supplement-tracker",
     "src": "app/routes/health-manager/supplement-tracker.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/project-manager/analytics.tsx?tsr-split=component": {
-    "file": "assets/analytics-Dlz3blx6.js",
+    "file": "assets/analytics-DU5PL8KA.js",
     "name": "analytics",
     "src": "app/routes/project-manager/analytics.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/project-manager/canvas.tsx?tsr-split=component": {
-    "file": "assets/canvas-v_wkNd8D.js",
+    "file": "assets/canvas-qqZ1pJ7l.js",
     "name": "canvas",
     "src": "app/routes/project-manager/canvas.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/project-manager/dashboard.tsx?tsr-split=component": {
-    "file": "assets/dashboard-CZmZhwcm.js",
+    "file": "assets/dashboard-Bp1XYu_N.js",
     "name": "dashboard",
     "src": "app/routes/project-manager/dashboard.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/project-manager/index.tsx?tsr-split=component": {
-    "file": "assets/index-Tvu-uJtZ.js",
+    "file": "assets/index-DBCoI4DW.js",
     "name": "index",
     "src": "app/routes/project-manager/index.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/project-manager/notes.tsx?tsr-split=component": {
-    "file": "assets/notes-BjGp4BfH.js",
+    "file": "assets/notes-Ckdvzw3O.js",
     "name": "notes",
     "src": "app/routes/project-manager/notes.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/project-manager/projects.tsx?tsr-split=component": {
-    "file": "assets/projects-BeMn8mmT.js",
+    "file": "assets/projects-D4nNn_hB.js",
     "name": "projects",
     "src": "app/routes/project-manager/projects.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/project-manager/router.tsx?tsr-split=component": {
-    "file": "assets/router-MVVf1S-W.js",
+    "file": "assets/router-SatEm2oN.js",
     "name": "router",
     "src": "app/routes/project-manager/router.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "app/routes/project-manager/tasks.tsx?tsr-split=component": {
-    "file": "assets/tasks-DXNz4z-E.js",
+    "file": "assets/tasks-B7gaZIux.js",
     "name": "tasks",
     "src": "app/routes/project-manager/tasks.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   },
   "virtual:$vinxi/handler/client": {
-    "file": "assets/client-CVfftVZ8.js",
+    "file": "assets/client-DqiKJOU2.js",
     "name": "client",
     "src": "virtual:$vinxi/handler/client",
     "isEntry": true,
     "imports": [
-      "_client-D9HN6d7N.js"
+      "_client-FBX9dFbx.js"
     ]
   }
 }

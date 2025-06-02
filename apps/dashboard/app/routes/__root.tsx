@@ -12,6 +12,7 @@ import type { ReactNode } from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
 import authClient from '../auth/auth-client'
 import { usePostHog } from 'posthog-js/react'
+import AppProvider from "@workspace/ui/components/dashboard/providers/app-provider"
 
 
 
@@ -126,9 +127,11 @@ function RootComponent() {
 
   return (
     <RootDocument>
+      <AppProvider>
       <UserContext.Provider value={user}>
         <Outlet />
       </UserContext.Provider>
+      </AppProvider>
     </RootDocument>
   )
 }
