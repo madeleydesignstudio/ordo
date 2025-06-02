@@ -1,11 +1,38 @@
-import { Maximize, Minimize } from 'lucide-react'
+import { Maximize, Minimize, Focus } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import React from 'react'
+
+// Focus mode context
+const FocusModeContext = React.createContext<{
+  isFocusMode: boolean
+  toggleFocusMode: () => void
+}>({
+  isFocusMode: false,
+  toggleFocusMode: () => {}
+})
+
+export const useFocusMode = () => React.useContext(FocusModeContext)
+
+export const FocusModeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isFocusMode, setIsFocusMode] = useState(false)
+  
+  const toggleFocusMode = () => {
+    setIsFocusMode(!isFocusMode)
+  }
+  
+  return (
+    <FocusModeContext.Provider value={{ isFocusMode, toggleFocusMode }}>
+      {children}
+    </FocusModeContext.Provider>
+  )
+}
 
 const BottomNav = () => {
   const [currentTime, setCurrentTime] = useState('')
   const [currentDate, setCurrentDate] = useState('')
   const [userCity, setUserCity] = useState('Loading...')
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const { isFocusMode, toggleFocusMode } = useFocusMode()
 
   // Update time and date
   useEffect(() => {
@@ -101,13 +128,24 @@ const BottomNav = () => {
   }, [])
 
   return (
-    <div className="h-full flex items-center justify-end px-4 gap-4 text-xs">
-          {/* Fullscreen Button */}
-          <button
-        onClick={toggleFullscreen}
-        className="h-6 px-2 text-xs"
+    <div className="h-full flex items-center justify-end px-4 gap-4 text-[10px]">
+      {/* Focus Mode */}
+      <button
+        onClick={toggleFocusMode}
+        className={`h-6 text-xs transition-colors ${
+          isFocusMode ? 'text-blue-500' : 'text-stone-400 hover:text-stone-600'
+        }`}
+        title={isFocusMode ? 'Exit Focus Mode' : 'Enter Focus Mode'}
       >
-        {isFullscreen ? <Minimize className="h-3 w-3" /> : <Maximize className="h-3 w-3" />}
+        <Focus className="h-3 w-3" />
+      </button>
+
+      {/* Fullscreen Button */}
+      <button
+        onClick={toggleFullscreen}
+        className="h-6"
+      >
+        {isFullscreen ? <Minimize className="h-3 w-3 text-stone-400" /> : <Maximize className="h-3 w-3 text-stone-400" />}
       </button>
       {/* User City */}
       <span className="text-stone-400">
