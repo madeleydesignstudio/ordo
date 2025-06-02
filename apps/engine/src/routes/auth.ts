@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
-import { createAuth } from '@ordo/auth/auth'
+import { createAuth } from '@ordo/auth'
 import { createDb } from '@ordo/neon-db/db'
-import type { AuthType } from '@ordo/auth/auth'
+import type { AuthType } from '@ordo/auth'
 
 const router = new Hono<{ Bindings: { DATABASE_URL: string }, Variables: AuthType }>({
   strict: false,

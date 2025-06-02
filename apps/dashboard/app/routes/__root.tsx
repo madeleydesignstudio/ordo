@@ -1,3 +1,4 @@
+import appCss from "@/styles/app.css?url"
 import { QueryClient } from '@tanstack/react-query'
 import {
   createRootRouteWithContext,
@@ -11,7 +12,9 @@ import type { ReactNode } from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
 import authClient from '../auth/auth-client'
 import { usePostHog } from 'posthog-js/react'
-import appCss from "@/styles/app.css?url"
+
+
+
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -19,7 +22,6 @@ export interface RouterContext {
   authClient: any
 }
 
-// Create React Context for user
 const UserContext = createContext<any>(null)
 export const useUser = () => useContext(UserContext)
 
@@ -44,6 +46,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       },
     ],
   }),
+
   component: RootComponent,
 })
 

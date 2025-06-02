@@ -1,7 +1,7 @@
 import { relations } from "drizzle-orm";
 import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
-import { user } from "./auth.schema.js";
-import { project } from "./projects.schema.js";
+import { user } from "./auth.schema";
+import { project } from "./projects.schema";
 
 export const taskStatusEnum = pgEnum("task_status", ["todo", "in_progress", "done"]);
 

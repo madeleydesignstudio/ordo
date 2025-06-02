@@ -22,4 +22,6 @@ app.get('/', (c) => {
 // Register auth routes
 app.route('/api', auth)
 
+
+
 export default app

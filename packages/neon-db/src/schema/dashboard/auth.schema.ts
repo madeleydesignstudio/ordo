@@ -1,7 +1,7 @@
 import { relations } from "drizzle-orm";
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { project } from "./projects.schema.js";
-import { task } from "./tasks.schema.js";
+import { boolean, pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
+import { project } from "./projects.schema";
+import { task } from "./tasks.schema";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -9,15 +9,17 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull(),
   image: text("image"),
-  country: text("country").default("GB"), // Default to US if not set
+  country: text("country").default("GB"), // Default to GB if not set
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
+  
 });
 
-// Relation: User can have many projects
-export const userRelations = relations(user, ({ many }) => ({
+// Relation: User can have many projects and one workspace
+export const userRelations = relations(user, ({ many, one }) => ({
   projects: many(project),
   tasks: many(task),
+ 
 }));
 
 export const session = pgTable("session", {

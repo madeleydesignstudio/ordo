@@ -4,7 +4,7 @@ import tsConfigPaths from 'vite-tsconfig-paths'
 import { cloudflare } from 'unenv'
 import nitroCloudflareBindings from "nitro-cloudflare-dev";
 
-const config = defineConfig({
+const config: ReturnType<typeof defineConfig> = defineConfig({
   vite: {
     plugins: [
       tsConfigPaths({

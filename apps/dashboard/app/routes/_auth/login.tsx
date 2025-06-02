@@ -1,5 +1,5 @@
-import { Button } from "@workspace/ui/components/button";
 import { createFileRoute } from "@tanstack/react-router";
+import { Button } from "@workspace/ui/components/button";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import authClient from "../../auth/auth-client";
@@ -9,7 +9,6 @@ export const Route = createFileRoute("/_auth/login")({
 });
 
 function LoginForm() {
-  const { redirectUrl } = Route.useRouteContext();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -78,8 +77,6 @@ function LoginForm() {
           className="h-full w-full bg-cover bg-center"
           style={{ backgroundImage: "url('https://storage.dev-0af.workers.dev/ordo-logo.png')" }}
         >
-          {/* You can also use an <img> tag instead of background-image */}
-          {/* <img src="/auth-background.jpg" alt="Authentication background" className="h-full w-full object-cover" /> */}
         </div>
       </div>
     </div>

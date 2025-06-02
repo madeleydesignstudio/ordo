@@ -1,6 +1,10 @@
 {
     "name": "@ordo/auth",
     "type": "module",
+    "exports": {
+        ".": "./auth.ts",
+        "./types": "./types.ts"
+    },
     "dependencies": {
         "better-auth": "^1.2.8",
         "@ordo/neon-db": "workspace:*"

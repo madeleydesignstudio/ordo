@@ -2,7 +2,7 @@
     "name": "@ordo/storage",
     "scripts": {
       "deploy": "wrangler deploy",
-      "dev": "wrangler dev"
+      "dev": "wrangler dev --port 4322"
     },
     "devDependencies": {
       "wrangler": "^3.0.0",

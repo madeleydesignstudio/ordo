@@ -13,7 +13,7 @@ export function createAuth(db: ReturnType<typeof createDb>, env: any) {
   // Set trusted origins based on environment
   const trustedOrigins = isDev 
     ? ["http://localhost:3001"] // Development dashboard
-    : ["https://dashboard.dev-0af.workers.dev"]; // Production dashboard - Change this to wrangler
+    : ["https://dashboard.dev-0af.workers.dev"]; // Production dashboard
   
   console.log('Auth config:', { isDev, baseURL, trustedOrigins });
 
@@ -69,3 +69,9 @@ export type AuthType = {
     user: any | null
     session: any | null
 }
+
+
+
+
+
+
