@@ -1,18 +1,12 @@
 import * as React from "react"
 import { cn } from "@workspace/ui/lib/utils"
-import Sidebar from "../main/sidebar"
-import BottomNav from "../main/bottomnav"
-import TopNav from "../main/topnav"
+import Sidebar from "@workspace/ui/components/dashboard/main/sidebar"
+import BottomNav from "@workspace/ui/components/dashboard/main/bottomnav"
+import TopNav from "@workspace/ui/components/dashboard/main/topnav"
+import { useUser } from "../routes/__root"
 
 interface AppProviderProps {
   children: React.ReactNode
-  user?: {
-    name?: string
-    image?: string
-  }
-  topNav?: React.ReactNode
-  bottomNav?: React.ReactNode
-  sideBar?: React.ReactNode
   className?: string
 }
 
@@ -38,9 +32,18 @@ export const useAppLayout = () => {
 
 export function AppProvider({
   children,
-  user,
   className,
 }: AppProviderProps) {
+  const user = useUser() // Direct access to user context from dashboard
+  
+  // Debug logging
+  React.useEffect(() => {
+    console.log('AppProvider user data:', user)
+    if (user?.image) {
+      console.log('User has profile image:', user.image)
+    }
+  }, [user])
+  
   const layoutConfig = {
     topNavHeight: 30,
     bottomNavHeight: 20,
@@ -50,26 +53,30 @@ export function AppProvider({
   return (
     <AppLayoutContext.Provider value={layoutConfig}>
       <div className={cn("h-screen w-full overflow-hidden", className)}>
-          {/* Side Bar */}
-          <div 
+        {/* Side Bar */}
+        <div 
           className="fixed left-0 top-0 bottom-0 z-40"
           style={{
             width: `${layoutConfig.sideBarWidth}px`,
           }}
         >
-          <Sidebar />
+          <Sidebar user={user} />
         </div>
+        
         {/* Top Navigation */}
         <div 
           className="fixed top-0 right-0 z-50"
-          style={{ height: `${layoutConfig.topNavHeight}px` }}
+          style={{ 
+            height: `${layoutConfig.topNavHeight}px`,
+            left: `${layoutConfig.sideBarWidth}px`
+          }}
         >
          <TopNav />
         </div>
 
         {/* Content Area */}
         <div 
-          className="overflow-hidden bg-stone-200 rounded-l-lg border-y border-l border-stone-400"
+          className="overflow-hidden bg-stone-100 rounded-l-lg border-y border-l border-stone-300"
           style={{
             marginTop: `${layoutConfig.topNavHeight}px`,
             marginLeft: `${layoutConfig.sideBarWidth}px`,
@@ -82,8 +89,11 @@ export function AppProvider({
 
         {/* Bottom Navigation */}
         <div 
-          className="fixed bottom-0 right-0 z-50 "
-          style={{ height: `${layoutConfig.bottomNavHeight}px` }}
+          className="fixed bottom-0 right-0 z-50"
+          style={{ 
+            height: `${layoutConfig.bottomNavHeight}px`,
+            left: `${layoutConfig.sideBarWidth}px`
+          }}
         >
           <BottomNav />
         </div>
@@ -92,4 +102,4 @@ export function AppProvider({
   )
 }
 
-export { AppProvider as default }
+export default AppProvider 

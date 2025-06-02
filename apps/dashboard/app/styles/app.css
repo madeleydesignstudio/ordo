@@ -1,7 +1,21 @@
 @import "@workspace/ui/globals.css" source("../");
 
+/* Prevent scrolling on dashboard */
 html, body {
     overflow: hidden;
     height: 100vh;
     max-height: 100vh;
   }
+
+/* Animation delay utilities for loading spinner */
+.animation-delay-150 {
+  animation-delay: 150ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}

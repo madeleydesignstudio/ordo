@@ -12,7 +12,8 @@ import type { ReactNode } from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
 import authClient from '../auth/auth-client'
 import { usePostHog } from 'posthog-js/react'
-import AppProvider from "@workspace/ui/components/dashboard/providers/app-provider"
+import AppProvider from "../components/app-provider"
+import { Toaster } from "@workspace/ui/components/sonner"
 
 
 
@@ -83,6 +84,7 @@ function RootComponent() {
           }
         } else {
           console.log('User found:', session.data.user)
+          console.log('User image:', session.data.user.image)
           const userData = session.data.user
           setUser(userData)
           
@@ -114,8 +116,31 @@ function RootComponent() {
   if (loading && !isPublicRoute) {
     return (
       <RootDocument>
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-lg">Loading...</div>
+        <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100">
+          <div className="flex flex-col items-center space-y-6 p-8">
+            {/* Animated Logo/Spinner */}
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-stone-200 border-t-stone-600 rounded-full animate-spin"></div>
+              <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-stone-400 rounded-full animate-spin animation-delay-150"></div>
+            </div>
+            
+            {/* Loading Text */}
+            <div className="text-center space-y-2">
+              <h2 className="text-xl font-semibold text-stone-800 tracking-tight">
+                Loading your workspace
+              </h2>
+              <p className="text-sm text-stone-600 max-w-sm">
+                Setting up your personalized dashboard experience
+              </p>
+            </div>
+            
+            {/* Progress Dots */}
+            <div className="flex space-x-2">
+              <div className="w-2 h-2 bg-stone-400 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-stone-400 rounded-full animate-pulse animation-delay-200"></div>
+              <div className="w-2 h-2 bg-stone-400 rounded-full animate-pulse animation-delay-400"></div>
+            </div>
+          </div>
         </div>
       </RootDocument>
     )
@@ -127,11 +152,15 @@ function RootComponent() {
 
   return (
     <RootDocument>
-      <AppProvider>
       <UserContext.Provider value={user}>
-        <Outlet />
+        {isPublicRoute ? (
+          <Outlet />
+        ) : (
+          <AppProvider>
+            <Outlet />
+          </AppProvider>
+        )}
       </UserContext.Provider>
-      </AppProvider>
     </RootDocument>
   )
 }
@@ -145,6 +174,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         {children}
         <Scripts />
+        <Toaster position="bottom-right" />
       </body>
     </html>
   )
