@@ -117,7 +117,7 @@ const Sidebar = ({ user }: { user?: UserProfileImageProps['user'] }) => {
       </div>
 
       {/* Main Navigation Links - Middle */}
-      <nav className="flex-1 px-1 space-y-8 flex flex-col justify-center text-xs">
+      <nav className="flex-1 px-1 space-y-16 flex flex-col justify-center text-xs">
         {currentNav.map((item, index) => (
           <Tooltip key={`${isHomeMode ? 'home' : 'business'}-${index}`}>
             <TooltipTrigger asChild>
@@ -127,7 +127,7 @@ const Sidebar = ({ user }: { user?: UserProfileImageProps['user'] }) => {
                 </div>
               </Link>
             </TooltipTrigger>
-            <TooltipContent side="right" sideOffset={10}>
+            <TooltipContent side="right" sideOffset={10} className="text-xs bg-stone-100 border border-stone-300 rounded-md text-stone-600">
               <p>{item.label}</p>
             </TooltipContent>
           </Tooltip>
