@@ -13,6 +13,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import authClient from '../auth/auth-client'
 import { usePostHog } from 'posthog-js/react'
 import AppProvider from "../components/app-provider"
+import { TRPCProvider } from "../components/trpc-provider"
 import { Toaster } from "@workspace/ui/components/sonner"
 
 
@@ -153,13 +154,15 @@ function RootComponent() {
   return (
     <RootDocument>
       <UserContext.Provider value={user}>
-        {isPublicRoute ? (
-          <Outlet />
-        ) : (
-          <AppProvider>
+        <TRPCProvider>
+          {isPublicRoute ? (
             <Outlet />
-          </AppProvider>
-        )}
+          ) : (
+            <AppProvider>
+              <Outlet />
+            </AppProvider>
+          )}
+        </TRPCProvider>
       </UserContext.Provider>
     </RootDocument>
   )

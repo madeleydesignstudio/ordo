@@ -1,6 +1,7 @@
 import { Maximize, Minimize, Focus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import React from 'react'
+import { useHotkeys } from 'react-hotkeys-hook'
 
 // Focus mode context
 const FocusModeContext = React.createContext<{
@@ -19,6 +20,17 @@ export const FocusModeProvider = ({ children }: { children: React.ReactNode }) =
   const toggleFocusMode = () => {
     setIsFocusMode(!isFocusMode)
   }
+
+  // Add keyboard shortcut for Cmd+F (or Ctrl+F on Windows/Linux)
+  useHotkeys('mod+f', (event) => {
+    event.preventDefault() // Prevent default browser behavior
+    toggleFocusMode()
+  }, {
+    enableOnContentEditable: true,
+    enableOnFormTags: ['input', 'textarea', 'select'],
+    preventDefault: true,
+    description: 'Toggle focus mode'
+  })
   
   return (
     <FocusModeContext.Provider value={{ isFocusMode, toggleFocusMode }}>
@@ -127,6 +139,17 @@ const BottomNav = () => {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
   }, [])
 
+  // Add keyboard shortcut for fullscreen toggle
+  useHotkeys('mod+shift+f', (event) => {
+    event.preventDefault()
+    toggleFullscreen()
+  }, {
+    enableOnContentEditable: true,
+    enableOnFormTags: ['input', 'textarea', 'select'],
+    preventDefault: true,
+    description: 'Toggle fullscreen'
+  })
+
   return (
     <div className="h-full flex items-center justify-end px-4 gap-4 text-[10px]">
       {/* Focus Mode */}
@@ -135,7 +158,7 @@ const BottomNav = () => {
         className={`h-6 text-xs transition-colors ${
           isFocusMode ? 'text-blue-500' : 'text-stone-400 hover:text-stone-600'
         }`}
-        title={isFocusMode ? 'Exit Focus Mode' : 'Enter Focus Mode'}
+        title={isFocusMode ? 'Exit Focus Mode (⌘F)' : 'Enter Focus Mode (⌘F)'}
       >
         <Focus className="h-3 w-3" />
       </button>
@@ -144,6 +167,7 @@ const BottomNav = () => {
       <button
         onClick={toggleFullscreen}
         className="h-6"
+        title={isFullscreen ? 'Exit Fullscreen (⌘⇧F)' : 'Enter Fullscreen (⌘⇧F)'}
       >
         {isFullscreen ? <Minimize className="h-3 w-3 text-stone-400" /> : <Maximize className="h-3 w-3 text-stone-400" />}
       </button>

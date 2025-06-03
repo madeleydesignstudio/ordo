@@ -5,17 +5,22 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import authClient from "../../auth/auth-client";
+import { useAuthHybrid } from "../../hooks/use-auth-hybrid";
 
 export const Route = createFileRoute("/_auth/signup")({
   component: SignupForm,
 });
 
 function SignupForm() {
-  const { redirectUrl, queryClient } = Route.useRouteContext();
+  const routeContext = Route.useRouteContext();
   const navigate = useNavigate();
+  const { signInWithGoogle, isLoading: isGoogleLoading } = useAuthHybrid();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Fallback redirect URL
+  const redirectUrl = (routeContext as any)?.redirectUrl || '/';
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,6 +42,7 @@ function SignupForm() {
     setIsLoading(true);
     setErrorMessage("");
 
+    // Keep email/password signup as direct Better-Auth (simpler flow)
     authClient.signUp.email(
       {
         name,
@@ -50,11 +56,20 @@ function SignupForm() {
           setIsLoading(false);
         },
         onSuccess: async () => {
-          await queryClient.invalidateQueries({ queryKey: ["user"] });
+          await routeContext.queryClient?.invalidateQueries({ queryKey: ["user"] });
           navigate({ to: redirectUrl });
         },
       },
     );
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setErrorMessage("");
+      await signInWithGoogle(redirectUrl);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Sign in failed');
+    }
   };
 
   return (
@@ -148,25 +163,8 @@ function SignupForm() {
               <Button
                 variant="outline"
                 type="button"
-                disabled={isLoading}
-                onClick={() =>
-                  authClient.signIn.social(
-                    {
-                      provider: "google",
-                      callbackURL: redirectUrl,
-                    },
-                    {
-                      onRequest: () => {
-                        setIsLoading(true);
-                        setErrorMessage("");
-                      },
-                      onError: (ctx) => {
-                        setIsLoading(false);
-                        setErrorMessage(ctx.error.message);
-                      },
-                    },
-                  )
-                }
+                disabled={isGoogleLoading}
+                onClick={handleGoogleSignIn}
                 className="w-full"
               >
                 <svg

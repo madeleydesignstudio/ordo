@@ -4,8 +4,10 @@ import { reactStartCookies } from "better-auth/react-start";
 import type { createDb } from "@ordo/neon-db/db";
 
 export function createAuth(db: ReturnType<typeof createDb>, env: any) {
-  // Use explicit environment variable to determine environment
-  const isDev = env.ENVIRONMENT === 'development';
+  // More robust environment detection - check multiple indicators
+  const isDev = env.ENVIRONMENT === 'development' || 
+                env.DEV_BASE_URL?.includes('localhost') ||
+                !env.ENVIRONMENT; // Default to dev if ENVIRONMENT is not set
   
   // Use production URL for deployed workers, dev URL for local development
   const baseURL = isDev ? env.DEV_BASE_URL : env.PROD_BASE_URL;
@@ -15,7 +17,7 @@ export function createAuth(db: ReturnType<typeof createDb>, env: any) {
     ? ["http://localhost:3001"] // Development dashboard
     : ["https://dashboard.dev-0af.workers.dev"]; // Production dashboard
   
-  console.log('Auth config:', { isDev, baseURL, trustedOrigins });
+  console.log('Auth config:', { isDev, baseURL, trustedOrigins, envVar: env.ENVIRONMENT });
 
   return betterAuth({
     baseURL,

@@ -1,27 +1,20 @@
 import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import auth from './routes/auth';
+import type { AppEnv } from './lib/types'
+import { corsMiddleware } from './middleware/cors'
+import authApp from './routes/auth'
+import healthApp from './routes/health'
+import trpcApp from './routes/trpc'
 
-const app = new Hono()
+const app = new Hono<AppEnv>()
 
-// Add CORS middleware
-app.use('*', cors({
-  origin: [
-    'http://localhost:3001', // Local dashboard URL
-    'https://dashboard.dev-0af.workers.dev' //  // Production dashboard URL
-  ],
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-}))
+// Apply CORS middleware globally
+app.use('*', corsMiddleware)
 
-app.get('/', (c) => {
-  return c.text('Hello Cloudflare!')
-})
-
-// Register auth routes
-app.route('/api', auth)
-
-
+// Mount routes
+const routes = app
+  .route('/', healthApp)
+  .route('/', trpcApp)
+  .route('/', authApp)
 
 export default app
+export type AppType = typeof routes

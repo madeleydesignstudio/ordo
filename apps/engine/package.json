@@ -6,9 +6,12 @@
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {
-    "hono": "^4.7.10",
+    "@hono/trpc-server": "^0.3.4",
     "@ordo/auth": "workspace:*",
-    "@ordo/neon-db": "workspace:*"
+    "@ordo/neon-db": "workspace:*",
+    "@ordo/trpc": "workspace:*",
+    "@trpc/server": "^11.0.0",
+    "hono": "^4.7.10"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250525.0",

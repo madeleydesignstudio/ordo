@@ -2,15 +2,29 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
-import authClient from "../../auth/auth-client";
+import { useAuthHybrid } from "../../hooks/use-auth-hybrid";
 
 export const Route = createFileRoute("/_auth/login")({
   component: LoginForm,
 });
 
 function LoginForm() {
-  const [isLoading, setIsLoading] = useState(false);
+  const { signInWithGoogle, isLoading } = useAuthHybrid();
   const [errorMessage, setErrorMessage] = useState("");
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setErrorMessage("");
+      const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+      const callbackURL = isDevelopment 
+        ? import.meta.env.VITE_DASHBOARD_DEV_URL
+        : import.meta.env.VITE_DASHBOARD_PROD_URL;
+      
+      await signInWithGoogle(callbackURL);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Sign in failed');
+    }
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -29,29 +43,7 @@ function LoginForm() {
             className="w-full"
             type="button"
             disabled={isLoading}
-            onClick={() => {
-              const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-              const callbackURL = isDevelopment 
-                ? import.meta.env.VITE_DASHBOARD_DEV_URL
-                : import.meta.env.VITE_DASHBOARD_PROD_URL;
-              
-              authClient.signIn.social(
-                {
-                  provider: "google",
-                  callbackURL,
-                },
-                {
-                  onRequest: () => {
-                    setIsLoading(true);
-                    setErrorMessage("");
-                  },
-                  onError: (ctx) => {
-                    setIsLoading(false);
-                    setErrorMessage(ctx.error.message);
-                  },
-                },
-              )
-            }}
+            onClick={handleGoogleSignIn}
           >
             {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mr-2 h-4 w-4">
