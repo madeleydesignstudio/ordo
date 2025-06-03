@@ -12,9 +12,19 @@ import {
   StickyNote,
   Palette,
   BarChart3,
-  MoreVertical
+  MoreVertical,
+  FileText,
+  Briefcase
 } from 'lucide-react'
 import { Button } from '@workspace/ui/components/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@workspace/ui/components/dropdown-menu'
 
 // Type definitions
 type NavItem = {
@@ -33,6 +43,7 @@ type RouteMap = {
 
 const TopNav = () => {
   const location = useLocation()
+  const navigate = useNavigate()
 
   // Secondary navigation configurations for different routes
   const secondaryNavConfigs: SecondaryNavConfig = {
@@ -99,15 +110,60 @@ const TopNav = () => {
     window.history.forward()
   }
 
+  // Handle creation actions
+  const handleCreateProject = () => {
+    // TODO: Implement project creation logic
+    console.log('Create new project')
+  }
+
+  const handleCreateTask = () => {
+    // TODO: Implement task creation logic
+    console.log('Create new task')
+  }
+
+  const handleCreateNote = () => {
+    // TODO: Implement note creation logic
+    console.log('Create new note')
+  }
+
+  const handleCreateCanvas = () => {
+    // TODO: Implement canvas creation logic
+    console.log('Create new canvas')
+  }
+
   return (
     <div className="h-full flex items-center justify-between px-4">
       {/* Left Side - Navigation Controls & Breadcrumb */}
       <div className="flex items-center gap-1 flex-1">
         <div className="flex items-center gap-1">
-        <button className='bg-stone-600 rounded-full p-2'>
-            <Plus className="h-4 w-4 text-stone-50" />
-          </button>
-          <button  onClick={handleBack}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className='bg-stone-600 hover:bg-stone-700 rounded-full p-2 transition-colors'>
+                <Plus className="h-4 w-4 text-stone-50" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuLabel>Create New</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleCreateProject}>
+                <img src="https://storage.dev-0af.workers.dev/project.png" alt="Project" className="h-4 w-4" />
+                <span>Project</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleCreateTask}>
+                <img src="https://storage.dev-0af.workers.dev/task.png" alt="Task" className="h-4 w-4" />
+                <span>Task</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleCreateNote}>
+                <img src="https://storage.dev-0af.workers.dev/note.png" alt="Note" className="h-4 w-4" />
+                <span>Note</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleCreateCanvas}>
+                <img src="https://storage.dev-0af.workers.dev/canvas.png" alt="Canvas" className="h-4 w-4" />
+                <span>Canvas</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <button onClick={handleBack}>
             <ChevronLeft className="h-4 w-4 text-stone-300" />
           </button>
           <button onClick={handleForward}>
@@ -125,6 +181,7 @@ const TopNav = () => {
           {currentSecondaryNav.map((item: NavItem, index: number) => {
            
             const Icon = item.icon
+            const isActive = location.pathname === item.href
             
             return (
               <Link key={index} to={item.href}>
@@ -136,7 +193,9 @@ const TopNav = () => {
                   ) : (
                     <Icon className="h-3 w-3" />
                   )}
-                  <span className="text-[8px] font-semibold">{item.label}</span>
+                  <span className={`text-[8px] ${isActive ? 'underline font-bold' : ''}`}>
+                    {item.label}
+                  </span>
                 </button>
               </Link>
             )

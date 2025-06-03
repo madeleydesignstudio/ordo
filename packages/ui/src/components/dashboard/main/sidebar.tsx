@@ -2,6 +2,7 @@ import React from 'react'
 import { User } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@workspace/ui/components/tooltip'
+import { Switch } from '@workspace/ui/components/switch'
 
 interface UserProfileImageProps {
   user?: {
@@ -138,20 +139,30 @@ const Sidebar = ({ user }: { user?: UserProfileImageProps['user'] }) => {
       <div className='p-2'>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div 
-              className="w-full flex flex-col items-center justify-center gap-1 cursor-pointer transition-transform duration-200 ease-in-out hover:scale-125"
-              onClick={() => setIsHomeMode(!isHomeMode)}
-            >
-              <img 
-                src={isHomeMode ? "https://storage.dev-0af.workers.dev/business.png" : "https://storage.dev-0af.workers.dev/home.png"} 
-                alt={isHomeMode ? "Switch to Business Mode" : "Switch to Home Mode"} 
-                width={40} 
-                height={40} 
+            <div className="w-full flex flex-col items-center justify-center gap-2 cursor-pointer">
+              {/* Image indicator */}
+              <div 
+                className="transition-transform duration-200 ease-in-out hover:scale-110"
+                onClick={() => setIsHomeMode(!isHomeMode)}
+              >
+                <img 
+                  src={isHomeMode ? "https://storage.dev-0af.workers.dev/home.png" : "https://storage.dev-0af.workers.dev/business.png"} 
+                  alt={isHomeMode ? "Home Mode" : "Business Mode"} 
+                  width={32} 
+                  height={32} 
+                />
+              </div>
+              
+              {/* Switch component */}
+              <Switch 
+                checked={isHomeMode}
+                onCheckedChange={setIsHomeMode}
+                className="scale-75"
               />
             </div>
           </TooltipTrigger>
-          <TooltipContent side="right" sideOffset={10}>
-            <p>{isHomeMode ? "Switch to Business Mode" : "Switch to Home Mode"}</p>
+          <TooltipContent side="right" sideOffset={10} className='text-xs bg-stone-100 border border-stone-300 rounded-md text-stone-600'>
+            <p>{isHomeMode ? "Home Mode (Switch to Business)" : "Business Mode (Switch to Home)"}</p>
           </TooltipContent>
         </Tooltip>
       </div>
