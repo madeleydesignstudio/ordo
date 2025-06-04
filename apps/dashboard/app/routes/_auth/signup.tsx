@@ -5,7 +5,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import authClient from "../../auth/auth-client";
-import { useAuthHybrid } from "../../hooks/use-auth-hybrid";
+import { useAuth } from "../../hooks/use-auth";
 
 export const Route = createFileRoute("/_auth/signup")({
   component: SignupForm,
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_auth/signup")({
 function SignupForm() {
   const routeContext = Route.useRouteContext();
   const navigate = useNavigate();
-  const { signInWithGoogle, isLoading: isGoogleLoading } = useAuthHybrid();
+  const { signInWithGoogle, isLoading: isGoogleLoading } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");

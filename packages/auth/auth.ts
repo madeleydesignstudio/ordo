@@ -4,20 +4,25 @@ import { reactStartCookies } from "better-auth/react-start";
 import type { createDb } from "@ordo/neon-db/db";
 
 export function createAuth(db: ReturnType<typeof createDb>, env: any) {
-  // More robust environment detection - check multiple indicators
-  const isDev = env.ENVIRONMENT === 'development' || 
-                env.DEV_BASE_URL?.includes('localhost') ||
-                !env.ENVIRONMENT; // Default to dev if ENVIRONMENT is not set
+  // Use the correct base URL based on environment
+  const isDevelopment = env.ENVIRONMENT === 'development';
+  const baseURL = isDevelopment ? env.DEV_BASE_URL : env.PROD_BASE_URL;
   
-  // Use production URL for deployed workers, dev URL for local development
-  const baseURL = isDev ? env.DEV_BASE_URL : env.PROD_BASE_URL;
+  console.log('Better Auth config:', {
+    environment: env.ENVIRONMENT,
+    isDevelopment,
+    baseURL,
+    devUrl: env.DEV_BASE_URL,
+    prodUrl: env.PROD_BASE_URL
+  });
   
-  // Set trusted origins based on environment
-  const trustedOrigins = isDev 
-    ? ["http://localhost:3001"] // Development dashboard
-    : ["https://dashboard.dev-0af.workers.dev"]; // Production dashboard
-  
-  console.log('Auth config:', { isDev, baseURL, trustedOrigins, envVar: env.ENVIRONMENT });
+  // Set trusted origins based on environment - include both engine and dashboard URLs
+  const trustedOrigins = [
+    "http://localhost:3001", // Development dashboard
+    "http://localhost:4321", // Development engine
+    "https://dashboard.dev-0af.workers.dev", // Production dashboard
+    "https://engine.dev-0af.workers.dev",  // Production engine
+  ];
 
   return betterAuth({
     baseURL,
@@ -25,24 +30,10 @@ export function createAuth(db: ReturnType<typeof createDb>, env: any) {
       provider: "pg",
     }),
 
-    // Allow requests from dashboard
     trustedOrigins,
-    
-    // Add advanced CORS configuration
-    advanced: {
-      crossSubDomainCookies: {
-        enabled: true,
-      },
-      defaultCookieAttributes: {
-        sameSite: isDev ? "lax" : "none", // Use "none" for production cross-origin
-        secure: !isDev, // Use secure cookies in production
-      },
-    },
 
-    // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
     plugins: [reactStartCookies()],
 
-    // https://www.better-auth.com/docs/concepts/session-management#session-caching
     session: {
       cookieCache: {
         enabled: true,
@@ -58,7 +49,6 @@ export function createAuth(db: ReturnType<typeof createDb>, env: any) {
       },
     },
 
-    // https://www.better-auth.com/docs/concepts/users-accounts#delete-user
     user: {
       deleteUser: {
         enabled: true,

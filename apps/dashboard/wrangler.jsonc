@@ -3,6 +3,12 @@
     "name": "dashboard",
     "main": "./.output/server/index.mjs",
     "compatibility_date": "2025-04-14",
+    "vars": {
+        "VITE_ENGINE_DEV_URL": "http://localhost:4321",
+        "VITE_ENGINE_PROD_URL": "https://engine.dev-0af.workers.dev",
+        "VITE_DASHBOARD_DEV_URL": "http://localhost:3001",
+        "VITE_DASHBOARD_PROD_URL": "https://dashboard.dev-0af.workers.dev"
+    },
     "observability": {
       "enabled": true
     },

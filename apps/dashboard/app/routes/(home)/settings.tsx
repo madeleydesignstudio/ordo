@@ -3,7 +3,7 @@ import { useUser } from '../__root'
 import { Button } from '@workspace/ui/components/button'
 import { Label } from '@workspace/ui/components/label'
 import { ScrollArea } from '@workspace/ui/components/scroll-area'
-import authClient from '../../auth/auth-client'
+import { useAuth } from '../../hooks/use-auth'
 import { useState } from 'react'
 import { User, Mail, Calendar, Globe, Shield, LogOut, Image } from 'lucide-react'
 import { toast } from 'sonner'
@@ -15,6 +15,7 @@ export const Route = createFileRoute('/(home)/settings')({
 function RouteComponent() {
   const user = useUser()
   const navigate = useNavigate()
+  const { signOut, isLoading: isAuthLoading } = useAuth()
   const [isSigningOut, setIsSigningOut] = useState(false)
 
   const handleSignOut = async () => {
@@ -26,54 +27,29 @@ function RouteComponent() {
     })
     
     try {
-      await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            console.log('Sign out successful, redirecting to login')
-            
-            // Dismiss loading toast and show success
-            toast.dismiss(loadingToast)
-            toast.success('Successfully logged out', {
-              description: 'You have been signed out securely',
-              duration: 2000,
-            })
-            
-            // Small delay to show success message before redirect
-            setTimeout(() => {
-              navigate({ to: '/login' })
-            }, 1000)
-          },
-          onError: (ctx) => {
-            console.error('Sign out error:', ctx.error)
-            
-            // Dismiss loading toast and show error
-            toast.dismiss(loadingToast)
-            toast.error('Sign out failed', {
-              description: 'There was an error signing you out. Redirecting anyway.',
-              duration: 3000,
-            })
-            
-            // Still redirect even if there's an error
-            setTimeout(() => {
-              navigate({ to: '/login' })
-            }, 2000)
-          }
-        }
+      // Use Better-Auth directly for sign out
+      await signOut()
+      
+      console.log('Sign out successful, redirecting to login')
+      
+      // Dismiss loading toast and show success
+      toast.dismiss(loadingToast)
+      toast.success('Successfully logged out', {
+        description: 'You have been signed out securely',
+        duration: 1000,
       })
+      
+      // Navigate immediately since signOut() now ensures the session is properly cleared
+      navigate({ to: '/login' })
     } catch (error) {
       console.error('Sign out failed:', error)
       
       // Dismiss loading toast and show error
       toast.dismiss(loadingToast)
       toast.error('Sign out failed', {
-        description: 'Network error occurred. Redirecting to login.',
+        description: 'There was an error signing you out. Please try again.',
         duration: 3000,
       })
-      
-      // Fallback: still redirect to login
-      setTimeout(() => {
-        navigate({ to: '/login' })
-      }, 2000)
     } finally {
       setIsSigningOut(false)
     }
@@ -106,11 +82,11 @@ function RouteComponent() {
           <Button 
             variant="destructive" 
             onClick={handleSignOut}
-            disabled={isSigningOut}
+            disabled={isSigningOut || isAuthLoading}
             className="flex items-center gap-2"
           >
             <LogOut className="h-4 w-4" />
-            {isSigningOut ? 'Signing out...' : 'Sign Out'}
+            {(isSigningOut || isAuthLoading) ? 'Signing out...' : 'Sign Out'}
           </Button>
         </div>
 

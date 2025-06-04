@@ -1,30 +1,48 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { LoaderCircle } from "lucide-react";
-import { useState } from "react";
-import { useAuthHybrid } from "../../hooks/use-auth-hybrid";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../hooks/use-auth";
 
 export const Route = createFileRoute("/_auth/login")({
   component: LoginForm,
 });
 
 function LoginForm() {
-  const { signInWithGoogle, isLoading } = useAuthHybrid();
+  const { signInWithGoogle, isLoading, isAuthenticated } = useAuth();
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      navigate({ to: "/" });
+    }
+  }, [isAuthenticated, isLoading, navigate]);
 
   const handleGoogleSignIn = async () => {
+    if (isAuthenticated) return;
+    
     try {
       setErrorMessage("");
-      const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-      const callbackURL = isDevelopment 
-        ? import.meta.env.VITE_DASHBOARD_DEV_URL
-        : import.meta.env.VITE_DASHBOARD_PROD_URL;
-      
-      await signInWithGoogle(callbackURL);
+      await signInWithGoogle();
     } catch (error) {
+      console.error("Sign-in error:", error);
       setErrorMessage(error instanceof Error ? error.message : 'Sign in failed');
     }
   };
+
+  // Show loading while checking auth
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center space-y-4">
+          <LoaderCircle className="mx-auto h-8 w-8 animate-spin" />
+          <p className="text-lg">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen">

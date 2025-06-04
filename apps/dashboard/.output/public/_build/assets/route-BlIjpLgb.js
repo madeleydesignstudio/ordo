@@ -1,0 +1,1 @@
+import{j as e,O as n}from"./client-D9jdpKMx.js";const o=function(){return e.jsx("div",{className:"h-screen w-screen",children:e.jsx("div",{className:"h-full w-full",children:e.jsx(n,{})})})};export{o as component};

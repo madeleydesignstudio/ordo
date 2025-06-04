@@ -1,28 +1,33 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import authClient from "../../auth/auth-client";
 
 export const Route = createFileRoute("/_auth")({
   component: RouteComponent,
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, location }) => {
     console.log("=== AUTH ROUTE BEFORELOAD ===");
-    console.log("context.user:", context.user);
+    console.log("Checking auth for path:", location.pathname);
     
-    // For now, just log and don't redirect to see what's happening
-    if (context.user) {
-      const user = context.user as any;
-      console.log("User found! Onboarding fields:", {
-        onboardingStarted: user.onboardingStarted,
-        onboardingStep: user.onboardingStep,
-        onboardingCompleted: user.onboardingCompleted
-      });
+    // Temporarily disable server-side auth check to debug the issue
+    // The client-side protection should handle this for now
+    console.log("Server-side auth check temporarily disabled for debugging");
+    
+    /* 
+    try {
+      // Use the auth client directly to check session
+      const session = await authClient.getSession();
+      console.log("Auth check session:", session);
       
-      const needsOnboarding = user.onboardingCompleted === undefined || !user.onboardingCompleted;
-      console.log("Needs onboarding:", needsOnboarding);
-      console.log("Should redirect to:", needsOnboarding ? "/onboarding" : "/");
-      
-      // TODO: Add redirect logic back after we understand what's happening
-    } else {
-      console.log("No user found in context");
+      if (session?.data?.user) {
+        console.log("User is authenticated, redirecting to dashboard");
+        throw redirect({ to: "/" });
+      } else {
+        console.log("No authenticated user found, allowing access to auth pages");
+      }
+    } catch (error) {
+      // If there's an error checking auth, log it but allow access to auth pages
+      console.error("Error checking auth:", error);
     }
+    */
     
     return {};
   },

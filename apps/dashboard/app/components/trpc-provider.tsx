@@ -16,13 +16,18 @@ export function TRPCProvider({ children }: TRPCProviderProps) {
     },
   }))
 
+  // Use consistent environment detection with auth client
+  const isDevelopment = 
+    (typeof window !== 'undefined' && window.location.hostname === 'localhost') ||
+    (typeof import.meta.env !== 'undefined' && import.meta.env.DEV);
+
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: process.env.NODE_ENV === 'development' 
-            ? 'http://localhost:4321/trpc'
-            : 'https://engine.dev-0af.workers.dev/trpc',
+          url: isDevelopment 
+            ? (import.meta.env.VITE_ENGINE_DEV_URL || 'http://localhost:4321') + '/trpc'
+            : (import.meta.env.VITE_ENGINE_PROD_URL || 'https://engine.dev-0af.workers.dev') + '/trpc',
           headers() {
             return {
               'Content-Type': 'application/json',
