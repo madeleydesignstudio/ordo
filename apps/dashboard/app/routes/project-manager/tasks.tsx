@@ -21,6 +21,7 @@ function RouteComponent() {
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
   const [editingTask, setEditingTask] = React.useState<Task | null>(null)
+  const [activeFilter, setActiveFilter] = React.useState<'inbox' | 'today' | 'upcoming' | 'filtered'>('inbox')
 
   // tRPC queries and mutations
   const tasksQuery = trpc.tasks.list.useQuery()
@@ -132,9 +133,6 @@ function RouteComponent() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
-          <p className="text-gray-600 mt-1">
-            Organize and track your tasks across projects
-          </p>
         </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
@@ -143,6 +141,30 @@ function RouteComponent() {
           <Plus className="h-4 w-4" />
           Add Task
         </button>
+      </div>
+
+      {/* Secondary Navigation */}
+      <div className="mb-6">
+        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg w-fit">
+          {[
+            { key: 'inbox', label: 'Inbox' },
+            { key: 'today', label: 'Today' },
+            { key: 'upcoming', label: 'Upcoming' },
+            { key: 'filtered', label: 'Filtered' }
+          ].map((filter) => (
+            <button
+              key={filter.key}
+              onClick={() => setActiveFilter(filter.key as typeof activeFilter)}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeFilter === filter.key
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
       </div>
       
       {/* Tasks List */}

@@ -66,7 +66,7 @@ function SignupForm() {
   const handleGoogleSignIn = async () => {
     try {
       setErrorMessage("");
-      await signInWithGoogle(redirectUrl);
+      await signInWithGoogle();
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Sign in failed');
     }

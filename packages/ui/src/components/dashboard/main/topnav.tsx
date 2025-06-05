@@ -25,6 +25,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu'
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@workspace/ui/components/breadcrumb'
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
+} from '@workspace/ui/components/dialog'
+import { ProjectForm } from '@workspace/ui/components/dashboard/project-manager/project-form'
+import { TaskForm } from '@workspace/ui/components/dashboard/project-manager/task-form'
+import type { ProjectFormData } from '@workspace/ui/components/dashboard/project-manager/project-form'
+import type { TaskFormData } from '@workspace/ui/components/dashboard/project-manager/task-form'
 
 // Type definitions
 type NavItem = {
@@ -41,9 +59,32 @@ type RouteMap = {
   [key: string]: string
 }
 
-const TopNav = () => {
+type TopNavProps = {
+  // tRPC data and mutations
+  projects?: { id: string; name: string }[]
+  tasks?: { id: string; name: string }[]
+  createProject?: (data: any) => Promise<void>
+  createTask?: (data: any) => Promise<void>
+  isCreatingProject?: boolean
+  isCreatingTask?: boolean
+  refetchProjects?: () => void
+  refetchTasks?: () => void
+}
+
+const TopNav = ({ 
+  projects = [], 
+  tasks = [], 
+  createProject, 
+  createTask, 
+  isCreatingProject = false, 
+  isCreatingTask = false,
+  refetchProjects,
+  refetchTasks 
+}: TopNavProps = {}) => {
   const location = useLocation()
   const navigate = useNavigate()
+  const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = React.useState(false)
+  const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = React.useState(false)
 
   // Secondary navigation configurations for different routes
   const secondaryNavConfigs: SecondaryNavConfig = {
@@ -75,10 +116,10 @@ const TopNav = () => {
   const routeBase = '/' + location.pathname.split('/')[1]
   const currentSecondaryNav = secondaryNavConfigs[routeBase] || []
 
-  // Generate breadcrumb from current path
-  const generateBreadcrumb = (pathname: string) => {
+  // Generate breadcrumb items from current path
+  const generateBreadcrumbItems = (pathname: string) => {
     const segments = pathname.split('/').filter(Boolean)
-    if (segments.length === 0) return 'Home'
+    if (segments.length === 0) return [{ label: 'Home', href: '/' }]
     
     const routeMap: RouteMap = {
       'project-manager': 'Project Manager',
@@ -99,7 +140,11 @@ const TopNav = () => {
       'invoices': 'Invoices',
     }
 
-    return segments.map(segment => routeMap[segment] || segment).join(' / ')
+    return segments.map((segment, index) => {
+      const href = '/' + segments.slice(0, index + 1).join('/')
+      const label = routeMap[segment] || segment
+      return { label, href }
+    })
   }
 
   const handleBack = () => {
@@ -112,13 +157,11 @@ const TopNav = () => {
 
   // Handle creation actions
   const handleCreateProject = () => {
-    // TODO: Implement project creation logic
-    console.log('Create new project')
+    setIsCreateProjectModalOpen(true)
   }
 
   const handleCreateTask = () => {
-    // TODO: Implement task creation logic
-    console.log('Create new task')
+    setIsCreateTaskModalOpen(true)
   }
 
   const handleCreateNote = () => {
@@ -129,6 +172,50 @@ const TopNav = () => {
   const handleCreateCanvas = () => {
     // TODO: Implement canvas creation logic
     console.log('Create new canvas')
+  }
+
+  // Handle form submissions
+  const handleProjectSubmit = async (data: ProjectFormData) => {
+    if (!createProject) return
+    
+    try {
+      await createProject({
+        name: data.name,
+        description: data.description,
+        icon: data.icon,
+        cover: data.cover,
+        startDate: data.startDate,
+        dueDate: data.dueDate,
+        status: data.status,
+        parentProjectId: data.parentProjectId,
+      })
+      setIsCreateProjectModalOpen(false)
+      refetchProjects?.()
+    } catch (error) {
+      console.error('Failed to create project:', error)
+    }
+  }
+
+  const handleTaskSubmit = async (data: TaskFormData) => {
+    if (!createTask) return
+    
+    try {
+      await createTask({
+        name: data.name,
+        description: data.description,
+        startDate: data.startDate,
+        dueDate: data.dueDate,
+        status: data.status,
+        priority: data.priority,
+        labels: data.labels,
+        projectId: data.projectId,
+        parentTaskId: data.parentTaskId,
+      })
+      setIsCreateTaskModalOpen(false)
+      refetchTasks?.()
+    } catch (error) {
+      console.error('Failed to create task:', error)
+    }
   }
 
   return (
@@ -170,9 +257,28 @@ const TopNav = () => {
             <ChevronRight className="h-4 w-4 text-stone-300" />
           </button>
         </div>
-        <div className="text-xs text-stone-300">
-          {generateBreadcrumb(location.pathname)}
-        </div>
+        <Breadcrumb className="text-xs">
+          <BreadcrumbList>
+            {generateBreadcrumbItems(location.pathname).map((item, index, array) => (
+              <React.Fragment key={item.href}>
+                <BreadcrumbItem>
+                  {index === array.length - 1 ? (
+                    <BreadcrumbPage className="text-stone-300 text-xs">
+                      {item.label}
+                    </BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <Link to={item.href} className="text-stone-300 hover:text-stone-100 text-xs">
+                        {item.label}
+                      </Link>
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {index < array.length - 1 && <BreadcrumbSeparator><span className="text-stone-300 text-xs">/</span></BreadcrumbSeparator>}
+              </React.Fragment>
+            ))}
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
 
       {/* Middle - Secondary Navigation Links */}
@@ -220,6 +326,39 @@ const TopNav = () => {
           <span className="text-sm font-semibold">Ordo</span>
         </div>
       </div>
+
+      {/* Create Project Dialog */}
+      <Dialog open={isCreateProjectModalOpen} onOpenChange={setIsCreateProjectModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create New Project</DialogTitle>
+          </DialogHeader>
+          <ProjectForm
+            mode="create"
+            onSubmit={handleProjectSubmit}
+            onCancel={() => setIsCreateProjectModalOpen(false)}
+            projects={projects}
+            isLoading={isCreatingProject}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Task Dialog */}
+      <Dialog open={isCreateTaskModalOpen} onOpenChange={setIsCreateTaskModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create New Task</DialogTitle>
+          </DialogHeader>
+          <TaskForm
+            mode="create"
+            onSubmit={handleTaskSubmit}
+            onCancel={() => setIsCreateTaskModalOpen(false)}
+            projects={projects}
+            tasks={tasks}
+            isLoading={isCreatingTask}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

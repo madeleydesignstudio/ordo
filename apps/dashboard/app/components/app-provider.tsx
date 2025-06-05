@@ -4,6 +4,7 @@ import Sidebar from "@workspace/ui/components/dashboard/main/sidebar"
 import BottomNav, { FocusModeProvider, useFocusMode } from "@workspace/ui/components/dashboard/main/bottomnav"
 import TopNav from "@workspace/ui/components/dashboard/main/topnav"
 import { useUser } from "../routes/__root"
+import { trpc } from "../lib/trpc"
 
 interface AppProviderProps {
   children: React.ReactNode
@@ -28,6 +29,67 @@ export const useAppLayout = () => {
     throw new Error("useAppLayout must be used within an AppProvider")
   }
   return context
+}
+
+// Connected TopNav component with tRPC integration
+const ConnectedTopNav = () => {
+  // tRPC queries and mutations
+  const projectsQuery = trpc.projects.list.useQuery()
+  const tasksQuery = trpc.tasks.list.useQuery()
+  const createProjectMutation = trpc.projects.create.useMutation()
+  const createTaskMutation = trpc.tasks.create.useMutation()
+
+  // Prepare data for forms - convert tRPC responses to proper types
+  const projects = (projectsQuery.data || []).map(project => ({
+    id: project.id,
+    name: project.name,
+  }))
+
+  const tasks = (tasksQuery.data || []).map((task: any) => ({
+    id: task.id,
+    name: task.name,
+  }))
+
+  // Create functions
+  const createProject = async (data: any) => {
+    await createProjectMutation.mutateAsync({
+      name: data.name,
+      description: data.description,
+      icon: data.icon,
+      cover: data.cover,
+      startDate: data.startDate,
+      dueDate: data.dueDate,
+      status: data.status,
+      parentProjectId: data.parentProjectId,
+    })
+  }
+
+  const createTask = async (data: any) => {
+    await createTaskMutation.mutateAsync({
+      name: data.name,
+      description: data.description,
+      startDate: data.startDate,
+      dueDate: data.dueDate,
+      status: data.status,
+      priority: data.priority,
+      labels: data.labels,
+      projectId: data.projectId,
+      parentTaskId: data.parentTaskId,
+    })
+  }
+
+  return (
+    <TopNav
+      projects={projects}
+      tasks={tasks}
+      createProject={createProject}
+      createTask={createTask}
+      isCreatingProject={createProjectMutation.isPending}
+      isCreatingTask={createTaskMutation.isPending}
+      refetchProjects={() => projectsQuery.refetch()}
+      refetchTasks={() => tasksQuery.refetch()}
+    />
+  )
 }
 
 const AppLayoutContent = ({ children, className }: AppProviderProps) => {
@@ -75,7 +137,7 @@ const AppLayoutContent = ({ children, className }: AppProviderProps) => {
             left: `${layoutConfig.sideBarWidth}px`
           }}
         >
-         <TopNav />
+         <ConnectedTopNav />
         </div>
 
         {/* Content Area - Adjusts based on focus mode */}

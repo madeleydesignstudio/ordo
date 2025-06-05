@@ -7,15 +7,8 @@ export const Route = createFileRoute('/(home)')({
 
 function ProtectedLayout() {
  
-  
-  
-
-
-
   return (
     <div>
-     
-      
       <main className="p-4">
         <Outlet />
       </main>

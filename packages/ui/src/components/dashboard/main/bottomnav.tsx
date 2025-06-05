@@ -43,6 +43,8 @@ const BottomNav = () => {
   const [currentTime, setCurrentTime] = useState('')
   const [currentDate, setCurrentDate] = useState('')
   const [userCity, setUserCity] = useState('Loading...')
+  const [temperature, setTemperature] = useState<string | null>(null)
+  const [isWeatherLoading, setIsWeatherLoading] = useState(true)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const { isFocusMode, toggleFocusMode } = useFocusMode()
 
@@ -72,35 +74,66 @@ const BottomNav = () => {
     return () => clearInterval(interval)
   }, [])
 
-  // Get user's city
+  // Get user's city and weather
   useEffect(() => {
-    const getUserLocation = async () => {
+    const getUserLocationAndWeather = async () => {
       try {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
               const { latitude, longitude } = position.coords
               
-              // Using a reverse geocoding service (you might want to use a different one)
-              const response = await fetch(
-                `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-              )
-              const data = await response.json()
-              setUserCity(data.city || data.locality || 'Unknown Location')
+              try {
+                // Get location data
+                const locationResponse = await fetch(
+                  `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+                )
+                const locationData = await locationResponse.json()
+                setUserCity(locationData.city || locationData.locality || 'Unknown Location')
+
+                // Get weather data using wttr.in API (using &m for metric/Celsius)
+                const weatherResponse = await fetch(
+                  `https://wttr.in/${latitude},${longitude}?format=%t&m`
+                )
+                const weatherData = await weatherResponse.text()
+                // The response should now be in Celsius, extract just the number
+                const tempMatch = weatherData.trim().match(/-?\d+/)
+                let temp = tempMatch ? tempMatch[0] : null
+                
+                // If we still get Fahrenheit somehow, convert to Celsius
+                if (temp && weatherData.includes('F')) {
+                  const fahrenheit = parseInt(temp)
+                  temp = Math.round((fahrenheit - 32) * 5/9).toString()
+                }
+                
+                setTemperature(temp)
+                setIsWeatherLoading(false)
+              } catch (error) {
+                console.error('Error fetching location or weather:', error)
+                setUserCity('Location error')
+                setTemperature(null)
+                setIsWeatherLoading(false)
+              }
             },
             () => {
               setUserCity('Location unavailable')
+              setTemperature(null)
+              setIsWeatherLoading(false)
             }
           )
         } else {
           setUserCity('Geolocation not supported')
+          setTemperature(null)
+          setIsWeatherLoading(false)
         }
       } catch (error) {
         setUserCity('Location error')
+        setTemperature(null)
+        setIsWeatherLoading(false)
       }
     }
 
-    getUserLocation()
+    getUserLocationAndWeather()
   }, [])
 
   // Helper function for day suffix
@@ -175,6 +208,17 @@ const BottomNav = () => {
       <span className="text-stone-400">
         {userCity}
       </span>
+      {/* Local Weather */}
+      {isWeatherLoading ? (
+        <div className="flex items-center">
+          <div className="animate-spin h-2 w-2 border border-stone-400 border-t-transparent rounded-full" />
+        </div>
+      ) : temperature && (
+        <span className="text-stone-400">
+          {temperature}°C
+        </span>
+      )}
+      
       {/* Vertical Border */}
       <div className="h-4 w-px bg-stone-400" />
       {/* Current Date */}

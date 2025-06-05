@@ -5,16 +5,6 @@ import type { AppEnv } from '../lib/types'
 
 const authApp = new Hono<AppEnv>()
 
-// Test endpoint to verify CORS and basic connectivity
-authApp.get('/api/auth/test', async (c) => {
-  console.log('Test endpoint hit from origin:', c.req.header('origin'));
-  return c.json({ 
-    message: 'Auth service is working',
-    origin: c.req.header('origin'),
-    timestamp: new Date().toISOString()
-  });
-})
-
 authApp.all('/api/auth/*', async (c) => {
   console.log('=== BETTER AUTH REQUEST ===');
   console.log('URL:', c.req.url);
@@ -28,11 +18,6 @@ authApp.all('/api/auth/*', async (c) => {
   
   try {
     const response = await auth.handler(c.req.raw);
-    
-    console.log('=== BETTER AUTH RESPONSE ===');
-    console.log('Status:', response.status);
-    console.log('Headers:', Object.fromEntries(response.headers.entries()));
-    
     // Try to read the response body for debugging
     const responseClone = response.clone();
     try {

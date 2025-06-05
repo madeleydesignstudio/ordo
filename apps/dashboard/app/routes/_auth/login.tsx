@@ -33,16 +33,16 @@ function LoginForm() {
   };
 
   // Show loading while checking auth
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center space-y-4">
-          <LoaderCircle className="mx-auto h-8 w-8 animate-spin" />
-          <p className="text-lg">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex min-h-screen items-center justify-center">
+  //       <div className="text-center space-y-4">
+  //         <LoaderCircle className="mx-auto h-8 w-8 animate-spin" />
+  //         <p className="text-lg">Loading...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="flex min-h-screen">
@@ -72,12 +72,6 @@ function LoginForm() {
             </svg>
             {isLoading ? "Signing in..." : "Sign in with Google"}
           </Button>
-
-          {errorMessage && (
-            <div className="text-destructive text-center text-sm">
-              {errorMessage}
-            </div>
-          )}
         </div>
       </div>
 
