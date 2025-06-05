@@ -2,13 +2,7 @@
 
 import React from 'react'
 import { Button } from '../../button'
-import { MoreHorizontal, Edit, Trash2, Calendar, User } from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../dropdown-menu'
+import { Settings, Plus } from 'lucide-react'
 
 export interface Project {
   id: string
@@ -28,15 +22,9 @@ interface ProjectListProps {
   projects: Project[]
   onEdit: (project: Project) => void
   onDelete: (projectId: string) => void
+  onCreateProject?: () => void
+  onProjectSettings?: (projectId: string) => void
   isLoading?: boolean
-}
-
-const statusConfig = {
-  backlog: { label: 'Backlog', color: 'bg-gray-100 text-gray-700', dot: 'bg-gray-500' },
-  todo: { label: 'To Do', color: 'bg-blue-100 text-blue-700', dot: 'bg-blue-500' },
-  in_progress: { label: 'In Progress', color: 'bg-yellow-100 text-yellow-700', dot: 'bg-yellow-500' },
-  done: { label: 'Done', color: 'bg-green-100 text-green-700', dot: 'bg-green-500' },
-  on_hold: { label: 'On Hold', color: 'bg-red-100 text-red-700', dot: 'bg-red-500' },
 }
 
 function formatDate(date: Date | null | undefined): string {
@@ -48,15 +36,23 @@ function formatDate(date: Date | null | undefined): string {
   }).format(new Date(date))
 }
 
-export function ProjectList({ projects, onEdit, onDelete, isLoading }: ProjectListProps) {
+export function ProjectList({ 
+  projects, 
+  onEdit, 
+  onCreateProject,
+  onProjectSettings,
+  isLoading 
+}: ProjectListProps) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="border rounded-lg p-6 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
-            <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+          <div key={i} className="bg-white rounded-lg border border-gray-200 overflow-hidden animate-pulse">
+            <div className="h-48 bg-gray-200"></div>
+            <div className="p-4">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            </div>
           </div>
         ))}
       </div>
@@ -67,7 +63,17 @@ export function ProjectList({ projects, onEdit, onDelete, isLoading }: ProjectLi
     return (
       <div className="text-center py-12">
         <div className="text-gray-500 text-lg mb-2">No projects found</div>
-        <div className="text-gray-400 text-sm">Create your first project to get started</div>
+        <img src="https://storage.dev-0af.workers.dev/architect.png" alt="Empty state" className="w-1/4 mx-auto mb-4" />
+        <div className="text-gray-400 text-sm mb-4">Create your first project to get started</div>
+        {onCreateProject && (
+          <Button
+            onClick={onCreateProject}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Create Project
+          </Button>
+        )}
       </div>
     )
   }
@@ -75,94 +81,89 @@ export function ProjectList({ projects, onEdit, onDelete, isLoading }: ProjectLi
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {projects.map((project) => {
-        const status = statusConfig[project.status]
-        
         return (
-          <div key={project.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
-            {/* Project Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{project.icon || '📁'}</span>
-                <div>
-                  <h3 className="font-semibold text-lg text-gray-900 line-clamp-1">
-                    {project.name}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`w-2 h-2 rounded-full ${status.dot}`}></span>
-                    <span className={`text-xs px-2 py-1 rounded-full ${status.color}`}>
-                      {status.label}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Actions Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => onEdit(project)}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => onDelete(project.id)}
-                    className="text-red-600"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            {/* Project Description */}
-            {project.description && (
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                {project.description}
-              </p>
-            )}
-
+          <div 
+            key={project.id} 
+            className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer"
+            onClick={() => onEdit(project)}
+          >
             {/* Cover Image */}
-            {project.cover && (
-              <div className="mb-4">
+            <div className="relative h-48 bg-gradient-to-br from-blue-500 to-purple-600">
+              {project.cover ? (
                 <img
                   src={project.cover}
                   alt={`${project.name} cover`}
-                  className="w-full h-32 object-cover rounded-md"
+                  className="w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement
                     target.style.display = 'none'
                   }}
                 />
-              </div>
-            )}
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-6xl opacity-20">
+                    {project.icon || '📁'}
+                  </span>
+                </div>
+              )}
+              
+              {/* Settings Icon - Hidden by default, shown on hover */}
+              <button
+                className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onProjectSettings?.(project.id)
+                }}
+                title="Project Settings"
+              >
+                <Settings className="h-4 w-4 text-gray-700" />
+              </button>
+            </div>
 
-            {/* Project Dates */}
-            <div className="space-y-2 text-xs text-gray-500">
-              {project.startDate && (
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-3 w-3" />
-                  <span>Start: {formatDate(project.startDate)}</span>
+            {/* Project Info */}
+            <div className="p-4">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl">
+                  {project.icon || '📁'}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg text-gray-900 truncate">
+                    {project.name}
+                  </h3>
                 </div>
-              )}
-              {project.dueDate && (
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-3 w-3" />
-                  <span>Due: {formatDate(project.dueDate)}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <User className="h-3 w-3" />
-                <span>Created: {formatDate(project.createdAt)}</span>
+              </div>
+              
+              <div className="text-sm text-gray-500">
+                Created {formatDate(project.createdAt)}
               </div>
             </div>
           </div>
         )
       })}
+      
+      {/* Add Project Placeholder Cards */}
+      {projects.length < 6 && onCreateProject && (
+        Array.from({ length: 6 - projects.length }).map((_, index) => (
+          <div 
+            key={`placeholder-${index}`}
+            className="border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer group"
+            onClick={onCreateProject}
+          >
+            <div className="h-48 flex items-center justify-center">
+              <div className="text-center">
+                <Plus className="h-12 w-12 text-gray-400 group-hover:text-blue-500 transition-colors mx-auto mb-2" />
+                <span className="text-sm text-gray-500 group-hover:text-blue-600 transition-colors">
+                  Add Project
+                </span>
+              </div>
+            </div>
+            <div className="p-4">
+              <div className="h-6"></div> {/* Spacer to match project card height */}
+              <div className="h-5"></div> {/* Spacer to match created date */}
+            </div>
+          </div>
+        ))
+      )}
     </div>
   )
 } 

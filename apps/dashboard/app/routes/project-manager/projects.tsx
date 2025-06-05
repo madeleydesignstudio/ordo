@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Plus } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import React from 'react'
 import { ProjectForm } from '@workspace/ui/components/dashboard/project-manager/project-form'
 import { ProjectList } from '@workspace/ui/components/dashboard/project-manager/project-list'
@@ -9,18 +9,24 @@ import {
   DialogHeader, 
   DialogTitle 
 } from '@workspace/ui/components/dialog'
+import { Button } from '@workspace/ui/components/button'
 import type { ProjectFormData } from '@workspace/ui/components/dashboard/project-manager/project-form'
 import type { Project } from '@workspace/ui/components/dashboard/project-manager/project-list'
 import { trpc } from '@/lib/trpc'
+import { useNavigate } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/project-manager/projects')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const navigate = useNavigate()
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
   const [editingProject, setEditingProject] = React.useState<Project | null>(null)
+  const [searchTerm, setSearchTerm] = React.useState('')
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const projectsPerPage = 6
 
   // tRPC queries and mutations
   const projectsQuery = trpc.projects.list.useQuery()
@@ -91,16 +97,39 @@ function RouteComponent() {
     }
   }
 
-  // Prepare data for forms - convert tRPC response to Project type
-  const projects: Project[] = (projectsQuery.data || []).map(project => ({
+  const handleProjectSettings = (projectId: string) => {
+    // Navigate to project settings page
+    navigate({ to: `/project-manager/projects/${projectId}/settings` })
+  }
+
+  // Prepare and filter data
+  const allProjects: Project[] = (projectsQuery.data || []).map(project => ({
     ...project,
     startDate: project.startDate ? new Date(project.startDate) : null,
     dueDate: project.dueDate ? new Date(project.dueDate) : null,
     createdAt: new Date(project.createdAt),
     updatedAt: new Date(project.updatedAt),
   }))
+
+  // Filter projects based on search term
+  const filteredProjects = React.useMemo(() => {
+    if (!searchTerm) return allProjects
+    return allProjects.filter(project =>
+      project.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [allProjects, searchTerm])
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProjects.length / projectsPerPage)
+  const startIndex = (currentPage - 1) * projectsPerPage
+  const paginatedProjects = filteredProjects.slice(startIndex, startIndex + projectsPerPage)
+
+  // Reset pagination when search changes
+  React.useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm])
   
-  const projectOptions = projects.map(p => ({ id: p.id, name: p.name }))
+  const projectOptions = allProjects.map(p => ({ id: p.id, name: p.name }))
 
   const initialEditData = editingProject ? {
     id: editingProject.id,
@@ -117,31 +146,69 @@ function RouteComponent() {
   } : undefined
 
   return (
-    <div className="p-6">
-      {/* Header with Add Project Button */}
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
-          <p className="text-gray-600 mt-1">
-            Manage your projects and track their progress
-          </p>
         </div>
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Add Project
-        </button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <input
+            type="text"
+            placeholder="Search projects..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
       </div>
       
       {/* Projects List */}
-      <ProjectList
-        projects={projects}
-        onEdit={handleEditProject}
-        onDelete={handleDeleteProject}
-        isLoading={projectsQuery.isLoading}
-      />
+      <div className="min-h-[600px]">
+        <ProjectList
+          projects={paginatedProjects}
+          onEdit={handleEditProject}
+          onDelete={handleDeleteProject}
+          onCreateProject={() => setIsCreateModalOpen(true)}
+          onProjectSettings={handleProjectSettings}
+          isLoading={projectsQuery.isLoading}
+        />
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6">
+          <div className="text-xs text-gray-700">
+            Showing {startIndex + 1} to {Math.min(startIndex + projectsPerPage, filteredProjects.length)} of {filteredProjects.length} projects
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <span className="text-xs text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Create Project Dialog */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>

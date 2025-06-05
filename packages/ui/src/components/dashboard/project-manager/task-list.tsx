@@ -1,8 +1,7 @@
 "use client"
 
-import React from 'react'
+import { Calendar, Edit, MoreHorizontal, Plus, Tag, Trash2 } from 'lucide-react'
 import { Button } from '../../button'
-import { MoreHorizontal, Edit, Trash2, Calendar, AlertTriangle, Tag } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +29,7 @@ interface TaskListProps {
   projects?: Array<{ id: string; name: string }>
   onEdit: (task: Task) => void
   onDelete: (taskId: string) => void
+  onCreateTask?: () => void
   isLoading?: boolean
 }
 
@@ -57,12 +57,12 @@ function formatDate(date: Date | null | undefined): string {
   }).format(new Date(date))
 }
 
-export function TaskList({ tasks, projects = [], onEdit, onDelete, isLoading }: TaskListProps) {
+export function TaskList({ tasks, projects = [], onEdit, onDelete, onCreateTask, isLoading }: TaskListProps) {
   if (isLoading) {
     return (
       <div className="space-y-4">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="border rounded-lg p-4 animate-pulse">
+          <div key={i} className="border-b rounded-lg p-4 animate-pulse">
             <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
             <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
             <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -76,7 +76,18 @@ export function TaskList({ tasks, projects = [], onEdit, onDelete, isLoading }: 
     return (
       <div className="text-center py-12">
         <div className="text-gray-500 text-lg mb-2">No tasks found</div>
-        <div className="text-gray-400 text-sm">Create your first task to get started</div>
+        <img src="https://storage.dev-0af.workers.dev/architect.png" alt="Empty state" className="w-1/4 mx-auto" />
+        <div className="text-gray-400 text-sm mb-4">Create your first task to get started</div>
+        {/* Create Task Button */}
+        {onCreateTask && (
+          <Button
+            onClick={onCreateTask}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Create Task
+          </Button>
+        )}
       </div>
     )
   }
@@ -89,7 +100,11 @@ export function TaskList({ tasks, projects = [], onEdit, onDelete, isLoading }: 
         const project = projects.find(p => p.id === task.projectId)
         
         return (
-          <div key={task.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+          <div 
+            key={task.id} 
+            className="border-b rounded-lg p-4 cursor-pointer group"
+            onClick={() => onEdit(task)}
+          >
             {/* Task Header */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
@@ -124,7 +139,12 @@ export function TaskList({ tasks, projects = [], onEdit, onDelete, isLoading }: 
               {/* Actions Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 ml-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 w-8 p-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>

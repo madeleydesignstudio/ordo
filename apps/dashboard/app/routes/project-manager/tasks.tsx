@@ -105,6 +105,42 @@ function RouteComponent() {
     updatedAt: new Date(task.updatedAt),
   }))
 
+  // Filter tasks based on active filter
+  const filteredTasks = React.useMemo(() => {
+    const today = new Date()
+    today.setHours(23, 59, 59, 999) // End of today
+    
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0) // Start of today
+
+    switch (activeFilter) {
+      case 'inbox':
+        // Tasks not assigned to any project
+        return tasks.filter(task => !task.projectId)
+      
+      case 'today':
+        // Tasks due today or overdue (including tasks with no due date but status is not done)
+        return tasks.filter(task => {
+          if (!task.dueDate) {
+            // Include tasks without due date that are not completed
+            return task.status !== 'done'
+          }
+          // Include tasks due today or overdue
+          return task.dueDate <= today
+        })
+      
+      case 'upcoming':
+        // Tasks due in the future
+        return tasks.filter(task => {
+          if (!task.dueDate) return false
+          return task.dueDate > today
+        })
+      
+      default:
+        return tasks
+    }
+  }, [tasks, activeFilter])
+
   const projects = (projectsQuery.data || []).map(project => ({
     id: project.id,
     name: project.name,
@@ -128,51 +164,82 @@ function RouteComponent() {
   } : undefined
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-4xl mx-auto">
       {/* Header with Add Task Button */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
         </div>
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Add Task
-        </button>
+      
       </div>
 
       {/* Secondary Navigation */}
-      <div className="mb-6">
+      <div className="mb-6 ">
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg w-fit">
           {[
             { key: 'inbox', label: 'Inbox' },
             { key: 'today', label: 'Today' },
             { key: 'upcoming', label: 'Upcoming' },
-            { key: 'filtered', label: 'Filtered' }
-          ].map((filter) => (
-            <button
-              key={filter.key}
-              onClick={() => setActiveFilter(filter.key as typeof activeFilter)}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeFilter === filter.key
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-              }`}
-            >
-              {filter.label}
-            </button>
-          ))}
+         
+          ].map((filter) => {
+            // Calculate task counts for each filter
+            const getTaskCount = (filterKey: string) => {
+              const today = new Date()
+              today.setHours(23, 59, 59, 999)
+              
+              switch (filterKey) {
+                case 'inbox':
+                  return tasks.filter(task => !task.projectId).length
+                case 'today':
+                  return tasks.filter(task => {
+                    if (!task.dueDate) {
+                      return task.status !== 'done'
+                    }
+                    return task.dueDate <= today
+                  }).length
+                case 'upcoming':
+                  return tasks.filter(task => {
+                    if (!task.dueDate) return false
+                    return task.dueDate > today
+                  }).length
+                default:
+                  return 0
+              }
+            }
+
+            const taskCount = getTaskCount(filter.key)
+
+            return (
+              <button
+                key={filter.key}
+                onClick={() => setActiveFilter(filter.key as typeof activeFilter)}
+                className={`px-4 py-2 font-medium rounded-md text-xs transition-colors flex items-center gap-2 ${
+                  activeFilter === filter.key
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                {filter.label}
+                <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                  activeFilter === filter.key
+                    ? 'bg-gray-200 text-gray-700'
+                    : 'bg-gray-300 text-gray-600'
+                }`}>
+                  {taskCount}
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
       
       {/* Tasks List */}
       <TaskList
-        tasks={tasks}
+        tasks={filteredTasks}
         projects={projects}
         onEdit={handleEditTask}
         onDelete={handleDeleteTask}
+        onCreateTask={() => setIsCreateModalOpen(true)}
         isLoading={tasksQuery.isLoading}
       />
 
