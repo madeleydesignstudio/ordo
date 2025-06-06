@@ -1,15 +1,10 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../select'
 import { Button } from '../../button'
 import { Input } from '../../input'
 import { Label } from '../../label'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../dropdown-menu'
 
 // Project form data interface
 export interface ProjectFormData {
@@ -41,7 +36,6 @@ const statusOptions = [
   { value: 'on_hold', label: 'On Hold', color: 'text-red-600' },
 ] as const
 
-const iconOptions = ['📁', '🚀', '💼', '🎯', '⚡', '🔥', '💡', '🎨', '🛠️', '📊']
 
 export function ProjectForm({
   initialData = {},
@@ -51,20 +45,70 @@ export function ProjectForm({
   isLoading = false,
   mode,
 }: ProjectFormProps) {
-  const [formData, setFormData] = React.useState<ProjectFormData>({
+  const [formData, setFormData] = useState<ProjectFormData>({
     name: '',
     status: 'backlog',
     icon: '📁',
     ...initialData,
   })
+  const [isUploading, setIsUploading] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSubmit(formData)
   }
 
-  const updateField = (field: keyof ProjectFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+  const updateField = (field: keyof ProjectFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file')
+      return
+    }
+
+    try {
+      setIsUploading(true)
+      
+      // Generate a unique key for the file
+      const timestamp = Date.now()
+      const key = `projects/${timestamp}-${file.name}`
+      
+      // The storage service URL
+      const storageUrl = 'https://storage.dev-0af.workers.dev'
+      
+      console.log(`Uploading to ${storageUrl}/${key}`)
+      
+      // Upload directly to storage service
+      const response = await fetch(`${storageUrl}/${key}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': file.type,
+          // Add the authentication header for the storage service
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_STORAGE_AUTH_SECRET || 'your-storage-auth-secret'}`,
+        },
+        body: file
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Upload error response:', errorText)
+        throw new Error('Upload failed')
+      }
+
+      const data = await response.json()
+      updateField('cover', data.url)
+    } catch (error) {
+      console.error('Upload failed:', error)
+      alert('Failed to upload image. Please try again.')
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   const selectedStatus = statusOptions.find(opt => opt.value === formData.status)
@@ -101,36 +145,41 @@ export function ProjectForm({
         {/* Project Icon */}
         <div className="space-y-2">
           <Label>Icon</Label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full justify-start">
-                <span className="mr-2 text-lg">{formData.icon}</span>
-                Choose Icon
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {iconOptions.map((icon) => (
-                <DropdownMenuItem
-                  key={icon}
-                  onClick={() => updateField('icon', icon)}
-                >
-                  <span className="mr-2 text-lg">{icon}</span>
-                  {icon}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Input
+            id="icon"
+            value={formData.icon}
+            onChange={(e) => updateField('icon', e.target.value)}
+            placeholder="Enter icon"
+          />
         </div>
 
-        {/* Cover Image URL */}
+        {/* Cover Image */}
         <div className="space-y-2">
-          <Label htmlFor="cover">Cover Image URL</Label>
+          <Label htmlFor="cover">Cover Image</Label>
+          <Select onValueChange={(value: string) => updateField('cover', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a cover image" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="https://images.unsplash.com/photo-1">Unsplash Image 1</SelectItem>
+              <SelectItem value="https://images.unsplash.com/photo-2">Unsplash Image 2</SelectItem>
+              <SelectItem value="https://images.unsplash.com/photo-3">Unsplash Image 3</SelectItem>
+              <SelectItem value="https://example.com/preset1.jpg">Preset Image 1</SelectItem>
+              <SelectItem value="https://example.com/preset2.jpg">Preset Image 2</SelectItem>
+            </SelectContent>
+          </Select>
           <Input
-            id="cover"
-            value={formData.cover || ''}
-            onChange={(e) => updateField('cover', e.target.value)}
-            placeholder="https://example.com/image.jpg"
+            type="file"
+            onChange={handleFileChange}
+            accept="image/*"
+            className="mt-2"
+            disabled={isUploading}
           />
+          {isUploading && (
+            <div className="text-sm text-muted-foreground mt-2">
+              Uploading image...
+            </div>
+          )}
         </div>
       </div>
 
@@ -164,52 +213,38 @@ export function ProjectForm({
         {/* Status */}
         <div className="space-y-2">
           <Label>Status</Label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full justify-start">
-                <span className={`mr-2 ${selectedStatus?.color}`}>●</span>
-                {selectedStatus?.label}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {statusOptions.map((status) => (
-                <DropdownMenuItem
-                  key={status.value}
-                  onClick={() => updateField('status', status.value)}
-                >
-                  <span className={`mr-2 ${status.color}`}>●</span>
-                  {status.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Select onValueChange={(value: string) => updateField('status', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="backlog">Backlog</SelectItem>
+              <SelectItem value="todo">To Do</SelectItem>
+              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="done">Done</SelectItem>
+              <SelectItem value="on_hold">On Hold</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Parent Project */}
         <div className="space-y-2">
           <Label>Parent Project</Label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full justify-start">
-                {selectedParentProject?.name || 'No parent project'}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => updateField('parentProjectId', undefined)}>
-                No parent project
-              </DropdownMenuItem>
+          <Select onValueChange={(value: string) => updateField('parentProjectId', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select parent project" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No parent project</SelectItem>
               {projects
                 .filter(p => p.id !== formData.id) // Don't allow self-reference
                 .map((project) => (
-                  <DropdownMenuItem
-                    key={project.id}
-                    onClick={() => updateField('parentProjectId', project.id)}
-                  >
+                  <SelectItem key={project.id} value={project.id}>
                     {project.name}
-                  </DropdownMenuItem>
+                  </SelectItem>
                 ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

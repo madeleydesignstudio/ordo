@@ -10,7 +10,8 @@
     "DEV_BASE_URL": "http://localhost:4321",
     "PROD_BASE_URL": "https://engine.dev-0af.workers.dev",
     "GOOGLE_CLIENT_ID": "1043030213057-4llu58gbh1o9euehtckilu6l7esikvpj.apps.googleusercontent.com",
-    "GOOGLE_CLIENT_SECRET": "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"
+    "GOOGLE_CLIENT_SECRET": "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",
+    "STORAGE_AUTH_SECRET": "your-storage-auth-secret"
   },
   // "kv_namespaces": [
   //   {

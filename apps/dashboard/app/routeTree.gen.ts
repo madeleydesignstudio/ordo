@@ -50,6 +50,9 @@ import { Route as AuthLoginImport } from './routes/_auth/login'
 import { Route as homeSettingsImport } from './routes/(home)/settings'
 import { Route as homeNotificationsImport } from './routes/(home)/notifications'
 import { Route as homeNewsImport } from './routes/(home)/news'
+import { Route as homeJournalImport } from './routes/(home)/journal'
+import { Route as homeHomeImport } from './routes/(home)/home'
+import { Route as homeBusinessImport } from './routes/(home)/business'
 
 // Create/Update Routes
 
@@ -289,6 +292,24 @@ const homeNewsRoute = homeNewsImport.update({
   getParentRoute: () => homeRouteRoute,
 } as any)
 
+const homeJournalRoute = homeJournalImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => homeRouteRoute,
+} as any)
+
+const homeHomeRoute = homeHomeImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => homeRouteRoute,
+} as any)
+
+const homeBusinessRoute = homeBusinessImport.update({
+  id: '/business',
+  path: '/business',
+  getParentRoute: () => homeRouteRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -313,6 +334,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/content-manager'
       preLoaderRoute: typeof ContentManagerRouteImport
       parentRoute: typeof rootRoute
+    }
+    '/(home)/business': {
+      id: '/(home)/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof homeBusinessImport
+      parentRoute: typeof homeRouteImport
+    }
+    '/(home)/home': {
+      id: '/(home)/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof homeHomeImport
+      parentRoute: typeof homeRouteImport
+    }
+    '/(home)/journal': {
+      id: '/(home)/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof homeJournalImport
+      parentRoute: typeof homeRouteImport
     }
     '/(home)/news': {
       id: '/(home)/news'
@@ -572,6 +614,9 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface homeRouteRouteChildren {
+  homeBusinessRoute: typeof homeBusinessRoute
+  homeHomeRoute: typeof homeHomeRoute
+  homeJournalRoute: typeof homeJournalRoute
   homeNewsRoute: typeof homeNewsRoute
   homeNotificationsRoute: typeof homeNotificationsRoute
   homeSettingsRoute: typeof homeSettingsRoute
@@ -579,6 +624,9 @@ interface homeRouteRouteChildren {
 }
 
 const homeRouteRouteChildren: homeRouteRouteChildren = {
+  homeBusinessRoute: homeBusinessRoute,
+  homeHomeRoute: homeHomeRoute,
+  homeJournalRoute: homeJournalRoute,
   homeNewsRoute: homeNewsRoute,
   homeNotificationsRoute: homeNotificationsRoute,
   homeSettingsRoute: homeSettingsRoute,
@@ -632,6 +680,9 @@ export interface FileRoutesByFullPath {
   '/': typeof homeIndexRoute
   '': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
+  '/business': typeof homeBusinessRoute
+  '/home': typeof homeHomeRoute
+  '/journal': typeof homeJournalRoute
   '/news': typeof homeNewsRoute
   '/notifications': typeof homeNotificationsRoute
   '/settings': typeof homeSettingsRoute
@@ -671,6 +722,9 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '': typeof AuthRouteRouteWithChildren
+  '/business': typeof homeBusinessRoute
+  '/home': typeof homeHomeRoute
+  '/journal': typeof homeJournalRoute
   '/news': typeof homeNewsRoute
   '/notifications': typeof homeNotificationsRoute
   '/settings': typeof homeSettingsRoute
@@ -714,6 +768,9 @@ export interface FileRoutesById {
   '/(home)': typeof homeRouteRouteWithChildren
   '/_auth': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
+  '/(home)/business': typeof homeBusinessRoute
+  '/(home)/home': typeof homeHomeRoute
+  '/(home)/journal': typeof homeJournalRoute
   '/(home)/news': typeof homeNewsRoute
   '/(home)/notifications': typeof homeNotificationsRoute
   '/(home)/settings': typeof homeSettingsRoute
@@ -758,6 +815,9 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/content-manager'
+    | '/business'
+    | '/home'
+    | '/journal'
     | '/news'
     | '/notifications'
     | '/settings'
@@ -796,6 +856,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
+    | '/business'
+    | '/home'
+    | '/journal'
     | '/news'
     | '/notifications'
     | '/settings'
@@ -837,6 +900,9 @@ export interface FileRouteTypes {
     | '/(home)'
     | '/_auth'
     | '/content-manager'
+    | '/(home)/business'
+    | '/(home)/home'
+    | '/(home)/journal'
     | '/(home)/news'
     | '/(home)/notifications'
     | '/(home)/settings'
@@ -972,6 +1038,9 @@ export const routeTree = rootRoute
     "/(home)": {
       "filePath": "(home)/route.tsx",
       "children": [
+        "/(home)/business",
+        "/(home)/home",
+        "/(home)/journal",
         "/(home)/news",
         "/(home)/notifications",
         "/(home)/settings",
@@ -997,6 +1066,18 @@ export const routeTree = rootRoute
         "/content-manager/reports",
         "/content-manager/"
       ]
+    },
+    "/(home)/business": {
+      "filePath": "(home)/business.tsx",
+      "parent": "/(home)"
+    },
+    "/(home)/home": {
+      "filePath": "(home)/home.tsx",
+      "parent": "/(home)"
+    },
+    "/(home)/journal": {
+      "filePath": "(home)/journal.tsx",
+      "parent": "/(home)"
     },
     "/(home)/news": {
       "filePath": "(home)/news.tsx",

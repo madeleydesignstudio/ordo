@@ -43,6 +43,7 @@ import { ProjectForm } from '@workspace/ui/components/dashboard/project-manager/
 import { TaskForm } from '@workspace/ui/components/dashboard/project-manager/task-form'
 import type { ProjectFormData } from '@workspace/ui/components/dashboard/project-manager/project-form'
 import type { TaskFormData } from '@workspace/ui/components/dashboard/project-manager/task-form'
+import { CommandMenu } from "./command-menu"
 
 // Type definitions
 type NavItem = {
@@ -218,6 +219,109 @@ const TopNav = ({
     }
   }
 
+  // Update the navigationLinks to include settings and actions
+  const navigationLinks = [
+    // Project Manager Routes
+    {
+      title: "Project Manager Dashboard",
+      href: "/project-manager/dashboard",
+      description: "Go to project manager overview"
+    },
+    {
+      title: "Projects",
+      href: "/project-manager/projects",
+      description: "View all projects"
+    },
+    {
+      title: "Tasks",
+      href: "/project-manager/tasks",
+      description: "View all tasks"
+    },
+    {
+      title: "Notes",
+      href: "/project-manager/notes",
+      description: "View all notes"
+    },
+    {
+      title: "Canvas",
+      href: "/project-manager/canvas",
+      description: "View all canvases"
+    },
+    {
+      title: "Project Analytics",
+      href: "/project-manager/analytics",
+      description: "View project analytics"
+    },
+    // Content Manager Routes
+    {
+      title: "Content Manager Dashboard",
+      href: "/content-manager/dashboard",
+      description: "Go to content manager overview"
+    },
+    {
+      title: "Content",
+      href: "/content-manager/content",
+      description: "Manage content"
+    },
+    {
+      title: "Media",
+      href: "/content-manager/media",
+      description: "Manage media"
+    },
+    {
+      title: "Schedule",
+      href: "/content-manager/schedule",
+      description: "Manage schedule"
+    },
+    {
+      title: "Content Analytics",
+      href: "/content-manager/analytics",
+      description: "View content analytics"
+    },
+    // Finance Manager Routes
+    {
+      title: "Finance Manager Dashboard",
+      href: "/finance-manager/dashboard",
+      description: "Go to finance manager overview"
+    },
+    {
+      title: "Transactions",
+      href: "/finance-manager/transactions",
+      description: "View all transactions"
+    },
+    {
+      title: "Budgets",
+      href: "/finance-manager/budgets",
+      description: "Manage budgets"
+    },
+    {
+      title: "Finance Reports",
+      href: "/finance-manager/reports",
+      description: "View finance reports"
+    },
+    {
+      title: "Invoices",
+      href: "/finance-manager/invoices",
+      description: "Manage invoices"
+    },
+    // General/Settings/Actions
+    {
+      title: "Settings",
+      href: "/settings",
+      description: "Account and app settings"
+    },
+    {
+      title: "Create Project",
+      action: () => setIsCreateProjectModalOpen(true),
+      description: "Open the create project dialog"
+    },
+    {
+      title: "Create Task",
+      action: () => setIsCreateTaskModalOpen(true),
+      description: "Open the create task dialog"
+    }
+  ]
+
   return (
     <div className="h-full flex items-center justify-between px-4">
       {/* Left Side - Navigation Controls & Breadcrumb */}
@@ -311,9 +415,7 @@ const TopNav = ({
 
       {/* Right Side - Logo, Search, Settings */}
       <div className="flex items-center gap-1 flex-1 justify-end">
-        <button >
-          <Search className="h-4 w-4 text-stone-400" />
-        </button>
+        <CommandMenu links={navigationLinks} />
         
         <button>
           <MoreVertical className="h-4 w-4 text-stone-400" />

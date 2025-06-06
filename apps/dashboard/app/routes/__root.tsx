@@ -15,6 +15,7 @@ import { usePostHog } from 'posthog-js/react'
 import AppProvider from "../components/app-provider"
 import { TRPCProvider } from "../components/trpc-provider"
 import { Toaster } from "@workspace/ui/components/sonner"
+import { ModeProvider} from '../hooks/use-mode'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -69,6 +70,21 @@ function RootComponent() {
       return
     }
     
+    // Add mode-based redirect for the root route
+    if (isAuthenticated && location.pathname === '/') {
+      // Check localStorage directly for the mode
+      const savedMode = typeof window !== 'undefined' 
+        ? localStorage.getItem('appMode') 
+        : null
+      
+      // Redirect based on the saved mode
+      if (savedMode === 'home') {
+        navigate({ to: '/home' })
+      } else {
+        navigate({ to: '/business' })
+      }
+    }
+    
     // Identify user with PostHog
     if (user && posthog) {
       posthog.identify(user.id, {
@@ -94,6 +110,7 @@ function RootComponent() {
 
   return (
     <RootDocument>
+      <ModeProvider>
       <UserContext.Provider value={user}>
         <TRPCProvider>
           {isPublicRoute ? (
@@ -105,6 +122,7 @@ function RootComponent() {
           )}
         </TRPCProvider>
       </UserContext.Provider>
+      </ModeProvider>
     </RootDocument>
   )
 }

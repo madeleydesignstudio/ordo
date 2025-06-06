@@ -5,6 +5,7 @@ import authApp from './routes/auth'
 import healthApp from './routes/health'
 import trpcApp from './routes/trpc'
 
+
 const app = new Hono<AppEnv>()
 
 // Apply CORS middleware globally
@@ -15,6 +16,7 @@ const routes = app
   .route('/', healthApp)
   .route('/', trpcApp)
   .route('/', authApp)
+ 
 
 export default app
 export type AppType = typeof routes

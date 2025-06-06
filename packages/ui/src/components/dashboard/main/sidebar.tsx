@@ -1,8 +1,9 @@
 import React from 'react'
 import { User } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@workspace/ui/components/tooltip'
 import { Switch } from '@workspace/ui/components/switch'
+import { useMode } from '../../../../../../apps/dashboard/app/hooks/use-mode'
 
 interface UserProfileImageProps {
   user?: {
@@ -37,7 +38,7 @@ const UserProfileImage = ({ user }: UserProfileImageProps) => {
     const optimizedImageUrl = getOptimizedImageUrl(user.image)
     
     return (
-      <div className="w-8 h-8 rounded-md overflow-hidden flex items-center justify-center bg-primary relative">
+      <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-primary relative">
         <img 
           src={optimizedImageUrl} 
           alt={user.name || 'User'} 
@@ -59,7 +60,7 @@ const UserProfileImage = ({ user }: UserProfileImageProps) => {
         />
         {/* Show fallback while loading or on error */}
         {(!imageLoaded || imageError) && (
-          <div className="absolute inset-0 w-full h-full bg-primary rounded-md flex items-center justify-center">
+          <div className="absolute inset-0 w-full h-full bg-primary rounded-full flex items-center justify-center">
             {user?.name ? (
               <span className="text-primary-foreground font-bold text-sm">
                 {user.name.charAt(0).toUpperCase()}
@@ -75,7 +76,7 @@ const UserProfileImage = ({ user }: UserProfileImageProps) => {
   
   // Fallback when no image or permanent error
   return (
-    <div className="w-8 h-8 rounded-md overflow-hidden flex items-center justify-center bg-primary">
+    <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-primary">
       <div className="w-full h-full bg-primary rounded-md flex items-center justify-center">
         {user?.name ? (
           <span className="text-primary-foreground font-bold text-sm">
@@ -90,23 +91,38 @@ const UserProfileImage = ({ user }: UserProfileImageProps) => {
 }
 
 const Sidebar = ({ user }: { user?: UserProfileImageProps['user'] }) => {
-  const [isHomeMode, setIsHomeMode] = React.useState(false)
+  const { isHomeMode, toggleMode } = useMode()
+  const navigate = useNavigate()
   
   const businessModeNav = [
-    { icon: "https://storage.dev-0af.workers.dev/cottage-home.png", label: "Home", href: "/", alt: "Home" },
+    { icon: "https://storage.dev-0af.workers.dev/business.png", label: "Business Home", href: "/", alt: "Home" },
     { icon: "https://storage.dev-0af.workers.dev/project-manager.png", label: "Project Manager", href: "/project-manager", alt: "Project Manager" },
     { icon: "https://storage.dev-0af.workers.dev/content-manager.png", label: "Content Manager", href: "/content-manager", alt: "Content Manager" },
-    { icon: "https://storage.dev-0af.workers.dev/finance-manager.png", label: "Finance Manager", href: "/finance-manager", alt: "Finance Manager" }
+    { icon: "https://storage.dev-0af.workers.dev/finance-manager.png", label: "Finance Manager", href: "/finance-manager", alt: "Finance Manager" },
   ]
   
   const homeModeNav = [
-    { icon: "https://storage.dev-0af.workers.dev/home-dashboard.png", label: "Dashboard", href: "/home/dashboard", alt: "Home Dashboard" },
-    { icon: "https://storage.dev-0af.workers.dev/home-tasks.png", label: "Tasks", href: "/home/tasks", alt: "Home Tasks" },
-    { icon: "https://storage.dev-0af.workers.dev/home-calendar.png", label: "Calendar", href: "/home/calendar", alt: "Home Calendar" },
-    { icon: "https://storage.dev-0af.workers.dev/home-notes.png", label: "Notes", href: "/home/notes", alt: "Home Notes" }
+    { icon: "https://storage.dev-0af.workers.dev/home.png", label: "Office Home", href: "/", alt: "Home" },
+    { icon: "https://storage.dev-0af.workers.dev/journal.png", label: "Journal", href: "/journal", alt: "Journal" },
+    { icon: "https://storage.dev-0af.workers.dev/apple.png", label: "Health Manager", href: "/health-manager", alt: "Health Manager" }
   ]
   
   const currentNav = isHomeMode ? homeModeNav : businessModeNav
+  
+  // Function to handle mode toggle with navigation
+  const handleModeToggle = () => {
+    // First toggle the mode
+    toggleMode()
+    
+    // Then navigate based on the new mode (which will be the opposite of current mode)
+    if (isHomeMode) {
+      // If currently in home mode, switching to business mode
+      navigate({ to: '/business' })
+    } else {
+      // If currently in business mode, switching to home mode
+      navigate({ to: '/home' })
+    }
+  }
   
   return (
     <div className="h-full flex flex-col">
@@ -143,7 +159,7 @@ const Sidebar = ({ user }: { user?: UserProfileImageProps['user'] }) => {
               {/* Image indicator */}
               <div 
                 className="transition-transform duration-200 ease-in-out hover:scale-110"
-                onClick={() => setIsHomeMode(!isHomeMode)}
+                onClick={handleModeToggle}
               >
                 <img 
                   src={isHomeMode ? "https://storage.dev-0af.workers.dev/home.png" : "https://storage.dev-0af.workers.dev/business.png"} 
@@ -156,7 +172,7 @@ const Sidebar = ({ user }: { user?: UserProfileImageProps['user'] }) => {
               {/* Switch component */}
               <Switch 
                 checked={isHomeMode}
-                onCheckedChange={setIsHomeMode}
+                onCheckedChange={handleModeToggle}
                 className="scale-75"
               />
             </div>

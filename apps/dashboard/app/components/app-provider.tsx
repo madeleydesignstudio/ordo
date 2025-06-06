@@ -1,10 +1,11 @@
-import * as React from "react"
-import { cn } from "@workspace/ui/lib/utils"
-import Sidebar from "@workspace/ui/components/dashboard/main/sidebar"
 import BottomNav, { FocusModeProvider, useFocusMode } from "@workspace/ui/components/dashboard/main/bottomnav"
+import Sidebar from "@workspace/ui/components/dashboard/main/sidebar"
 import TopNav from "@workspace/ui/components/dashboard/main/topnav"
-import { useUser } from "../routes/__root"
+import { MobileRedirect } from "@workspace/ui/components/dashboard/providers/mobile-detector"
+import { cn } from "@workspace/ui/lib/utils"
+import * as React from "react"
 import { trpc } from "../lib/trpc"
+import { useUser } from "../routes/__root"
 
 interface AppProviderProps {
   children: React.ReactNode
@@ -179,11 +180,16 @@ const AppLayoutContent = ({ children, className }: AppProviderProps) => {
 
 export function AppProvider({ children, className }: AppProviderProps) {
   return (
-    <FocusModeProvider>
+  
+    <MobileRedirect>
+       <FocusModeProvider>
       <AppLayoutContent className={className}>
         {children}
       </AppLayoutContent>
     </FocusModeProvider>
+    </MobileRedirect>
+   
+   
   )
 }
 
