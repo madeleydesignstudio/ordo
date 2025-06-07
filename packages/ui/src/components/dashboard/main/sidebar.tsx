@@ -104,7 +104,8 @@ const Sidebar = ({ user }: { user?: UserProfileImageProps['user'] }) => {
   const homeModeNav = [
     { icon: "https://storage.dev-0af.workers.dev/home.png", label: "Office Home", href: "/", alt: "Home" },
     { icon: "https://storage.dev-0af.workers.dev/journal.png", label: "Journal", href: "/journal", alt: "Journal" },
-    { icon: "https://storage.dev-0af.workers.dev/apple.png", label: "Health Manager", href: "/health-manager", alt: "Health Manager" }
+    { icon: "https://storage.dev-0af.workers.dev/apple.png", label: "Health Manager", href: "/health-manager", alt: "Health Manager" },
+    { icon: "https://storage.dev-0af.workers.dev/bookmarks.png", label: "Bookmarks", href: "/bookmarks", alt: "Bookmarks" }
   ]
   
   const currentNav = isHomeMode ? homeModeNav : businessModeNav

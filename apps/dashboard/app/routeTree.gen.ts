@@ -53,6 +53,7 @@ import { Route as homeNewsImport } from './routes/(home)/news'
 import { Route as homeJournalImport } from './routes/(home)/journal'
 import { Route as homeHomeImport } from './routes/(home)/home'
 import { Route as homeBusinessImport } from './routes/(home)/business'
+import { Route as homeBookmarksImport } from './routes/(home)/bookmarks'
 
 // Create/Update Routes
 
@@ -310,6 +311,12 @@ const homeBusinessRoute = homeBusinessImport.update({
   getParentRoute: () => homeRouteRoute,
 } as any)
 
+const homeBookmarksRoute = homeBookmarksImport.update({
+  id: '/bookmarks',
+  path: '/bookmarks',
+  getParentRoute: () => homeRouteRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -334,6 +341,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/content-manager'
       preLoaderRoute: typeof ContentManagerRouteImport
       parentRoute: typeof rootRoute
+    }
+    '/(home)/bookmarks': {
+      id: '/(home)/bookmarks'
+      path: '/bookmarks'
+      fullPath: '/bookmarks'
+      preLoaderRoute: typeof homeBookmarksImport
+      parentRoute: typeof homeRouteImport
     }
     '/(home)/business': {
       id: '/(home)/business'
@@ -614,6 +628,7 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface homeRouteRouteChildren {
+  homeBookmarksRoute: typeof homeBookmarksRoute
   homeBusinessRoute: typeof homeBusinessRoute
   homeHomeRoute: typeof homeHomeRoute
   homeJournalRoute: typeof homeJournalRoute
@@ -624,6 +639,7 @@ interface homeRouteRouteChildren {
 }
 
 const homeRouteRouteChildren: homeRouteRouteChildren = {
+  homeBookmarksRoute: homeBookmarksRoute,
   homeBusinessRoute: homeBusinessRoute,
   homeHomeRoute: homeHomeRoute,
   homeJournalRoute: homeJournalRoute,
@@ -680,6 +696,7 @@ export interface FileRoutesByFullPath {
   '/': typeof homeIndexRoute
   '': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
+  '/bookmarks': typeof homeBookmarksRoute
   '/business': typeof homeBusinessRoute
   '/home': typeof homeHomeRoute
   '/journal': typeof homeJournalRoute
@@ -722,6 +739,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '': typeof AuthRouteRouteWithChildren
+  '/bookmarks': typeof homeBookmarksRoute
   '/business': typeof homeBusinessRoute
   '/home': typeof homeHomeRoute
   '/journal': typeof homeJournalRoute
@@ -768,6 +786,7 @@ export interface FileRoutesById {
   '/(home)': typeof homeRouteRouteWithChildren
   '/_auth': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
+  '/(home)/bookmarks': typeof homeBookmarksRoute
   '/(home)/business': typeof homeBusinessRoute
   '/(home)/home': typeof homeHomeRoute
   '/(home)/journal': typeof homeJournalRoute
@@ -815,6 +834,7 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/content-manager'
+    | '/bookmarks'
     | '/business'
     | '/home'
     | '/journal'
@@ -856,6 +876,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
+    | '/bookmarks'
     | '/business'
     | '/home'
     | '/journal'
@@ -900,6 +921,7 @@ export interface FileRouteTypes {
     | '/(home)'
     | '/_auth'
     | '/content-manager'
+    | '/(home)/bookmarks'
     | '/(home)/business'
     | '/(home)/home'
     | '/(home)/journal'
@@ -1038,6 +1060,7 @@ export const routeTree = rootRoute
     "/(home)": {
       "filePath": "(home)/route.tsx",
       "children": [
+        "/(home)/bookmarks",
         "/(home)/business",
         "/(home)/home",
         "/(home)/journal",
@@ -1066,6 +1089,10 @@ export const routeTree = rootRoute
         "/content-manager/reports",
         "/content-manager/"
       ]
+    },
+    "/(home)/bookmarks": {
+      "filePath": "(home)/bookmarks.tsx",
+      "parent": "/(home)"
     },
     "/(home)/business": {
       "filePath": "(home)/business.tsx",
