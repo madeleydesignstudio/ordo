@@ -1,153 +1,106 @@
 'use client';
-import { faker } from '@faker-js/faker';
+
+import { MoreHorizontal } from 'lucide-react';
+import { Button } from '../../button';
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '../../avatar';
-import {
+  Table,
   TableBody,
   TableCell,
-  TableColumnHeader,
   TableHead,
   TableHeader,
-  TableHeaderGroup,
-  TableProvider,
   TableRow,
-} from '../../kibo-ui/table';
-import type { ColumnDef } from '../../kibo-ui/table';
-import { ChevronRightIcon } from 'lucide-react';
-const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-const statuses = [
-  { id: faker.string.uuid(), name: 'Planned', color: '#6B7280' },
-  { id: faker.string.uuid(), name: 'In Progress', color: '#F59E0B' },
-  { id: faker.string.uuid(), name: 'Done', color: '#10B981' },
-];
-const users = Array.from({ length: 4 })
-  .fill(null)
-  .map(() => ({
-    id: faker.string.uuid(),
-    name: faker.person.fullName(),
-    image: faker.image.avatar(),
-  }));
-const exampleGroups = Array.from({ length: 6 })
-  .fill(null)
-  .map(() => ({
-    id: faker.string.uuid(),
-    name: capitalize(faker.company.buzzPhrase()),
-  }));
-const exampleProducts = Array.from({ length: 4 })
-  .fill(null)
-  .map(() => ({
-    id: faker.string.uuid(),
-    name: capitalize(faker.company.buzzPhrase()),
-  }));
-const exampleInitiatives = Array.from({ length: 2 })
-  .fill(null)
-  .map(() => ({
-    id: faker.string.uuid(),
-    name: capitalize(faker.company.buzzPhrase()),
-  }));
-const exampleReleases = Array.from({ length: 3 })
-  .fill(null)
-  .map(() => ({
-    id: faker.string.uuid(),
-    name: capitalize(faker.company.buzzPhrase()),
-  }));
-const exampleFeatures = Array.from({ length: 20 })
-  .fill(null)
-  .map(() => ({
-    id: faker.string.uuid(),
-    name: capitalize(faker.company.buzzPhrase()),
-    startAt: faker.date.past({ years: 0.5, refDate: new Date() }),
-    endAt: faker.date.future({ years: 0.5, refDate: new Date() }),
-    status: faker.helpers.arrayElement(statuses),
-    owner: faker.helpers.arrayElement(users),
-    group: faker.helpers.arrayElement(exampleGroups),
-    product: faker.helpers.arrayElement(exampleProducts),
-    initiative: faker.helpers.arrayElement(exampleInitiatives),
-    release: faker.helpers.arrayElement(exampleReleases),
-  }));
-const TableView = () => {
-  const columns: ColumnDef<(typeof exampleFeatures)[number]>[] = [
-    {
-      accessorKey: 'name',
-      header: ({ column }) => (
-        <TableColumnHeader column={column} title="Name" />
-      ),
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Avatar className="size-6">
-              <AvatarImage src={row.original.owner.image} />
-              <AvatarFallback>
-                {row.original.owner.name?.slice(0, 2)}
-              </AvatarFallback>
-            </Avatar>
-            <div
-              className="absolute right-0 bottom-0 h-2 w-2 rounded-full ring-2 ring-background"
-              style={{
-                backgroundColor: row.original.status.color,
-              }}
-            />
-          </div>
-          <div>
-            <span className="font-medium">{row.original.name}</span>
-            <div className="flex items-center gap-1 text-muted-foreground text-xs">
-              <span>{row.original.product.name}</span>
-              <ChevronRightIcon size={12} />
-              <span>{row.original.group.name}</span>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'startAt',
-      header: ({ column }) => (
-        <TableColumnHeader column={column} title="Start At" />
-      ),
-      cell: ({ row }) =>
-        new Intl.DateTimeFormat('en-US', {
-          dateStyle: 'medium',
-        }).format(row.original.startAt),
-    },
-    {
-      accessorKey: 'endAt',
-      header: ({ column }) => (
-        <TableColumnHeader column={column} title="End At" />
-      ),
-      cell: ({ row }) =>
-        new Intl.DateTimeFormat('en-US', {
-          dateStyle: 'medium',
-        }).format(row.original.endAt),
-    },
-    {
-      id: 'release',
-      accessorFn: (row) => row.release.id,
-      header: ({ column }) => (
-        <TableColumnHeader column={column} title="Release" />
-      ),
-      cell: ({ row }) => row.original.release.name,
-    },
-  ];
+} from '../../table';
+
+interface Project {
+  id: string;
+  name: string;
+  description?: string;
+  status: string;
+  startDate?: Date | null;
+  dueDate?: Date | null;
+  icon?: string;
+  cover?: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  parentProjectId?: string | null;
+}
+
+interface TableViewProps {
+  projects: Project[];
+}
+
+// Status mapping to user-friendly labels and colors
+const statusMap: Record<string, { label: string, color: string }> = {
+  'backlog': { label: 'Backlog', color: 'bg-stone-200 text-stone-800' },
+  'todo': { label: 'To Do', color: 'bg-blue-100 text-blue-800' },
+  'in_progress': { label: 'In Progress', color: 'bg-amber-100 text-amber-800' },
+  'done': { label: 'Done', color: 'bg-emerald-100 text-emerald-800' },
+  'on_hold': { label: 'On Hold', color: 'bg-red-100 text-red-800' },
+};
+
+// Format date to a readable string
+const formatDate = (date: Date | null | undefined): string => {
+  if (!date) return '—';
+  return new Intl.DateTimeFormat('en-US', { 
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  }).format(date);
+};
+
+const TableView = ({ projects = [] }: TableViewProps) => {
   return (
-    <TableProvider columns={columns} data={exampleFeatures}>
-      <TableHeader>
-        {({ headerGroup }) => (
-          <TableHeaderGroup key={headerGroup.id} headerGroup={headerGroup}>
-            {({ header }) => <TableHead key={header.id} header={header} />}
-          </TableHeaderGroup>
-        )}
-      </TableHeader>
-      <TableBody>
-        {({ row }) => (
-          <TableRow key={row.id} row={row}>
-            {({ cell }) => <TableCell key={cell.id} cell={cell} />}
+    <div className="rounded-md border overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Start Date</TableHead>
+            <TableHead>Due Date</TableHead>
+            <TableHead>Created</TableHead>
+            <TableHead className="w-[80px]">Actions</TableHead>
           </TableRow>
-        )}
-      </TableBody>
-    </TableProvider>
+        </TableHeader>
+        <TableBody>
+          {projects.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-6 text-stone-500">
+                No projects to display
+              </TableCell>
+            </TableRow>
+          ) : (
+            projects.map((project) => (
+              <TableRow key={project.id} className="hover:bg-stone-50">
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">{project.icon || '📁'}</span>
+                    <span>{project.name}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span 
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${statusMap[project.status]?.color || 'bg-stone-200 text-stone-800'}`}
+                  >
+                    {statusMap[project.status]?.label || project.status}
+                  </span>
+                </TableCell>
+                <TableCell>{formatDate(project.startDate)}</TableCell>
+                <TableCell>{formatDate(project.dueDate)}</TableCell>
+                <TableCell>{formatDate(project.createdAt)}</TableCell>
+                <TableCell>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
+
 export default TableView;

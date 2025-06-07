@@ -1,3 +1,4 @@
+import { useLocation } from "@tanstack/react-router"
 import BottomNav, { FocusModeProvider, useFocusMode } from "@workspace/ui/components/dashboard/main/bottomnav"
 import Sidebar from "@workspace/ui/components/dashboard/main/sidebar"
 import TopNav from "@workspace/ui/components/dashboard/main/topnav"
@@ -39,7 +40,9 @@ const ConnectedTopNav = () => {
   const tasksQuery = trpc.tasks.list.useQuery()
   const createProjectMutation = trpc.projects.create.useMutation()
   const createTaskMutation = trpc.tasks.create.useMutation()
-
+  const location = useLocation()
+  const user = useUser()
+  
   // Prepare data for forms - convert tRPC responses to proper types
   const projects = (projectsQuery.data || []).map(project => ({
     id: project.id,
@@ -89,6 +92,7 @@ const ConnectedTopNav = () => {
       isCreatingTask={createTaskMutation.isPending}
       refetchProjects={() => projectsQuery.refetch()}
       refetchTasks={() => tasksQuery.refetch()}
+      user={user}
     />
   )
 }

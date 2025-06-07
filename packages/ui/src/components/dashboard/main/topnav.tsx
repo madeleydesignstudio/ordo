@@ -1,22 +1,22 @@
-import React from 'react'
 import { Link, useLocation, useNavigate } from '@tanstack/react-router'
-import { 
-  Plus, 
-  ChevronLeft, 
-  ChevronRight, 
-  Search, 
-  MoreHorizontal,
-  Home,
-  FolderKanban,
-  CheckSquare,
-  StickyNote,
-  Palette,
-  BarChart3,
-  MoreVertical,
-  FileText,
-  Briefcase
-} from 'lucide-react'
-import { Button } from '@workspace/ui/components/button'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@workspace/ui/components/breadcrumb'
+import type { ProjectFormData } from '@workspace/ui/components/dashboard/project-manager/project-form'
+import { ProjectForm } from '@workspace/ui/components/dashboard/project-manager/project-form'
+import type { TaskFormData } from '@workspace/ui/components/dashboard/project-manager/task-form'
+import { TaskForm } from '@workspace/ui/components/dashboard/project-manager/task-form'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from '@workspace/ui/components/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,24 +25,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu'
+import { cn } from '@workspace/ui/lib/utils'
 import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@workspace/ui/components/breadcrumb'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle 
-} from '@workspace/ui/components/dialog'
-import { ProjectForm } from '@workspace/ui/components/dashboard/project-manager/project-form'
-import { TaskForm } from '@workspace/ui/components/dashboard/project-manager/task-form'
-import type { ProjectFormData } from '@workspace/ui/components/dashboard/project-manager/project-form'
-import type { TaskFormData } from '@workspace/ui/components/dashboard/project-manager/task-form'
+  BarChart3,
+  Calendar,
+  CheckSquare,
+  ChevronLeft,
+  ChevronRight,
+  FolderKanban,
+  GanttChart,
+  Home,
+  LayoutGrid,
+  List,
+  MoreVertical,
+  Palette,
+  Plus,
+  StickyNote,
+  Table
+} from 'lucide-react'
+import React from 'react'
+import { ViewType } from '../project-manager/view-container'
 import { CommandMenu } from "./command-menu"
 
 // Type definitions
@@ -70,7 +72,32 @@ type TopNavProps = {
   isCreatingTask?: boolean
   refetchProjects?: () => void
   refetchTasks?: () => void
+  user?: any
+  onViewChange?: (viewType: ViewType) => void
 }
+
+// View option interface
+interface ViewOption {
+  type: ViewType
+  label: string
+  icon: React.ComponentType<{ className?: string }>
+}
+
+// View options for the selector
+const viewOptions: ViewOption[] = [
+  { type: 'kanban', label: 'Kanban', icon: LayoutGrid },
+  { type: 'list', label: 'List', icon: List },
+  { type: 'table', label: 'Table', icon: Table },
+  { type: 'calendar', label: 'Calendar', icon: Calendar },
+  { type: 'gantt', label: 'Gantt', icon: GanttChart },
+]
+
+// Routes where the view selector should be displayed
+const viewSelectorRoutes = [
+  '/project-manager/projects',
+  '/project-manager/tasks',
+  '/project-manager/notes',
+]
 
 const TopNav = ({ 
   projects = [], 
@@ -80,13 +107,45 @@ const TopNav = ({
   isCreatingProject = false, 
   isCreatingTask = false,
   refetchProjects,
-  refetchTasks 
+  refetchTasks,
+  user,
+  onViewChange
 }: TopNavProps = {}) => {
   const location = useLocation()
   const navigate = useNavigate()
+  const topNavRef = React.useRef<HTMLDivElement>(null)
   const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = React.useState(false)
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = React.useState(false)
+  const [activeView, setActiveView] = React.useState<ViewType>('kanban')
 
+  // Listen for the viewchange event from the project-manager layout
+  React.useEffect(() => {
+    const topNavEl = topNavRef.current
+    
+    if (topNavEl) {
+      const handleViewChangeEvent = (event: CustomEvent) => {
+        if (event.detail.enableViewSelector) {
+          setActiveView(event.detail.activeView)
+          // Store the callback from the event
+          const originalOnViewChange = onViewChange
+          // @ts-ignore - we know this exists based on the event creation
+          onViewChange = event.detail.onViewChange
+          return () => {
+            onViewChange = originalOnViewChange
+          }
+        }
+      }
+      
+      // @ts-ignore - CustomEvent type mismatch
+      topNavEl.addEventListener('viewchange', handleViewChangeEvent)
+      
+      return () => {
+        // @ts-ignore - CustomEvent type mismatch
+        topNavEl.removeEventListener('viewchange', handleViewChangeEvent)
+      }
+    }
+  }, [])
+  
   // Secondary navigation configurations for different routes
   const secondaryNavConfigs: SecondaryNavConfig = {
     '/project-manager': [
@@ -112,6 +171,40 @@ const TopNav = ({
       { label: 'Invoices', href: '/finance-manager/invoices', icon: StickyNote },
     ],
   }
+
+  // Check if current route should show the view selector
+  const shouldShowViewSelector = viewSelectorRoutes.includes(location.pathname)
+
+  // Handler for changing the view
+  const handleViewChange = (viewType: ViewType) => {
+    // Set local state first
+    setActiveView(viewType)
+    
+    // Call the onViewChange callback if provided by the parent
+    if (onViewChange) {
+      onViewChange(viewType)
+    }
+    
+    // If no callback provided, store in localStorage directly as fallback
+    if (!onViewChange) {
+      localStorage.setItem('projectManagerView', viewType)
+    }
+    
+    // Force a re-render of components that depend on the view type
+    window.dispatchEvent(new CustomEvent('viewTypeChanged', { 
+      detail: { viewType } 
+    }))
+  }
+
+  // Restore saved view preference on mount
+  React.useEffect(() => {
+    if (shouldShowViewSelector && !onViewChange) {
+      const savedView = localStorage.getItem('projectManagerView') as ViewType | null
+      if (savedView && ['kanban', 'list', 'table', 'calendar', 'gantt', 'classic'].includes(savedView)) {
+        setActiveView(savedView as ViewType)
+      }
+    }
+  }, [shouldShowViewSelector, onViewChange])
 
   // Get current route base (e.g., '/project-manager' from '/project-manager/dashboard')
   const routeBase = '/' + location.pathname.split('/')[1]
@@ -323,7 +416,7 @@ const TopNav = ({
   ]
 
   return (
-    <div className="h-full flex items-center justify-between px-4">
+    <div ref={topNavRef} className="topnav-container h-full flex items-center justify-between px-4">
       {/* Left Side - Navigation Controls & Breadcrumb */}
       <div className="flex items-center gap-1 flex-1">
         <div className="flex items-center gap-1">
@@ -415,8 +508,32 @@ const TopNav = ({
 
       {/* Right Side - Logo, Search, Settings */}
       <div className="flex items-center gap-1 flex-1 justify-end">
+
+        {/* View Selector */}
+        {shouldShowViewSelector && (
+          <div className="flex items-center bg-stone-100 border border-stone-200 rounded-md mr-2">
+            {viewOptions.map((option) => {
+              const Icon = option.icon
+              return (
+                <button
+                  key={option.type}
+                  onClick={() => handleViewChange(option.type)}
+                  className={cn(
+                    "p-1 flex items-center justify-center transition-colors",
+                    activeView === option.type 
+                      ? "bg-stone-200 text-stone-800" 
+                      : "text-stone-600 hover:text-stone-800 hover:bg-stone-200"
+                  )}
+                  title={option.label}
+                >
+                  <Icon className="h-4 w-4" />
+                </button>
+              )
+            })}
+          </div>
+        )}
+
         <CommandMenu links={navigationLinks} />
-        
         <button>
           <MoreVertical className="h-4 w-4 text-stone-400" />
         </button>
@@ -437,6 +554,7 @@ const TopNav = ({
           </DialogHeader>
           <ProjectForm
             mode="create"
+            user={user}
             onSubmit={handleProjectSubmit}
             onCancel={() => setIsCreateProjectModalOpen(false)}
             projects={projects}

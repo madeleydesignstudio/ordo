@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ProjectManagerImport } from './routes/project-manager'
 import { Route as ContentManagerRouteImport } from './routes/content-manager/route'
 import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as homeRouteImport } from './routes/(home)/route'
@@ -57,6 +58,12 @@ import { Route as homeBookmarksImport } from './routes/(home)/bookmarks'
 
 // Create/Update Routes
 
+const ProjectManagerRoute = ProjectManagerImport.update({
+  id: '/project-manager',
+  path: '/project-manager',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const ContentManagerRouteRoute = ContentManagerRouteImport.update({
   id: '/content-manager',
   path: '/content-manager',
@@ -74,9 +81,9 @@ const homeRouteRoute = homeRouteImport.update({
 } as any)
 
 const ProjectManagerIndexRoute = ProjectManagerIndexImport.update({
-  id: '/project-manager/',
-  path: '/project-manager/',
-  getParentRoute: () => rootRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectManagerRoute,
 } as any)
 
 const HealthManagerIndexRoute = HealthManagerIndexImport.update({
@@ -104,45 +111,45 @@ const homeIndexRoute = homeIndexImport.update({
 } as any)
 
 const ProjectManagerTasksRoute = ProjectManagerTasksImport.update({
-  id: '/project-manager/tasks',
-  path: '/project-manager/tasks',
-  getParentRoute: () => rootRoute,
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => ProjectManagerRoute,
 } as any)
 
 const ProjectManagerRouterRoute = ProjectManagerRouterImport.update({
-  id: '/project-manager/router',
-  path: '/project-manager/router',
-  getParentRoute: () => rootRoute,
+  id: '/router',
+  path: '/router',
+  getParentRoute: () => ProjectManagerRoute,
 } as any)
 
 const ProjectManagerProjectsRoute = ProjectManagerProjectsImport.update({
-  id: '/project-manager/projects',
-  path: '/project-manager/projects',
-  getParentRoute: () => rootRoute,
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => ProjectManagerRoute,
 } as any)
 
 const ProjectManagerNotesRoute = ProjectManagerNotesImport.update({
-  id: '/project-manager/notes',
-  path: '/project-manager/notes',
-  getParentRoute: () => rootRoute,
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => ProjectManagerRoute,
 } as any)
 
 const ProjectManagerDashboardRoute = ProjectManagerDashboardImport.update({
-  id: '/project-manager/dashboard',
-  path: '/project-manager/dashboard',
-  getParentRoute: () => rootRoute,
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => ProjectManagerRoute,
 } as any)
 
 const ProjectManagerCanvasRoute = ProjectManagerCanvasImport.update({
-  id: '/project-manager/canvas',
-  path: '/project-manager/canvas',
-  getParentRoute: () => rootRoute,
+  id: '/canvas',
+  path: '/canvas',
+  getParentRoute: () => ProjectManagerRoute,
 } as any)
 
 const ProjectManagerAnalyticsRoute = ProjectManagerAnalyticsImport.update({
-  id: '/project-manager/analytics',
-  path: '/project-manager/analytics',
-  getParentRoute: () => rootRoute,
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => ProjectManagerRoute,
 } as any)
 
 const HealthManagerSupplementTrackerRoute =
@@ -340,6 +347,13 @@ declare module '@tanstack/react-router' {
       path: '/content-manager'
       fullPath: '/content-manager'
       preLoaderRoute: typeof ContentManagerRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/project-manager': {
+      id: '/project-manager'
+      path: '/project-manager'
+      fullPath: '/project-manager'
+      preLoaderRoute: typeof ProjectManagerImport
       parentRoute: typeof rootRoute
     }
     '/(home)/bookmarks': {
@@ -540,52 +554,52 @@ declare module '@tanstack/react-router' {
     }
     '/project-manager/analytics': {
       id: '/project-manager/analytics'
-      path: '/project-manager/analytics'
+      path: '/analytics'
       fullPath: '/project-manager/analytics'
       preLoaderRoute: typeof ProjectManagerAnalyticsImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof ProjectManagerImport
     }
     '/project-manager/canvas': {
       id: '/project-manager/canvas'
-      path: '/project-manager/canvas'
+      path: '/canvas'
       fullPath: '/project-manager/canvas'
       preLoaderRoute: typeof ProjectManagerCanvasImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof ProjectManagerImport
     }
     '/project-manager/dashboard': {
       id: '/project-manager/dashboard'
-      path: '/project-manager/dashboard'
+      path: '/dashboard'
       fullPath: '/project-manager/dashboard'
       preLoaderRoute: typeof ProjectManagerDashboardImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof ProjectManagerImport
     }
     '/project-manager/notes': {
       id: '/project-manager/notes'
-      path: '/project-manager/notes'
+      path: '/notes'
       fullPath: '/project-manager/notes'
       preLoaderRoute: typeof ProjectManagerNotesImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof ProjectManagerImport
     }
     '/project-manager/projects': {
       id: '/project-manager/projects'
-      path: '/project-manager/projects'
+      path: '/projects'
       fullPath: '/project-manager/projects'
       preLoaderRoute: typeof ProjectManagerProjectsImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof ProjectManagerImport
     }
     '/project-manager/router': {
       id: '/project-manager/router'
-      path: '/project-manager/router'
+      path: '/router'
       fullPath: '/project-manager/router'
       preLoaderRoute: typeof ProjectManagerRouterImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof ProjectManagerImport
     }
     '/project-manager/tasks': {
       id: '/project-manager/tasks'
-      path: '/project-manager/tasks'
+      path: '/tasks'
       fullPath: '/project-manager/tasks'
       preLoaderRoute: typeof ProjectManagerTasksImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof ProjectManagerImport
     }
     '/(home)/': {
       id: '/(home)/'
@@ -617,10 +631,10 @@ declare module '@tanstack/react-router' {
     }
     '/project-manager/': {
       id: '/project-manager/'
-      path: '/project-manager'
-      fullPath: '/project-manager'
+      path: '/'
+      fullPath: '/project-manager/'
       preLoaderRoute: typeof ProjectManagerIndexImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof ProjectManagerImport
     }
   }
 }
@@ -692,10 +706,37 @@ const ContentManagerRouteRouteChildren: ContentManagerRouteRouteChildren = {
 const ContentManagerRouteRouteWithChildren =
   ContentManagerRouteRoute._addFileChildren(ContentManagerRouteRouteChildren)
 
+interface ProjectManagerRouteChildren {
+  ProjectManagerAnalyticsRoute: typeof ProjectManagerAnalyticsRoute
+  ProjectManagerCanvasRoute: typeof ProjectManagerCanvasRoute
+  ProjectManagerDashboardRoute: typeof ProjectManagerDashboardRoute
+  ProjectManagerNotesRoute: typeof ProjectManagerNotesRoute
+  ProjectManagerProjectsRoute: typeof ProjectManagerProjectsRoute
+  ProjectManagerRouterRoute: typeof ProjectManagerRouterRoute
+  ProjectManagerTasksRoute: typeof ProjectManagerTasksRoute
+  ProjectManagerIndexRoute: typeof ProjectManagerIndexRoute
+}
+
+const ProjectManagerRouteChildren: ProjectManagerRouteChildren = {
+  ProjectManagerAnalyticsRoute: ProjectManagerAnalyticsRoute,
+  ProjectManagerCanvasRoute: ProjectManagerCanvasRoute,
+  ProjectManagerDashboardRoute: ProjectManagerDashboardRoute,
+  ProjectManagerNotesRoute: ProjectManagerNotesRoute,
+  ProjectManagerProjectsRoute: ProjectManagerProjectsRoute,
+  ProjectManagerRouterRoute: ProjectManagerRouterRoute,
+  ProjectManagerTasksRoute: ProjectManagerTasksRoute,
+  ProjectManagerIndexRoute: ProjectManagerIndexRoute,
+}
+
+const ProjectManagerRouteWithChildren = ProjectManagerRoute._addFileChildren(
+  ProjectManagerRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof homeIndexRoute
   '': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
+  '/project-manager': typeof ProjectManagerRouteWithChildren
   '/bookmarks': typeof homeBookmarksRoute
   '/business': typeof homeBusinessRoute
   '/home': typeof homeHomeRoute
@@ -734,7 +775,7 @@ export interface FileRoutesByFullPath {
   '/content-manager/': typeof ContentManagerIndexRoute
   '/finance-manager': typeof FinanceManagerIndexRoute
   '/health-manager': typeof HealthManagerIndexRoute
-  '/project-manager': typeof ProjectManagerIndexRoute
+  '/project-manager/': typeof ProjectManagerIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -786,6 +827,7 @@ export interface FileRoutesById {
   '/(home)': typeof homeRouteRouteWithChildren
   '/_auth': typeof AuthRouteRouteWithChildren
   '/content-manager': typeof ContentManagerRouteRouteWithChildren
+  '/project-manager': typeof ProjectManagerRouteWithChildren
   '/(home)/bookmarks': typeof homeBookmarksRoute
   '/(home)/business': typeof homeBusinessRoute
   '/(home)/home': typeof homeHomeRoute
@@ -834,6 +876,7 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/content-manager'
+    | '/project-manager'
     | '/bookmarks'
     | '/business'
     | '/home'
@@ -872,7 +915,7 @@ export interface FileRouteTypes {
     | '/content-manager/'
     | '/finance-manager'
     | '/health-manager'
-    | '/project-manager'
+    | '/project-manager/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
@@ -921,6 +964,7 @@ export interface FileRouteTypes {
     | '/(home)'
     | '/_auth'
     | '/content-manager'
+    | '/project-manager'
     | '/(home)/bookmarks'
     | '/(home)/business'
     | '/(home)/home'
@@ -968,6 +1012,7 @@ export interface RootRouteChildren {
   homeRouteRoute: typeof homeRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   ContentManagerRouteRoute: typeof ContentManagerRouteRouteWithChildren
+  ProjectManagerRoute: typeof ProjectManagerRouteWithChildren
   FinanceManagerBudgetingRoute: typeof FinanceManagerBudgetingRoute
   FinanceManagerDashboardRoute: typeof FinanceManagerDashboardRoute
   FinanceManagerNewsRoute: typeof FinanceManagerNewsRoute
@@ -980,22 +1025,15 @@ export interface RootRouteChildren {
   HealthManagerJournalRoute: typeof HealthManagerJournalRoute
   HealthManagerRouterRoute: typeof HealthManagerRouterRoute
   HealthManagerSupplementTrackerRoute: typeof HealthManagerSupplementTrackerRoute
-  ProjectManagerAnalyticsRoute: typeof ProjectManagerAnalyticsRoute
-  ProjectManagerCanvasRoute: typeof ProjectManagerCanvasRoute
-  ProjectManagerDashboardRoute: typeof ProjectManagerDashboardRoute
-  ProjectManagerNotesRoute: typeof ProjectManagerNotesRoute
-  ProjectManagerProjectsRoute: typeof ProjectManagerProjectsRoute
-  ProjectManagerRouterRoute: typeof ProjectManagerRouterRoute
-  ProjectManagerTasksRoute: typeof ProjectManagerTasksRoute
   FinanceManagerIndexRoute: typeof FinanceManagerIndexRoute
   HealthManagerIndexRoute: typeof HealthManagerIndexRoute
-  ProjectManagerIndexRoute: typeof ProjectManagerIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   homeRouteRoute: homeRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   ContentManagerRouteRoute: ContentManagerRouteRouteWithChildren,
+  ProjectManagerRoute: ProjectManagerRouteWithChildren,
   FinanceManagerBudgetingRoute: FinanceManagerBudgetingRoute,
   FinanceManagerDashboardRoute: FinanceManagerDashboardRoute,
   FinanceManagerNewsRoute: FinanceManagerNewsRoute,
@@ -1008,16 +1046,8 @@ const rootRouteChildren: RootRouteChildren = {
   HealthManagerJournalRoute: HealthManagerJournalRoute,
   HealthManagerRouterRoute: HealthManagerRouterRoute,
   HealthManagerSupplementTrackerRoute: HealthManagerSupplementTrackerRoute,
-  ProjectManagerAnalyticsRoute: ProjectManagerAnalyticsRoute,
-  ProjectManagerCanvasRoute: ProjectManagerCanvasRoute,
-  ProjectManagerDashboardRoute: ProjectManagerDashboardRoute,
-  ProjectManagerNotesRoute: ProjectManagerNotesRoute,
-  ProjectManagerProjectsRoute: ProjectManagerProjectsRoute,
-  ProjectManagerRouterRoute: ProjectManagerRouterRoute,
-  ProjectManagerTasksRoute: ProjectManagerTasksRoute,
   FinanceManagerIndexRoute: FinanceManagerIndexRoute,
   HealthManagerIndexRoute: HealthManagerIndexRoute,
-  ProjectManagerIndexRoute: ProjectManagerIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -1033,6 +1063,7 @@ export const routeTree = rootRoute
         "/(home)",
         "/_auth",
         "/content-manager",
+        "/project-manager",
         "/finance-manager/budgeting",
         "/finance-manager/dashboard",
         "/finance-manager/news",
@@ -1045,16 +1076,8 @@ export const routeTree = rootRoute
         "/health-manager/journal",
         "/health-manager/router",
         "/health-manager/supplement-tracker",
-        "/project-manager/analytics",
-        "/project-manager/canvas",
-        "/project-manager/dashboard",
-        "/project-manager/notes",
-        "/project-manager/projects",
-        "/project-manager/router",
-        "/project-manager/tasks",
         "/finance-manager/",
-        "/health-manager/",
-        "/project-manager/"
+        "/health-manager/"
       ]
     },
     "/(home)": {
@@ -1088,6 +1111,19 @@ export const routeTree = rootRoute
         "/content-manager/people",
         "/content-manager/reports",
         "/content-manager/"
+      ]
+    },
+    "/project-manager": {
+      "filePath": "project-manager.tsx",
+      "children": [
+        "/project-manager/analytics",
+        "/project-manager/canvas",
+        "/project-manager/dashboard",
+        "/project-manager/notes",
+        "/project-manager/projects",
+        "/project-manager/router",
+        "/project-manager/tasks",
+        "/project-manager/"
       ]
     },
     "/(home)/bookmarks": {
@@ -1191,25 +1227,32 @@ export const routeTree = rootRoute
       "filePath": "health-manager/supplement-tracker.tsx"
     },
     "/project-manager/analytics": {
-      "filePath": "project-manager/analytics.tsx"
+      "filePath": "project-manager/analytics.tsx",
+      "parent": "/project-manager"
     },
     "/project-manager/canvas": {
-      "filePath": "project-manager/canvas.tsx"
+      "filePath": "project-manager/canvas.tsx",
+      "parent": "/project-manager"
     },
     "/project-manager/dashboard": {
-      "filePath": "project-manager/dashboard.tsx"
+      "filePath": "project-manager/dashboard.tsx",
+      "parent": "/project-manager"
     },
     "/project-manager/notes": {
-      "filePath": "project-manager/notes.tsx"
+      "filePath": "project-manager/notes.tsx",
+      "parent": "/project-manager"
     },
     "/project-manager/projects": {
-      "filePath": "project-manager/projects.tsx"
+      "filePath": "project-manager/projects.tsx",
+      "parent": "/project-manager"
     },
     "/project-manager/router": {
-      "filePath": "project-manager/router.tsx"
+      "filePath": "project-manager/router.tsx",
+      "parent": "/project-manager"
     },
     "/project-manager/tasks": {
-      "filePath": "project-manager/tasks.tsx"
+      "filePath": "project-manager/tasks.tsx",
+      "parent": "/project-manager"
     },
     "/(home)/": {
       "filePath": "(home)/index.tsx",
@@ -1226,7 +1269,8 @@ export const routeTree = rootRoute
       "filePath": "health-manager/index.tsx"
     },
     "/project-manager/": {
-      "filePath": "project-manager/index.tsx"
+      "filePath": "project-manager/index.tsx",
+      "parent": "/project-manager"
     }
   }
 }

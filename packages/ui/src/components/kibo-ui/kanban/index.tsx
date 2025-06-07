@@ -191,6 +191,7 @@ export type KanbanProviderProps<
   columns: C[];
   data: T[];
   onDataChange?: (data: T[]) => void;
+  onColumnDrop?: (itemId: string, columnId: string) => void;
   onDragStart?: (event: DragStartEvent) => void;
   onDragEnd?: (event: DragEndEvent) => void;
   onDragOver?: (event: DragOverEvent) => void;
@@ -204,6 +205,7 @@ export const KanbanProvider = <
   onDragStart,
   onDragEnd,
   onDragOver,
+  onColumnDrop,
   className,
   columns,
   data,
@@ -248,10 +250,12 @@ export const KanbanProvider = <
       const activeIndex = newData.findIndex((item) => item.id === active.id);
       const overIndex = newData.findIndex((item) => item.id === over.id);
 
-      newData[activeIndex].column = overColumn;
-      newData = arrayMove(newData, activeIndex, overIndex);
+      if (activeIndex !== -1 && overIndex !== -1) {
+        (newData[activeIndex] as T).column = overColumn;
+        newData = arrayMove(newData, activeIndex, overIndex);
 
-      onDataChange?.(newData);
+        onDataChange?.(newData);
+      }
     }
 
     onDragOver?.(event);
@@ -264,7 +268,50 @@ export const KanbanProvider = <
 
     const { active, over } = event;
 
-    if (!over || active.id === over.id) {
+    if (!over) {
+      return;
+    }
+    
+    // Get the active and over ids as strings
+    const activeId = active.id.toString();
+    const overId = over.id.toString();
+    
+    // Check if dropping directly onto a column
+    const isColumn = columns.some(column => column.id === overId);
+    if (isColumn) {
+      // Handle dropping directly onto a column
+      const cardId = activeId;
+      const columnId = overId;
+      
+      // Find the card and update its column
+      let newData = [...data];
+      const cardIndex = newData.findIndex(item => item.id === cardId);
+      
+      if (cardIndex !== -1) {
+        const oldColumn = newData[cardIndex]?.column;
+        
+        // Only update if column changed
+        if (oldColumn && oldColumn !== columnId) {
+          // Create a new object with the updated column
+          newData[cardIndex] = {
+            ...newData[cardIndex],
+            column: columnId,
+          } as T;
+          
+          onDataChange?.(newData);
+          
+          // Also call the specific column drop handler if provided
+          if (onColumnDrop) {
+            onColumnDrop(cardId, columnId);
+          }
+        }
+      }
+      
+      return;
+    }
+    
+    // Handle dropping onto another card (existing logic)
+    if (active.id === over.id) {
       return;
     }
 
