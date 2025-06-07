@@ -14,6 +14,7 @@ import type { ProjectFormData } from '@workspace/ui/components/dashboard/project
 import type { Project } from '@workspace/ui/components/dashboard/project-manager/project-list'
 import { trpc } from '@/lib/trpc'
 import { useNavigate } from '@tanstack/react-router'
+import { useUser } from '../__root'
 
 export const Route = createFileRoute('/project-manager/projects')({
   component: RouteComponent,
@@ -21,6 +22,7 @@ export const Route = createFileRoute('/project-manager/projects')({
 
 function RouteComponent() {
   const navigate = useNavigate()
+  const user = useUser()
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
   const [editingProject, setEditingProject] = React.useState<Project | null>(null)
@@ -219,6 +221,7 @@ function RouteComponent() {
           </DialogHeader>
           <ProjectForm
             mode="create"
+            user={user}
             onSubmit={handleCreateProject}
             onCancel={() => setIsCreateModalOpen(false)}
             projects={projectOptions}
@@ -241,6 +244,7 @@ function RouteComponent() {
           </DialogHeader>
           <ProjectForm
             mode="edit"
+            user={user}
             initialData={initialEditData}
             onSubmit={handleUpdateProject}
             onCancel={() => {

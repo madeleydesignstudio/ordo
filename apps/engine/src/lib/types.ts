@@ -6,6 +6,7 @@ export interface CloudflareBindings {
   DEV_BASE_URL?: string
   PROD_BASE_URL?: string
   STORAGE_AUTH_SECRET: string
+  AUTH_SECRET: string
 }
 
 export type AppEnv = {

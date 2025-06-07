@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Button } from '../../button'
 import { Input } from '../../input'
 import { Label } from '../../label'
+import { StorageClient } from '@ordo/storage-client'
 
 // Project form data interface
 export interface ProjectFormData {
@@ -26,6 +27,10 @@ interface ProjectFormProps {
   onCancel: () => void
   isLoading?: boolean
   mode: 'create' | 'edit'
+  user: {
+    id: string
+    name?: string
+  }
 }
 
 const statusOptions = [
@@ -44,6 +49,7 @@ export function ProjectForm({
   onCancel,
   isLoading = false,
   mode,
+  user,
 }: ProjectFormProps) {
   const [formData, setFormData] = useState<ProjectFormData>({
     name: '',
@@ -52,6 +58,8 @@ export function ProjectForm({
     ...initialData,
   })
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,47 +73,89 @@ export function ProjectForm({
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-
+  
+    // Reset state
+    setUploadProgress(0)
+    setUploadError(null)
+  
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
+      setUploadError('Please select an image file')
       return
     }
-
+  
+    // Validate file size (limit to 5MB)
+    const maxSize = 5 * 1024 * 1024
+    if (file.size > maxSize) {
+      setUploadError('File size should be less than 5MB')
+      return
+    }
+  
     try {
       setIsUploading(true)
       
-      // Generate a unique key for the file
+      // Generate a unique path
       const timestamp = Date.now()
-      const key = `projects/${timestamp}-${file.name}`
+      const fileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+      const userId = user?.id || 'anonymous'
+      const path = `users/${userId}/projects/${timestamp}-${fileName}`
       
-      // The storage service URL
-      const storageUrl = 'https://storage.dev-0af.workers.dev'
+      // Show progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          const newProgress = prev + Math.random() * 10
+          return newProgress > 90 ? 90 : newProgress
+        })
+      }, 300)
       
-      console.log(`Uploading to ${storageUrl}/${key}`)
+      // Call your backend API with full URL
+      const backendUrl = process.env.NODE_ENV === 'production' 
+        ? 'http://localhost:4321' 
+        : 'https://storage.dev-0af.workers.dev/' // Replace with your production backend URL
       
-      // Upload directly to storage service
-      const response = await fetch(`${storageUrl}/${key}`, {
+      const response = await fetch(`${backendUrl}/api/upload-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          fileType: file.type,
+          path: path,
+        }),
+      })
+  
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('API Error:', errorText)
+        throw new Error(`Failed to get upload URL: ${response.status}`)
+      }
+  
+      const { uploadUrl, imageUrl, authToken } = await response.json()
+  
+      // Upload file to your storage service with auth token
+      const uploadResponse = await fetch(uploadUrl, {
         method: 'PUT',
         headers: {
           'Content-Type': file.type,
-          // Add the authentication header for the storage service
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_STORAGE_AUTH_SECRET || 'your-storage-auth-secret'}`,
+          'Authorization': `Bearer ${authToken}`, // Add auth header
         },
-        body: file
+        body: file,
       })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('Upload error response:', errorText)
-        throw new Error('Upload failed')
+  
+      clearInterval(progressInterval)
+      setUploadProgress(100)
+      
+      if (uploadResponse.ok) {
+        updateField('cover', imageUrl)
+      } else {
+        const errorText = await uploadResponse.text()
+        console.error('Upload Error:', errorText)
+        throw new Error(`Upload failed: ${uploadResponse.status}`)
       }
-
-      const data = await response.json()
-      updateField('cover', data.url)
     } catch (error) {
       console.error('Upload failed:', error)
-      alert('Failed to upload image. Please try again.')
+      setUploadError(error instanceof Error ? error.message : 'Failed to upload image')
     } finally {
       setIsUploading(false)
     }
@@ -113,6 +163,28 @@ export function ProjectForm({
 
   const selectedStatus = statusOptions.find(opt => opt.value === formData.status)
   const selectedParentProject = projects.find(p => p.id === formData.parentProjectId)
+
+  // Preview the selected cover image
+  const coverImagePreview = formData.cover ? (
+    <div className="mt-2 relative rounded-md overflow-hidden" style={{ height: '120px' }}>
+      <img 
+        src={formData.cover} 
+        alt="Cover preview" 
+        className="w-full h-full object-cover" 
+      />
+      <button
+        type="button"
+        onClick={() => updateField('cover', '')}
+        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1"
+        aria-label="Remove image"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  ) : null
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -168,6 +240,9 @@ export function ProjectForm({
               <SelectItem value="https://example.com/preset2.jpg">Preset Image 2</SelectItem>
             </SelectContent>
           </Select>
+          
+          {coverImagePreview}
+          
           <Input
             type="file"
             onChange={handleFileChange}
@@ -175,10 +250,23 @@ export function ProjectForm({
             className="mt-2"
             disabled={isUploading}
           />
+          
           {isUploading && (
-            <div className="text-sm text-muted-foreground mt-2">
-              Uploading image...
+            <div className="mt-2 space-y-2">
+              <div className="text-sm text-muted-foreground">
+                Uploading image... {Math.round(uploadProgress)}%
+              </div>
+              <div className="w-full bg-stone-200 rounded-full h-2.5">
+                <div 
+                  className="bg-stone-600 h-2.5 rounded-full transition-all duration-300" 
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
             </div>
+          )}
+          
+          {uploadError && (
+            <p className="text-red-500 text-sm mt-1">{uploadError}</p>
           )}
         </div>
       </div>
@@ -250,7 +338,7 @@ export function ProjectForm({
 
       {/* Form Actions */}
       <div className="flex gap-3 pt-4">
-        <Button type="submit" disabled={isLoading || !formData.name.trim()}>
+        <Button type="submit" disabled={isLoading || isUploading || !formData.name.trim()}>
           {isLoading ? 'Saving...' : mode === 'create' ? 'Create Project' : 'Update Project'}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
