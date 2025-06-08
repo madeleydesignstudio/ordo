@@ -5,7 +5,7 @@
   "compatibility_date": "2024-09-23",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
-    "ENVIRONMENT": "production",
+    "ENVIRONMENT": "development",
     "DATABASE_URL": "postgresql://neon-ordo_owner:npg_NTLrRjHI62UZ@ep-muddy-night-aba4aq3j-pooler.eu-west-2.aws.neon.tech/neon-ordo?sslmode=require",
     "DEV_BASE_URL": "http://localhost:4321",
     "PROD_BASE_URL": "https://engine.dev-0af.workers.dev",

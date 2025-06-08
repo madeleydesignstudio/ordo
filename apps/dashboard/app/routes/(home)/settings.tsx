@@ -5,7 +5,7 @@ import { Label } from '@workspace/ui/components/label'
 import { ScrollArea } from '@workspace/ui/components/scroll-area'
 import { useAuth } from '../../hooks/use-auth'
 import { useState } from 'react'
-import { User, Mail, Calendar, Globe, Shield, LogOut, Image } from 'lucide-react'
+import { User, Mail, Calendar, Globe, Shield, LogOut, Image, Keyboard } from 'lucide-react'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/(home)/settings')({
@@ -249,6 +249,49 @@ function RouteComponent() {
                 <div className={`p-3 border rounded-md flex items-center gap-2 ${user.emailVerified ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
                   <Shield className="h-4 w-4" />
                   {user.emailVerified ? 'Verified by Google' : 'Not Verified'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Keyboard Shortcuts */}
+        <div className="bg-white rounded-lg border p-6 space-y-4">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            <Keyboard className="h-5 w-5" />
+            Keyboard Shortcuts
+          </h2>
+          
+          <div className="space-y-4">
+            <div className="p-4 bg-purple-50 border border-purple-200 rounded-md">
+              <h3 className="font-medium text-purple-900 mb-2">Available Shortcuts</h3>
+              <p className="text-purple-700">
+                Use these keyboard shortcuts to quickly navigate and control the application.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <h3 className="font-medium">Navigation</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center p-3 border rounded-md bg-gray-50">
+                    <span>Command Menu</span>
+                    <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-200 rounded">⌘ + K</kbd>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="font-medium">View Controls</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center p-3 border rounded-md bg-gray-50">
+                    <span>Toggle Focus Mode</span>
+                    <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-200 rounded">⌘ + F</kbd>
+                  </div>
+                  <div className="flex justify-between items-center p-3 border rounded-md bg-gray-50">
+                    <span>Toggle Fullscreen</span>
+                    <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-200 rounded">⌘ + Shift + F</kbd>
+                  </div>
                 </div>
               </div>
             </div>
