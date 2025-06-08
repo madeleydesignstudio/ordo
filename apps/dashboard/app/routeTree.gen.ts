@@ -48,6 +48,7 @@ import { Route as ContentManagerDashboardImport } from './routes/content-manager
 import { Route as ContentManagerCompanyImport } from './routes/content-manager/company'
 import { Route as AuthSignupImport } from './routes/_auth/signup'
 import { Route as AuthLoginImport } from './routes/_auth/login'
+import { Route as homeTestImport } from './routes/(home)/test'
 import { Route as homeSettingsImport } from './routes/(home)/settings'
 import { Route as homeNotificationsImport } from './routes/(home)/notifications'
 import { Route as homeNewsImport } from './routes/(home)/news'
@@ -282,6 +283,12 @@ const AuthLoginRoute = AuthLoginImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any)
 
+const homeTestRoute = homeTestImport.update({
+  id: '/test',
+  path: '/test',
+  getParentRoute: () => homeRouteRoute,
+} as any)
+
 const homeSettingsRoute = homeSettingsImport.update({
   id: '/settings',
   path: '/settings',
@@ -403,6 +410,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof homeSettingsImport
+      parentRoute: typeof homeRouteImport
+    }
+    '/(home)/test': {
+      id: '/(home)/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof homeTestImport
       parentRoute: typeof homeRouteImport
     }
     '/_auth/login': {
@@ -649,6 +663,7 @@ interface homeRouteRouteChildren {
   homeNewsRoute: typeof homeNewsRoute
   homeNotificationsRoute: typeof homeNotificationsRoute
   homeSettingsRoute: typeof homeSettingsRoute
+  homeTestRoute: typeof homeTestRoute
   homeIndexRoute: typeof homeIndexRoute
 }
 
@@ -660,6 +675,7 @@ const homeRouteRouteChildren: homeRouteRouteChildren = {
   homeNewsRoute: homeNewsRoute,
   homeNotificationsRoute: homeNotificationsRoute,
   homeSettingsRoute: homeSettingsRoute,
+  homeTestRoute: homeTestRoute,
   homeIndexRoute: homeIndexRoute,
 }
 
@@ -744,6 +760,7 @@ export interface FileRoutesByFullPath {
   '/news': typeof homeNewsRoute
   '/notifications': typeof homeNotificationsRoute
   '/settings': typeof homeSettingsRoute
+  '/test': typeof homeTestRoute
   '/login': typeof AuthLoginRoute
   '/signup': typeof AuthSignupRoute
   '/content-manager/company': typeof ContentManagerCompanyRoute
@@ -787,6 +804,7 @@ export interface FileRoutesByTo {
   '/news': typeof homeNewsRoute
   '/notifications': typeof homeNotificationsRoute
   '/settings': typeof homeSettingsRoute
+  '/test': typeof homeTestRoute
   '/login': typeof AuthLoginRoute
   '/signup': typeof AuthSignupRoute
   '/content-manager/company': typeof ContentManagerCompanyRoute
@@ -835,6 +853,7 @@ export interface FileRoutesById {
   '/(home)/news': typeof homeNewsRoute
   '/(home)/notifications': typeof homeNotificationsRoute
   '/(home)/settings': typeof homeSettingsRoute
+  '/(home)/test': typeof homeTestRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/signup': typeof AuthSignupRoute
   '/content-manager/company': typeof ContentManagerCompanyRoute
@@ -884,6 +903,7 @@ export interface FileRouteTypes {
     | '/news'
     | '/notifications'
     | '/settings'
+    | '/test'
     | '/login'
     | '/signup'
     | '/content-manager/company'
@@ -926,6 +946,7 @@ export interface FileRouteTypes {
     | '/news'
     | '/notifications'
     | '/settings'
+    | '/test'
     | '/login'
     | '/signup'
     | '/content-manager/company'
@@ -972,6 +993,7 @@ export interface FileRouteTypes {
     | '/(home)/news'
     | '/(home)/notifications'
     | '/(home)/settings'
+    | '/(home)/test'
     | '/_auth/login'
     | '/_auth/signup'
     | '/content-manager/company'
@@ -1090,6 +1112,7 @@ export const routeTree = rootRoute
         "/(home)/news",
         "/(home)/notifications",
         "/(home)/settings",
+        "/(home)/test",
         "/(home)/"
       ]
     },
@@ -1152,6 +1175,10 @@ export const routeTree = rootRoute
     },
     "/(home)/settings": {
       "filePath": "(home)/settings.tsx",
+      "parent": "/(home)"
+    },
+    "/(home)/test": {
+      "filePath": "(home)/test.tsx",
       "parent": "/(home)"
     },
     "/_auth/login": {

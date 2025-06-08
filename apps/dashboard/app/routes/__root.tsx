@@ -8,14 +8,13 @@ import {
   useLocation,
   useNavigate,
 } from '@tanstack/react-router'
-import type { ReactNode } from 'react'
-import { createContext, useContext, useEffect } from 'react'
-import { useAuth } from '../hooks/use-auth'
+import { Toaster } from "@workspace/ui/components/sonner"
 import { usePostHog } from 'posthog-js/react'
+import { createContext, useContext, useEffect } from 'react'
 import AppProvider from "../components/app-provider"
 import { TRPCProvider } from "../components/trpc-provider"
-import { Toaster } from "@workspace/ui/components/sonner"
-import { ModeProvider} from '../hooks/use-mode'
+import { useAuth } from '../hooks/use-auth'
+import { ModeProvider } from '../hooks/use-mode'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -127,7 +126,7 @@ function RootComponent() {
   )
 }
 
-function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html>
       <head>

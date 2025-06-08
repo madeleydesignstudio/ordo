@@ -5,5 +5,5 @@ export const Route = createFileRoute('/project-manager/')({
 })
 
 function RouteComponent() {
-  return <div>Hello</div>
+  return <div className='h-[93vh] w-[97.1vw] bg-red-300 flex justify-center items-center'>Hello</div>
 }
