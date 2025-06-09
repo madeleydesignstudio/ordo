@@ -6,5 +6,12 @@ export const Route = createFileRoute('/project-manager/notes')({
 })
 
 function RouteComponent() {
-  return <div><Notes/></div>
+  return <div className='flex'>
+    <div className='w-2/12'>Hello</div>
+    <div className='w-3/12 border-l border-stone-300'>Hello</div>
+    <div className='w-9/12 border-l border-stone-300 '>
+    
+    <div className='max-w-5xl mx-auto h-full'><Notes/></div>
+   </div>
+    </div>
 }

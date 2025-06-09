@@ -152,6 +152,7 @@ const KanbanView = ({ projects = [], onStatusChange }: KanbanViewProps) => {
       onDragEnd={handleDragEnd}
       columns={columns}
       data={kanbanItems}
+      className="h-full"
     >
       {(column) => (
         <KanbanBoard key={column.id} id={column.id}>

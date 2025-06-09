@@ -140,7 +140,7 @@ const AppLayoutContent = ({ className }: AppProviderProps) => {
         {/* Content Area - Adjusts based on focus mode */}
         <div 
           className={cn(
-            "overflow-hidden bg-stone-100 transition-all duration-300 ease-in-out flex flex-col justify-center items-center",
+            "overflow-hidden bg-stone-100 transition-all duration-300 ease-in-out flex flex-col",
             "border-y border-l border-stone-300 rounded-l-lg",
             isFocusMode ? "mt-[10px] ml-[10px] mb-[20px] mr-0" : "mt-[40px] ml-[50px] mb-[20px] mr-0",
             isFocusMode 
@@ -151,7 +151,9 @@ const AppLayoutContent = ({ className }: AppProviderProps) => {
               : "w-[calc(100vw-50px)]"
           )}
         >
+        
             <Outlet />
+      
         </div>
         {/* Bottom Navigation - Always visible */}
         <div 

@@ -251,7 +251,7 @@ function RouteComponent() {
     // For legacy/classic view
     if (activeView === 'classic') {
       return (
-        <div className="h-[93vh] w-[97.1vw]">
+        <div className="h-full w-full">
           <ProjectList
             projects={paginatedProjects}
             onEdit={handleEditProject}
@@ -266,7 +266,7 @@ function RouteComponent() {
     
     // For new view types (kanban, list, table, etc.)
     return (
-      <div className="h-[93vh] w-[97.1vw]">
+      <div className="h-full w-full ">
         <ViewContainer 
           key={`view-${activeView}`} 
           viewType={activeView} 
@@ -306,16 +306,11 @@ function RouteComponent() {
   }
 
   return (
-    <div className=" h-[93vh] w-[97.1vw]">
+    <div className=" h-[83vh] w-full p-4">
       {/* Header with Project Count */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {projectsQuery.isLoading 
-              ? 'Loading projects...' 
-              : `${filteredProjects.length} project${filteredProjects.length !== 1 ? 's' : ''}`}
-          </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative max-w-md">
@@ -328,18 +323,6 @@ function RouteComponent() {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          <Button
-            onClick={() => setIsCreateModalOpen(true)}
-            disabled={createProjectMutation.isPending}
-            className="flex items-center gap-1"
-          >
-            {createProjectMutation.isPending ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></div>
-            ) : (
-              <Plus className="h-4 w-4" />
-            )}
-            New Project
-          </Button>
         </div>
       </div>
       
@@ -347,7 +330,7 @@ function RouteComponent() {
       {renderProjectView()}
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {/* {totalPages > 1 && (
         <div className="flex items-center justify-between mt-6">
           <div className="text-xs text-gray-700">
             Showing {startIndex + 1} to {Math.min(startIndex + projectsPerPage, filteredProjects.length)} of {filteredProjects.length} projects
@@ -374,7 +357,7 @@ function RouteComponent() {
             </Button>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Create Project Dialog */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>

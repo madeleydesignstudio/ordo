@@ -77,7 +77,7 @@ const ViewContainer = ({ viewType: initialViewType, data = [], onStatusChange }:
   };
 
   return (
-    <div className="">
+    <div className="h-full">
       {renderView()}
     </div>
   );
