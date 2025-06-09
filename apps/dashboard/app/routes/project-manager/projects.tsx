@@ -251,7 +251,7 @@ function RouteComponent() {
     // For legacy/classic view
     if (activeView === 'classic') {
       return (
-        <div className="min-h-[600px]">
+        <div className="h-[93vh] w-[97.1vw]">
           <ProjectList
             projects={paginatedProjects}
             onEdit={handleEditProject}
@@ -266,7 +266,7 @@ function RouteComponent() {
     
     // For new view types (kanban, list, table, etc.)
     return (
-      <div className="min-h-[600px]">
+      <div className="h-[93vh] w-[97.1vw]">
         <ViewContainer 
           key={`view-${activeView}`} 
           viewType={activeView} 
@@ -306,7 +306,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className=" h-[93vh] w-[97.1vw]">
       {/* Header with Project Count */}
       <div className="flex items-center justify-between mb-6">
         <div>

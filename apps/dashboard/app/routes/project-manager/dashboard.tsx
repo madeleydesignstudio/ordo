@@ -3,6 +3,8 @@ import DateSlider from '@workspace/ui/components/dashboard/project-manager/date-
 import { useState } from 'react'
 import { trpc } from '../../lib/trpc'
 import { CalendarIcon } from 'lucide-react'
+import { useFocusMode } from '@workspace/ui/components/dashboard/main/bottomnav'
+import { cn } from '@workspace/ui/lib/utils'
 
 export const Route = createFileRoute('/project-manager/dashboard')({
   component: RouteComponent,
@@ -11,6 +13,8 @@ export const Route = createFileRoute('/project-manager/dashboard')({
 function RouteComponent() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date())
   const { data: tasks, isLoading, error } = trpc.tasks.list.useQuery()
+  const { isFocusMode } = useFocusMode()
+
 
   const handleDateChange = (newDate: Date) => {
     setCurrentDate(newDate)
@@ -21,7 +25,12 @@ function RouteComponent() {
   }
 
   return (
-    <div className="flex flex-col h-[93vh] w-[97.1vw]">
+    <div className={cn(
+      "transition-all duration-300 ease-in-out flex flex-col",
+      isFocusMode 
+        ? "h-[97vh] w-[99.5vw]" 
+        : "h-[93vh] w-[97.1vw]"
+    )}>"
       {/* Task content area */}
       <div className="flex-1 min-h-0 overflow-auto">
         <div className="p-4">

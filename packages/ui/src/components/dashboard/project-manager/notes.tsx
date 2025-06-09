@@ -326,7 +326,7 @@ const Notes = () => {
     <EditorProvider
       content={content}
       placeholder="Start typing..."
-      className="h-full w-full overflow-y-auto rounded-lg border bg-background p-4"
+      className="h-[93vh] w-full overflow-y-auto  p-4"
       onUpdate={handleUpdate}
     >
       <EditorFloatingMenu>
@@ -371,6 +371,14 @@ const Notes = () => {
           <EditorTableRowAfter />
           <EditorTableRowDelete />
         </EditorTableRowMenu>
+        <EditorTableGlobalMenu>
+          <EditorTableHeaderColumnToggle />
+          <EditorTableHeaderRowToggle />
+          <EditorTableDelete />
+          <EditorTableMergeCells />
+          <EditorTableSplitCell />
+          <EditorTableFix />
+        </EditorTableGlobalMenu>
         <EditorTableGlobalMenu>
           <EditorTableHeaderColumnToggle />
           <EditorTableHeaderRowToggle />

@@ -77,7 +77,7 @@ const ViewContainer = ({ viewType: initialViewType, data = [], onStatusChange }:
   };
 
   return (
-    <div className="p-4 bg-white rounded-md shadow-sm">
+    <div className="">
       {renderView()}
     </div>
   );
