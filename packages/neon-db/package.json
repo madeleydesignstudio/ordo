@@ -13,4 +13,5 @@
         "./db": "./src/db.ts",
         "./schema": "./src/schema/index.ts"
     }
+    
 }

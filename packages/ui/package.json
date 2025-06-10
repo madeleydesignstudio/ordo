@@ -43,6 +43,7 @@
     "@tiptap/react": "^2.14.0",
     "@tiptap/starter-kit": "^2.14.0",
     "@tiptap/suggestion": "^2.14.0",
+    "@types/lodash-es": "^4.17.12",
     "@uidotdev/usehooks": "^2.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

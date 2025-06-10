@@ -2,6 +2,7 @@ import { HelloSchema, publicProcedure, router } from '@ordo/trpc'
 import { healthProcedure } from './procedures/health'
 import { projectsRouter } from './procedures/projects'
 import { tasksRouter } from './procedures/tasks'
+import { notesRouter } from './procedures/notes'
 
 export const appRouter = router({
   // Health check
@@ -22,6 +23,9 @@ export const appRouter = router({
 
   // Tasks procedures
   tasks: tasksRouter,
+
+  // Notes procedures
+  notes: notesRouter,
 })
 
 export type AppRouter = typeof appRouter 
