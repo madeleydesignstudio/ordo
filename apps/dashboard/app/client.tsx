@@ -18,9 +18,8 @@ hydrateRoot(
       apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY}
       options={{
         api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-        ui_host: import.meta.env.VITE_PUBLIC_POSTHOG_UI_HOST,
         capture_exceptions: true,
-        debug: import.meta.env.MODE === 'development',
+        debug: import.meta.env.MODE === 'production',
         disable_external_dependency_loading: true,
       }}
     >

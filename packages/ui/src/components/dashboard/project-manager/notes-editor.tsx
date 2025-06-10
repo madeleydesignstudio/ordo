@@ -1,6 +1,5 @@
 import * as React from "react"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
-import { debounce } from "lodash-es"
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit"
@@ -91,7 +90,6 @@ interface NotesEditorProps {
   }) => Promise<void>
   onTitleChange?: (title: string) => void
   autoSave?: boolean
-  autoSaveDelay?: number
 }
 
 const MainToolbarContent = ({
@@ -203,7 +201,6 @@ export function NotesEditor({
   onSave,
   onTitleChange,
   autoSave = true,
-  autoSaveDelay = 1000,
 }: NotesEditorProps) {
   const isMobile = useMobile()
   const windowSize = useWindowSize()
@@ -281,34 +278,28 @@ export function NotesEditor({
     }
   }, [editor, onSave, title])
 
-  // Debounced auto-save
-  const debouncedSave = React.useMemo(
-    () => debounce(performSave, autoSaveDelay),
-    [performSave, autoSaveDelay]
-  )
-
   // Handle title changes
   const handleTitleChange = React.useCallback((newTitle: string) => {
     setTitle(newTitle)
     onTitleChange?.(newTitle)
     if (autoSave) {
-      debouncedSave()
+      performSave()
     }
-  }, [onTitleChange, autoSave, debouncedSave])
+  }, [onTitleChange, autoSave, performSave])
 
   // Handle editor content changes
   React.useEffect(() => {
     if (!editor || !autoSave) return
 
     const handleUpdate = () => {
-      debouncedSave()
+      performSave()
     }
 
     editor.on('update', handleUpdate)
     return () => {
       editor.off('update', handleUpdate)
     }
-  }, [editor, autoSave, debouncedSave])
+  }, [editor, autoSave, performSave])
 
   // Mobile view handling
   React.useEffect(() => {
@@ -317,12 +308,13 @@ export function NotesEditor({
     }
   }, [isMobile, mobileView])
 
-  // Cleanup debounced function
+  // Update editor content when note changes
   React.useEffect(() => {
-    return () => {
-      debouncedSave.cancel()
+    if (editor && note?.content) {
+      editor.commands.setContent(note.content)
+      setTitle(note.title || "Untitled Note")
     }
-  }, [debouncedSave])
+  }, [editor, note])
 
   return (
     <div className="notes-editor">

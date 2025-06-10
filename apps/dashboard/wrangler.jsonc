@@ -8,6 +8,8 @@
         "VITE_ENGINE_PROD_URL": "https://engine.dev-0af.workers.dev",
         "VITE_DASHBOARD_DEV_URL": "http://localhost:3001",
         "VITE_DASHBOARD_PROD_URL": "https://dashboard.dev-0af.workers.dev",
+        "VITE_PUBLIC_POSTHOG_KEY": "phc_8xc5BDSJGVFNtbFwV1FrK0r6zCgJgj7S85576RrgnsJ",
+        "VITE_PUBLIC_POSTHOG_HOST": "https://ordo.dev-0af.workers.dev/",
         "STORAGE_AUTH_SECRET": "your-storage-auth-secret",
         "NEXT_PUBLIC_STORAGE_AUTH_SECRET": "your-storage-auth-secret"
     },

@@ -37,7 +37,9 @@ function RouteComponent() {
     folderId: search.folderId,
     search: searchQuery || undefined,
   }, {
-    enabled: isAuthenticated
+    enabled: isAuthenticated,
+    refetchOnWindowFocus: true,
+    staleTime: 0
   })
   
   const { data: folders } = trpc.notes.folders.list.useQuery(undefined, {
@@ -46,7 +48,12 @@ function RouteComponent() {
   
   const { data: noteData } = trpc.notes.getById.useQuery(
     { id: search.noteId! },
-    { enabled: !!search.noteId && isAuthenticated }
+    { 
+      enabled: !!search.noteId && isAuthenticated,
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      staleTime: 0
+    }
   )
   
   const createNoteMutation = trpc.notes.create.useMutation({
@@ -73,10 +80,23 @@ function RouteComponent() {
     },
   })
   
+  // Track loading state for the current note
+  const [isLoadingNote, setIsLoadingNote] = useState(false)
+  
+  // Refetch note data when noteId changes
+  useEffect(() => {
+    if (search.noteId) {
+      // Clear current note while loading
+      setCurrentNote(null)
+      setIsLoadingNote(true)
+    }
+  }, [search.noteId])
+  
   // Update current note when noteData changes
   useEffect(() => {
     if (noteData) {
       setCurrentNote(noteData)
+      setIsLoadingNote(false)
     }
   }, [noteData])
   
@@ -108,10 +128,20 @@ function RouteComponent() {
       setCurrentNote(newNote)
     } else {
       // Update existing note
-      await updateNoteMutation.mutateAsync({
+      const updatedNote = await updateNoteMutation.mutateAsync({
         id: currentNote.id,
         ...noteData,
       })
+      
+      // Update current note with the latest data
+      setCurrentNote({
+        ...currentNote,
+        ...noteData,
+        updatedAt: new Date()
+      })
+      
+      // Refresh the notes list
+      refetchNotes()
     }
   }
   
@@ -239,13 +269,18 @@ function RouteComponent() {
       
       {/* Main Editor */}
       <div className='w-7/12'>
-        {currentNote || search.noteId ? (
+        {isLoadingNote ? (
+          <div className='flex items-center justify-center h-full text-gray-500'>
+            <div className='text-center'>
+              <p>Loading note...</p>
+            </div>
+          </div>
+        ) : currentNote || search.noteId ? (
           <div className='max-w-5xl mx-auto h-full'>
             <NotesEditor
               note={currentNote}
               onSave={handleSaveNote}
               autoSave={true}
-              autoSaveDelay={1000}
             />
           </div>
         ) : (
