@@ -284,7 +284,7 @@ function RouteComponent() {
             <NotesEditor
               note={currentNote}
               onSave={handleSaveNote}
-              autoSave={false}
+              autoSave={true}
             />
           </div>
         ) : (

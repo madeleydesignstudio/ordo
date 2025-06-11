@@ -1,18 +1,17 @@
-import * as React from "react"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
-import { ScrollArea } from "../../scroll-area"
+import * as React from "react"
 
 // --- Tiptap Core Extensions ---
-import { StarterKit } from "@tiptap/starter-kit"
+import { Highlight } from "@tiptap/extension-highlight"
 import { Image } from "@tiptap/extension-image"
+import { Subscript } from "@tiptap/extension-subscript"
+import { Superscript } from "@tiptap/extension-superscript"
 import { TaskItem } from "@tiptap/extension-task-item"
 import { TaskList } from "@tiptap/extension-task-list"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { Typography } from "@tiptap/extension-typography"
-import { Highlight } from "@tiptap/extension-highlight"
-import { Subscript } from "@tiptap/extension-subscript"
-import { Superscript } from "@tiptap/extension-superscript"
 import { Underline } from "@tiptap/extension-underline"
+import { StarterKit } from "@tiptap/starter-kit"
 
 // --- Custom Extensions ---
 import { Link } from "../../tiptap/tiptap-extension/link-extension"
@@ -29,28 +28,28 @@ import {
 } from "../../tiptap/tiptap-ui-primitive/toolbar"
 
 // --- Tiptap Node ---
-import { ImageUploadNode } from "../../tiptap/tiptap-node/image-upload-node/image-upload-node-extension"
 import "../../tiptap/tiptap-node/code-block-node/code-block-node.scss"
-import "../../tiptap/tiptap-node/list-node/list-node.scss"
 import "../../tiptap/tiptap-node/image-node/image-node.scss"
+import { ImageUploadNode } from "../../tiptap/tiptap-node/image-upload-node/image-upload-node-extension"
+import "../../tiptap/tiptap-node/list-node/list-node.scss"
 import "../../tiptap/tiptap-node/paragraph-node/paragraph-node.scss"
 
 // --- Tiptap UI ---
 import { HeadingDropdownMenu } from "../../tiptap/tiptap-ui/heading-dropdown-menu"
-import { ImageUploadButton } from "../../tiptap/tiptap-ui/image-upload-button"
-import { ListDropdownMenu } from "../../tiptap/tiptap-ui/list-dropdown-menu"
-import { NodeButton } from "../../tiptap/tiptap-ui/node-button"
 import {
-  HighlightPopover,
   HighlightContent,
   HighlighterButton,
+  HighlightPopover,
 } from "../../tiptap/tiptap-ui/highlight-popover"
+import { ImageUploadButton } from "../../tiptap/tiptap-ui/image-upload-button"
 import {
-  LinkPopover,
-  LinkContent,
   LinkButton,
+  LinkContent,
+  LinkPopover,
 } from "../../tiptap/tiptap-ui/link-popover"
+import { ListDropdownMenu } from "../../tiptap/tiptap-ui/list-dropdown-menu"
 import { MarkButton } from "../../tiptap/tiptap-ui/mark-button"
+import { NodeButton } from "../../tiptap/tiptap-ui/node-button"
 import { TextAlignButton } from "../../tiptap/tiptap-ui/text-align-button"
 import { UndoRedoButton } from "../../tiptap/tiptap-ui/undo-redo-button"
 
@@ -60,9 +59,10 @@ import { HighlighterIcon } from "../../tiptap/tiptap-icons/highlighter-icon"
 import { LinkIcon } from "../../tiptap/tiptap-icons/link-icon"
 
 // --- Hooks ---
+import { useCursorVisibility } from "../../../hooks/use-cursor-visibility"
+import { useDebouncedCallback } from "../../../hooks/use-debounce"
 import { useMobile } from "../../../hooks/use-mobile"
 import { useWindowSize } from "../../../hooks/use-window-size"
-import { useCursorVisibility } from "../../../hooks/use-cursor-visibility"
 
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from "../../../lib/tiptap-utils"
@@ -92,6 +92,9 @@ interface NotesEditorProps {
   onTitleChange?: (title: string) => void
   autoSave?: boolean
 }
+
+// Constants
+const AUTOSAVE_DELAY = 2000; // 2 seconds
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -211,11 +214,14 @@ export function NotesEditor({
   const [title, setTitle] = React.useState(note?.title || "Untitled Note")
   const [isSaving, setIsSaving] = React.useState(false)
   const [lastSaved, setLastSaved] = React.useState<Date | null>(null)
+  const [contentChanged, setContentChanged] = React.useState(false)
   const toolbarRef = React.useRef<HTMLDivElement>(null)
   
-  // Track content changes without triggering immediate saves
-  const [contentChanged, setContentChanged] = React.useState(false)
-  const [saveTimer, setSaveTimer] = React.useState<NodeJS.Timeout | null>(null)
+  // Track if the editor is currently focused to prevent autosave from interrupting typing
+  const [isEditorFocused, setIsEditorFocused] = React.useState(false)
+  
+  // Track if we're currently creating a list to prevent autosave during list creation
+  const isCreatingListRef = React.useRef(false)
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -225,6 +231,21 @@ export function NotesEditor({
         autocorrect: "off",
         autocapitalize: "off",
         "aria-label": "Main content area, start typing to enter text.",
+      },
+      handleKeyDown: (view, event) => {
+        // Detect when user is creating or modifying a list
+        if (event.key === 'Enter' && (
+          editor?.isActive('bulletList') || 
+          editor?.isActive('orderedList') || 
+          editor?.isActive('taskList')
+        )) {
+          isCreatingListRef.current = true;
+          // Reset the flag after a short delay
+          setTimeout(() => {
+            isCreatingListRef.current = false;
+          }, 500);
+        }
+        return false; // Let TipTap handle the event
       },
     },
     extensions: [
@@ -270,9 +291,19 @@ export function NotesEditor({
       Link.configure({ openOnClick: false }),
     ],
     content: note?.content || { type: 'doc', content: [{ type: 'paragraph' }] },
-    onUpdate: ({ editor }) => {
-      // Always track content changes regardless of autosave setting
-      setContentChanged(true)
+    onUpdate: () => {
+      // Only mark as changed, the actual save will be debounced
+      setContentChanged(true);
+    },
+    onFocus: () => {
+      setIsEditorFocused(true);
+    },
+    onBlur: () => {
+      setIsEditorFocused(false);
+      // When focus leaves the editor, we can save if there are changes
+      if (contentChanged && autoSave) {
+        debouncedSave();
+      }
     },
   })
 
@@ -283,82 +314,80 @@ export function NotesEditor({
 
   // Perform the actual save operation
   const performSave = React.useCallback(async () => {
-    if (!editor || !onSave) return // Remove the contentChanged check to allow manual saves
+    if (!editor || !onSave || !contentChanged) return;
+    
+    // Don't save if we're in the middle of creating a list
+    if (isCreatingListRef.current) {
+      return;
+    }
 
-    setIsSaving(true)
+    setIsSaving(true);
     try {
-      const content = editor.getJSON()
-      const htmlContent = editor.getHTML()
-      const plainTextContent = htmlToPlainText(htmlContent)
+      const content = editor.getJSON();
+      const htmlContent = editor.getHTML();
+      const plainTextContent = htmlToPlainText(htmlContent);
 
       await onSave({
         title,
         content,
         htmlContent,
         plainTextContent,
-      })
+      });
 
-      setLastSaved(new Date())
-      setContentChanged(false)
+      setLastSaved(new Date());
+      setContentChanged(false);
     } catch (error) {
-      console.error('Failed to save note:', error)
+      console.error('Failed to save note:', error);
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }, [editor, onSave, title])
+  }, [editor, onSave, title, contentChanged]);
+
+  // Create a debounced version of the save function
+  const debouncedSave = useDebouncedCallback(performSave, AUTOSAVE_DELAY);
 
   // Handle title changes
   const handleTitleChange = React.useCallback((newTitle: string) => {
-    setTitle(newTitle)
-    onTitleChange?.(newTitle)
+    setTitle(newTitle);
+    onTitleChange?.(newTitle);
+    setContentChanged(true);
+    
     if (autoSave) {
-      setContentChanged(true)
+      debouncedSave();
     }
-  }, [onTitleChange, autoSave])
+  }, [onTitleChange, autoSave, debouncedSave]);
 
-  // Set up interval-based autosave rather than reacting to every editor update
+  // Handle autosave when content changes
   React.useEffect(() => {
-    if (!autoSave) return
+    if (!autoSave || !contentChanged) return;
     
-    // Only start the autosave timer if there are unsaved changes
-    if (contentChanged && !saveTimer) {
-      const timer = setInterval(() => {
-        performSave()
-      }, 3000) // Save every 3 seconds if there are changes
-      
-      setSaveTimer(timer)
-    } else if (!contentChanged && saveTimer) {
-      clearInterval(saveTimer)
-      setSaveTimer(null)
+    // Only trigger autosave if the user isn't currently focused in the editor
+    // This prevents interrupting typing with saves
+    if (!isEditorFocused) {
+      debouncedSave();
     }
-    
-    return () => {
-      if (saveTimer) {
-        clearInterval(saveTimer)
-      }
-    }
-  }, [autoSave, contentChanged, performSave, saveTimer])
+  }, [contentChanged, autoSave, isEditorFocused, debouncedSave]);
 
   // Manual save button handler
   const handleManualSave = React.useCallback(() => {
-    performSave()
-  }, [performSave])
+    performSave();
+  }, [performSave]);
 
   // Mobile view handling
   React.useEffect(() => {
     if (!isMobile && mobileView !== "main") {
-      setMobileView("main")
+      setMobileView("main");
     }
-  }, [isMobile, mobileView])
+  }, [isMobile, mobileView]);
 
   // Update editor content when note changes
   React.useEffect(() => {
     if (editor && note?.content) {
-      editor.commands.setContent(note.content)
-      setTitle(note.title || "Untitled Note")
-      setContentChanged(false)
+      editor.commands.setContent(note.content);
+      setTitle(note.title || "Untitled Note");
+      setContentChanged(false);
     }
-  }, [editor, note])
+  }, [editor, note]);
 
   return (
     <div className="notes-editor flex flex-col h-full ">
@@ -431,8 +460,6 @@ export function NotesEditor({
               editor={editor}
               role="presentation"
               className="simple-editor-content"
-              onInput={() => setContentChanged(true)}
-              onChange={() => setContentChanged(true)}
             />
           </div>
         </div>

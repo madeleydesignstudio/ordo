@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -38,7 +38,6 @@ import {
   LayoutGrid,
   List,
   MoreVertical,
-  Palette,
   Plus,
   StickyNote,
   Table
@@ -97,6 +96,8 @@ const viewSelectorRoutes = [
   '/project-manager/projects',
   '/project-manager/tasks',
   '/project-manager/notes',
+  '/health-manager/workouts',
+  '/health-manager/nutrition',
 ]
 
 const TopNav = ({ 
@@ -112,7 +113,6 @@ const TopNav = ({
   onViewChange
 }: TopNavProps = {}) => {
   const location = useLocation()
-  const navigate = useNavigate()
   const topNavRef = React.useRef<HTMLDivElement>(null)
   const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = React.useState(false)
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = React.useState(false)
@@ -157,18 +157,28 @@ const TopNav = ({
       { label: 'Analytics', href: '/project-manager/analytics', icon: "https://storage.dev-0af.workers.dev/analytics.png" },
     ],
     '/content-manager': [
-      { label: 'Dashboard', href: '/content-manager/dashboard', icon: Home },
-      { label: 'Content', href: '/content-manager/content', icon: FolderKanban },
-      { label: 'Media', href: '/content-manager/media', icon: Palette },
-      { label: 'Schedule', href: '/content-manager/schedule', icon: CheckSquare },
-      { label: 'Analytics', href: '/content-manager/analytics', icon: BarChart3 },
+      { label: 'Dashboard', href: '/content-manager/dashboard', icon: "https://storage.dev-0af.workers.dev/dashboard.png" },
+      { label: 'People', href: '/content-manager/people', icon: "https://storage.dev-0af.workers.dev/people.png" },
+      { label: 'Company', href: '/content-manager/company', icon: "https://storage.dev-0af.workers.dev/company.png" },
+      { label: 'Inbox', href: '/content-manager/inbox', icon: "https://storage.dev-0af.workers.dev/inbox.png" },
+      { label: 'Email', href: '/content-manager/email', icon: BarChart3 },
+      { label: 'Inbox-Zero', href: '/content-manager/inbox-zero', icon: BarChart3 },
+      { label: 'Reports', href: '/content-manager/reports', icon: BarChart3 },
     ],
     '/finance-manager': [
       { label: 'Dashboard', href: '/finance-manager/dashboard', icon: Home },
       { label: 'Transactions', href: '/finance-manager/transactions', icon: FolderKanban },
-      { label: 'Budgets', href: '/finance-manager/budgets', icon: CheckSquare },
-      { label: 'Reports', href: '/finance-manager/reports', icon: BarChart3 },
-      { label: 'Invoices', href: '/finance-manager/invoices', icon: StickyNote },
+      { label: 'News', href: '/finance-manager/news', icon: CheckSquare },
+      { label: 'Portfolio', href: '/finance-manager/portfolio', icon: BarChart3 },
+      { label: 'Budgeting', href: '/finance-manager/budgeting', icon: StickyNote },
+      { label: 'Reports', href: '/finance-manager/reports', icon: StickyNote },
+    ],
+    '/health-manager': [
+      { label: 'Supplement Tracker', href: '/health-manager/dashboard', icon: "https://storage.dev-0af.workers.dev/dashboard.png" },
+      { label: 'Fitness Tracker', href: '/health-manager/workouts', icon: "https://storage.dev-0af.workers.dev/workout.png" },
+      { label: 'Sleep', href: '/health-manager/sleep', icon: "https://storage.dev-0af.workers.dev/sleep.png" },
+      { label: 'Mood', href: '/health-manager/mood', icon: "https://storage.dev-0af.workers.dev/mood.png" },
+      { label: 'Metrics', href: '/health-manager/metrics', icon: "https://storage.dev-0af.workers.dev/metrics.png" },
     ],
   }
 
@@ -219,6 +229,7 @@ const TopNav = ({
       'project-manager': 'Project Manager',
       'content-manager': 'Content Manager', 
       'finance-manager': 'Finance Manager',
+      'health-manager': 'Health Manager',
       'dashboard': 'Dashboard',
       'projects': 'Projects',
       'tasks': 'Tasks',
@@ -232,6 +243,11 @@ const TopNav = ({
       'budgets': 'Budgets',
       'reports': 'Reports',
       'invoices': 'Invoices',
+      'workouts': 'Workouts',
+      'nutrition': 'Nutrition',
+      'sleep': 'Sleep',
+      'mood': 'Mood',
+      'metrics': 'Health Metrics',
     }
 
     return segments.map((segment, index) => {
@@ -396,6 +412,37 @@ const TopNav = ({
       title: "Invoices",
       href: "/finance-manager/invoices",
       description: "Manage invoices"
+    },
+    // Health Manager Routes
+    {
+      title: "Health Manager Dashboard",
+      href: "/health-manager/dashboard",
+      description: "Go to health manager overview"
+    },
+    {
+      title: "Workouts",
+      href: "/health-manager/workouts",
+      description: "View and manage workout plans"
+    },
+    {
+      title: "Nutrition",
+      href: "/health-manager/nutrition",
+      description: "Track diet and nutrition information"
+    },
+    {
+      title: "Sleep",
+      href: "/health-manager/sleep",
+      description: "Monitor sleep patterns and quality"
+    },
+    {
+      title: "Mood",
+      href: "/health-manager/mood",
+      description: "Track mood and mental health"
+    },
+    {
+      title: "Health Metrics",
+      href: "/health-manager/metrics",
+      description: "View health metrics and statistics"
     },
     // General/Settings/Actions
     {
