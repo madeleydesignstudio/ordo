@@ -35,41 +35,26 @@ body {
 }
 
 .content-wrapper {
-  height: calc(100% - var(--tt-toolbar-height));
-  overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    display: block;
-    width: 0.5rem;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--tt-scrollbar-color);
-    border-radius: 4px;
-  }
-
-  /* Firefox scrollbar */
-  scrollbar-width: thin;
-  scrollbar-color: var(--tt-scrollbar-color) transparent;
+  /* Using ScrollArea component instead of direct scrolling */
+  position: relative;
+  height: 100%;
 }
 
 .simple-editor-content {
-  max-width: 640px;
+  max-width: 720px;
   width: 100%;
   margin: 0 auto;
 }
 
 .simple-editor-content .tiptap.ProseMirror {
-  padding: 3rem 3rem;
+  padding: 1.5rem;
+  outline: none;
+  min-height: 300px; /* Smaller min-height to avoid forcing scroll */
 }
 
 @media screen and (max-width: 480px) {
   .simple-editor-content .tiptap.ProseMirror {
-    padding: 1rem 1.5rem;
+    padding: 1rem;
   }
 }
 
@@ -105,4 +90,42 @@ body {
 // Selected text highlight
 ::selection {
   background-color: rgba(35, 131, 226, 0.28);
+}
+
+/* Notes editor specific styles */
+.notes-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden; /* Prevent editor from scrolling as a whole */
+}
+
+.notes-editor .tiptap-toolbar {
+  flex-shrink: 0;
+}
+
+/* Make the scrollbar look nicer */
+.notes-editor .flex-grow.overflow-y-auto {
+  &::-webkit-scrollbar {
+    display: block;
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #d4d4d4;
+    border-radius: 4px;
+  }
+
+  /* Firefox scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d4 transparent;
+}
+
+/* Create shadow effect for sticky elements */
+.notes-editor .sticky {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }

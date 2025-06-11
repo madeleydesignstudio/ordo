@@ -79,7 +79,7 @@ export function canToggleList(editor: Editor | null, type: ListType): boolean {
     case "orderedList":
       return editor.can().toggleOrderedList()
     case "taskList":
-      return editor.can().toggleList("taskList", "taskItem")
+      return editor.can().toggleTaskList()
     default:
       return false
   }
@@ -111,7 +111,7 @@ export function toggleList(editor: Editor | null, type: ListType): void {
       editor.chain().focus().toggleOrderedList().run()
       break
     case "taskList":
-      editor.chain().focus().toggleList("taskList", "taskItem").run()
+      editor.chain().focus().toggleTaskList().run()
       break
   }
 }

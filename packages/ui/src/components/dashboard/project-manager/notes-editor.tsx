@@ -1,5 +1,6 @@
 import * as React from "react"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
+import { ScrollArea } from "../../scroll-area"
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit"
@@ -211,6 +212,10 @@ export function NotesEditor({
   const [isSaving, setIsSaving] = React.useState(false)
   const [lastSaved, setLastSaved] = React.useState<Date | null>(null)
   const toolbarRef = React.useRef<HTMLDivElement>(null)
+  
+  // Track content changes without triggering immediate saves
+  const [contentChanged, setContentChanged] = React.useState(false)
+  const [saveTimer, setSaveTimer] = React.useState<NodeJS.Timeout | null>(null)
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -223,11 +228,30 @@ export function NotesEditor({
       },
     },
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        
+      }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Underline,
-      TaskList,
-      TaskItem.configure({ nested: true }),
+      TaskList.configure({
+        HTMLAttributes: {
+          class: 'task-list',
+        },
+      }),
+      TaskItem.configure({ 
+        nested: true,
+        HTMLAttributes: {
+          class: 'task-item',
+        },
+      }),
       Highlight.configure({ multicolor: true }),
       Image,
       Typography,
@@ -246,6 +270,10 @@ export function NotesEditor({
       Link.configure({ openOnClick: false }),
     ],
     content: note?.content || { type: 'doc', content: [{ type: 'paragraph' }] },
+    onUpdate: ({ editor }) => {
+      // Always track content changes regardless of autosave setting
+      setContentChanged(true)
+    },
   })
 
   const bodyRect = useCursorVisibility({
@@ -253,9 +281,9 @@ export function NotesEditor({
     overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,
   })
 
-  // Auto-save function
+  // Perform the actual save operation
   const performSave = React.useCallback(async () => {
-    if (!editor || !onSave) return
+    if (!editor || !onSave) return // Remove the contentChanged check to allow manual saves
 
     setIsSaving(true)
     try {
@@ -271,6 +299,7 @@ export function NotesEditor({
       })
 
       setLastSaved(new Date())
+      setContentChanged(false)
     } catch (error) {
       console.error('Failed to save note:', error)
     } finally {
@@ -283,23 +312,37 @@ export function NotesEditor({
     setTitle(newTitle)
     onTitleChange?.(newTitle)
     if (autoSave) {
-      performSave()
+      setContentChanged(true)
     }
-  }, [onTitleChange, autoSave, performSave])
+  }, [onTitleChange, autoSave])
 
-  // Handle editor content changes
+  // Set up interval-based autosave rather than reacting to every editor update
   React.useEffect(() => {
-    if (!editor || !autoSave) return
-
-    const handleUpdate = () => {
-      performSave()
+    if (!autoSave) return
+    
+    // Only start the autosave timer if there are unsaved changes
+    if (contentChanged && !saveTimer) {
+      const timer = setInterval(() => {
+        performSave()
+      }, 3000) // Save every 3 seconds if there are changes
+      
+      setSaveTimer(timer)
+    } else if (!contentChanged && saveTimer) {
+      clearInterval(saveTimer)
+      setSaveTimer(null)
     }
-
-    editor.on('update', handleUpdate)
+    
     return () => {
-      editor.off('update', handleUpdate)
+      if (saveTimer) {
+        clearInterval(saveTimer)
+      }
     }
-  }, [editor, autoSave, performSave])
+  }, [autoSave, contentChanged, performSave, saveTimer])
+
+  // Manual save button handler
+  const handleManualSave = React.useCallback(() => {
+    performSave()
+  }, [performSave])
 
   // Mobile view handling
   React.useEffect(() => {
@@ -313,13 +356,14 @@ export function NotesEditor({
     if (editor && note?.content) {
       editor.commands.setContent(note.content)
       setTitle(note.title || "Untitled Note")
+      setContentChanged(false)
     }
   }, [editor, note])
 
   return (
-    <div className="notes-editor">
-      {/* Title Input */}
-      <div className="mb-4 px-4 pt-4">
+    <div className="notes-editor flex flex-col h-full ">
+      {/* Title Input - Fixed section */}
+      <div className="px-4 pt-4 pb-2 flex-shrink-0  border-b border-gray-100">
         <input
           type="text"
           value={title}
@@ -329,45 +373,68 @@ export function NotesEditor({
         />
         
         {/* Save Status */}
-        <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
-          {isSaving && <span>Saving...</span>}
-          {lastSaved && !isSaving && (
-            <span>Saved {lastSaved.toLocaleTimeString()}</span>
-          )}
+        <div className="flex items-center justify-between mt-2 mb-2 text-sm text-gray-500">
+          <div>
+            {isSaving && <span>Saving...</span>}
+            {lastSaved && !isSaving && (
+              <span>Saved {lastSaved.toLocaleTimeString()}</span>
+            )}
+            {contentChanged && !isSaving && (
+              <span>Unsaved changes</span>
+            )}
+          </div>
+          
+          {/* Always show manual save button */}
+          <button 
+            onClick={handleManualSave}
+            className="px-3 py-1 rounded bg-blue-500 text-white text-sm hover:bg-blue-600 transition-colors"
+            disabled={isSaving || (!contentChanged && !!lastSaved)}
+          >
+            {isSaving ? 'Saving...' : 'Save'}
+          </button>
         </div>
       </div>
 
       <EditorContext.Provider value={{ editor }}>
-        <Toolbar
-          ref={toolbarRef}
-          style={
-            isMobile
-              ? {
-                  bottom: `calc(100% - ${windowSize.height - bodyRect.y}px)`,
-                }
-              : {}
-          }
-        >
-          {mobileView === "main" ? (
-            <MainToolbarContent
-              onHighlighterClick={() => setMobileView("highlighter")}
-              onLinkClick={() => setMobileView("link")}
-              isMobile={isMobile}
-            />
-          ) : (
-            <MobileToolbarContent
-              type={mobileView === "highlighter" ? "highlighter" : "link"}
-              onBack={() => setMobileView("main")}
-            />
-          )}
-        </Toolbar>
+        {/* Toolbar - Fixed section */}
+        <div className="flex-shrink-0 border-b border-gray-100">
+          <Toolbar
+            ref={toolbarRef}
+            style={
+              isMobile
+                ? {
+                    bottom: `calc(100% - ${windowSize.height - bodyRect.y}px)`,
+                  }
+                : {}
+            }
+            className="flex-shrink-0"
+          >
+            {mobileView === "main" ? (
+              <MainToolbarContent
+                onHighlighterClick={() => setMobileView("highlighter")}
+                onLinkClick={() => setMobileView("link")}
+                isMobile={isMobile}
+              />
+            ) : (
+              <MobileToolbarContent
+                type={mobileView === "highlighter" ? "highlighter" : "link"}
+                onBack={() => setMobileView("main")}
+              />
+            )}
+          </Toolbar>
+        </div>
 
-        <div className="content-wrapper">
-          <EditorContent
-            editor={editor}
-            role="presentation"
-            className="simple-editor-content"
-          />
+        {/* Content - This is the ONLY scrollable part */}
+        <div className="flex-grow overflow-y-auto">
+          <div className="editor-container py-4 px-4">
+            <EditorContent
+              editor={editor}
+              role="presentation"
+              className="simple-editor-content"
+              onInput={() => setContentChanged(true)}
+              onChange={() => setContentChanged(true)}
+            />
+          </div>
         </div>
       </EditorContext.Provider>
     </div>

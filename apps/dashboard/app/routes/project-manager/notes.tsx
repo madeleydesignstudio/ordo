@@ -166,109 +166,113 @@ function RouteComponent() {
   }
   
   return (
-    <div className='flex h-screen'>
+    <div className='flex h-[93vh] overflow-hidden'>
       {/* Sidebar - Folders */}
-      <div className='w-2/12 border-r border-stone-300 p-4'>
-        <div className='flex items-center justify-between mb-4'>
-          <h3 className='font-semibold'>Folders</h3>
-          <Button
-            size='sm'
-            variant='ghost'
-            onClick={() => {
-              const name = prompt('Folder name:')
-              if (name) {
-                createFolderMutation.mutate({ name })
-              }
-            }}
-          >
-            <PlusIcon className='h-4 w-4' />
-          </Button>
-        </div>
-        
-        <div className='space-y-1'>
-          <button
-            onClick={() => navigate({ to: '/project-manager/notes', search: {} })}
-            className={`w-full text-left p-2 rounded hover:bg-gray-100 flex items-center gap-2 ${
-              !search.folderId ? 'bg-blue-50 text-blue-600' : ''
-            }`}
-          >
-            <FolderIcon className='h-4 w-4' />
-            All Notes
-          </button>
+      <div className='w-2/12 border-r border-stone-300 overflow-y-auto'>
+        <div className='p-4'>
+          <div className='flex items-center justify-between mb-4'>
+            <h3 className='font-semibold'>Folders</h3>
+            <Button
+              size='sm'
+              variant='ghost'
+              onClick={() => {
+                const name = prompt('Folder name:')
+                if (name) {
+                  createFolderMutation.mutate({ name })
+                }
+              }}
+            >
+              <PlusIcon className='h-4 w-4' />
+            </Button>
+          </div>
           
-          {folders?.map((folder) => (
+          <div className='space-y-1'>
             <button
-              key={folder.id}
-              onClick={() =>
-                navigate({
-                  to: '/project-manager/notes',
-                  search: { folderId: folder.id },
-                })
-              }
+              onClick={() => navigate({ to: '/project-manager/notes', search: {} })}
               className={`w-full text-left p-2 rounded hover:bg-gray-100 flex items-center gap-2 ${
-                search.folderId === folder.id ? 'bg-blue-50 text-blue-600' : ''
+                !search.folderId ? 'bg-blue-50 text-blue-600' : ''
               }`}
             >
-              <FolderIcon className='h-4 w-4' style={{ color: folder.color || '#6366f1' }} />
-              {folder.name}
+              <FolderIcon className='h-4 w-4' />
+              All Notes
             </button>
-          ))}
+            
+            {folders?.map((folder) => (
+              <button
+                key={folder.id}
+                onClick={() =>
+                  navigate({
+                    to: '/project-manager/notes',
+                    search: { folderId: folder.id },
+                  })
+                }
+                className={`w-full text-left p-2 rounded hover:bg-gray-100 flex items-center gap-2 ${
+                  search.folderId === folder.id ? 'bg-blue-50 text-blue-600' : ''
+                }`}
+              >
+                <FolderIcon className='h-4 w-4' style={{ color: folder.color || '#6366f1' }} />
+                {folder.name}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
       
       {/* Sidebar - Notes List */}
-      <div className='w-3/12 border-r border-stone-300 p-4'>
-        <div className='flex items-center justify-between mb-4'>
-          <h3 className='font-semibold'>Notes</h3>
-          <Button size='sm' onClick={handleCreateNote}>
-            <PlusIcon className='h-4 w-4' />
-          </Button>
-        </div>
-        
-        {/* Search */}
-        <div className='relative mb-4'>
-          <SearchIcon className='absolute left-3 top-3 h-4 w-4 text-gray-400' />
-          <input
-            type='text'
-            placeholder='Search notes...'
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className='w-full pl-10 pr-4 py-2 border rounded-md'
-          />
-        </div>
-        
-        {/* Notes List */}
-        <div className='space-y-2'>
-          {notes?.map((note) => (
-            <button
-              key={note.id}
-              onClick={() => handleSelectNote(note.id)}
-              className={`w-full text-left p-3 rounded-md border hover:bg-gray-50 ${
-                search.noteId === note.id ? 'bg-blue-50 border-blue-200' : ''
-              }`}
-            >
-              <h4 className='font-medium truncate'>{note.title}</h4>
-              <p className='text-sm text-gray-500 mt-1'>
-                {new Date(note.updatedAt).toLocaleDateString()}
-              </p>
-              {note.plainTextContent && (
-                <p className='text-sm text-gray-600 mt-1 line-clamp-2'>
-                  {note.plainTextContent.substring(0, 100)}...
-                </p>
-              )}
-            </button>
-          ))}
+      <div className='w-3/12 border-r border-stone-300 overflow-y-auto'>
+        <div className='p-4'>
+          <div className='flex items-center justify-between mb-4'>
+            <h3 className='font-semibold'>Notes</h3>
+            <Button size='sm' onClick={handleCreateNote}>
+              <PlusIcon className='h-4 w-4' />
+            </Button>
+          </div>
           
-          {notes?.length === 0 && (
-            <div className='text-center py-8 text-gray-500'>
-              No notes found. Create your first note!
-            </div>
-          )}
+          {/* Search */}
+          <div className='relative mb-4'>
+            <SearchIcon className='absolute left-3 top-3 h-4 w-4 text-gray-400' />
+            <input
+              type='text'
+              placeholder='Search notes...'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border rounded-md'
+            />
+          </div>
+          
+          {/* Notes List */}
+          <div className='space-y-2'>
+            {notes?.map((note) => (
+              <button
+                key={note.id}
+                onClick={() => handleSelectNote(note.id)}
+                className={`w-full text-left p-3 rounded-md border hover:bg-gray-50 ${
+                  search.noteId === note.id ? 'bg-blue-50 border-blue-200' : ''
+                }`}
+              >
+                <h4 className='font-medium truncate'>{note.title}</h4>
+                <p className='text-sm text-gray-500 mt-1'>
+                  {new Date(note.updatedAt).toLocaleDateString()}
+                </p>
+                {note.plainTextContent && (
+                  <p className='text-sm text-gray-600 mt-1 line-clamp-2'>
+                    {note.plainTextContent.substring(0, 100)}...
+                  </p>
+                )}
+              </button>
+            ))}
+            
+            {notes?.length === 0 && (
+              <div className='text-center py-8 text-gray-500'>
+                No notes found. Create your first note!
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
-      {/* Main Editor */}
-      <div className='w-7/12'>
+      {/* Main Editor - Fixed layout with scrollable content area only */}
+      <div className='w-7/12 flex flex-col'>
         {isLoadingNote ? (
           <div className='flex items-center justify-center h-full text-gray-500'>
             <div className='text-center'>
@@ -276,11 +280,11 @@ function RouteComponent() {
             </div>
           </div>
         ) : currentNote || search.noteId ? (
-          <div className='max-w-5xl mx-auto h-full'>
+          <div className='h-full flex flex-col'>
             <NotesEditor
               note={currentNote}
               onSave={handleSaveNote}
-              autoSave={true}
+              autoSave={false}
             />
           </div>
         ) : (
