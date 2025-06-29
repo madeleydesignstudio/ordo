@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    "expo-router"
+  ],
+  "expo": {
+    "scheme": "ordo",
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}
