@@ -1,10 +1,193 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-expo';
-import { YStack, XStack, Text, Card, H2, H3, Spinner, Button } from 'tamagui';
+import { YStack, XStack, Text, Card, H2, H3, Spinner, Button, Input, TextArea, Select, Adapt, Sheet } from 'tamagui';
 import { trpc } from '../lib/trpc';
 import { useTasksStore } from '../lib/store/tasks';
 
+interface TaskFormData {
+  title: string;
+  description: string;
+  priority: number;
+}
+
+const TaskForm = ({ onSuccess }: { onSuccess: () => void }) => {
+  const [formData, setFormData] = useState<TaskFormData>({
+    title: '',
+    description: '',
+    priority: 0,
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { addTask } = useTasksStore();
+  const createTaskMutation = trpc.createTask.useMutation({
+    onSuccess: (newTask) => {
+      addTask({
+        ...newTask,
+        createdAt: new Date(newTask.createdAt),
+        updatedAt: new Date(newTask.updatedAt),
+      });
+      setFormData({ title: '', description: '', priority: 0 });
+      setIsSubmitting(false);
+      onSuccess();
+    },
+    onError: (error) => {
+      console.error('Failed to create task:', error);
+      setIsSubmitting(false);
+    },
+  });
+
+  const handleSubmit = () => {
+    if (!formData.title.trim()) return;
+    
+    setIsSubmitting(true);
+    createTaskMutation.mutate({
+      title: formData.title.trim(),
+      description: formData.description.trim() || undefined,
+      priority: formData.priority,
+    });
+  };
+
+  const priorityOptions = [
+    { label: 'Low', value: 0 },
+    { label: 'Medium', value: 1 },
+    { label: 'High', value: 2 },
+  ];
+
+  return (
+    <Card padding="$4" marginBottom="$4" backgroundColor="$gray1">
+      <YStack space="$3">
+        <H3>Create New Task</H3>
+        
+        <YStack space="$2">
+          <Text fontSize="$3" fontWeight="500">Title *</Text>
+          <Input
+            value={formData.title}
+            onChangeText={(text) => setFormData({ ...formData, title: text })}
+            placeholder="Enter task title..."
+          />
+        </YStack>
+
+        <YStack space="$2">
+          <Text fontSize="$3" fontWeight="500">Description</Text>
+          <TextArea
+            value={formData.description}
+            onChangeText={(text) => setFormData({ ...formData, description: text })}
+            placeholder="Enter task description..."
+            numberOfLines={3}
+          />
+        </YStack>
+
+        <YStack space="$2">
+          <Text fontSize="$3" fontWeight="500">Priority</Text>
+          <Select
+            value={formData.priority.toString()}
+            onValueChange={(value) => setFormData({ ...formData, priority: parseInt(value) })}
+          >
+            <Select.Trigger>
+              <Select.Value placeholder="Select priority" />
+            </Select.Trigger>
+            <Adapt when="sm" platform="touch">
+              <Sheet modal dismissOnSnapToBottom>
+                <Sheet.Frame>
+                  <Sheet.ScrollView>
+                    <Adapt.Contents />
+                  </Sheet.ScrollView>
+                </Sheet.Frame>
+                <Sheet.Overlay />
+              </Sheet>
+            </Adapt>
+            <Select.Content zIndex={200000}>
+              <Select.ScrollUpButton />
+              <Select.Viewport>
+                {priorityOptions.map((option) => (
+                  <Select.Item key={option.value} index={option.value} value={option.value.toString()}>
+                    <Select.ItemText>{option.label}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Select.Viewport>
+              <Select.ScrollDownButton />
+            </Select.Content>
+          </Select>
+        </YStack>
+
+        <Button
+          onPress={handleSubmit}
+          disabled={isSubmitting || !formData.title.trim()}
+          theme="blue"
+          size="$4"
+        >
+          {isSubmitting ? 'Creating...' : 'Create Task'}
+        </Button>
+      </YStack>
+    </Card>
+  );
+};
+
 const TaskItem = ({ task }: { task: any }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({
+    title: task.title,
+    description: task.description || '',
+    priority: task.priority,
+  });
+
+  const { updateTask, removeTask } = useTasksStore();
+
+  const updateTaskMutation = trpc.updateTask.useMutation({
+    onSuccess: (updatedTask) => {
+      updateTask(task.id, {
+        ...updatedTask,
+        createdAt: new Date(updatedTask.createdAt),
+        updatedAt: new Date(updatedTask.updatedAt),
+      });
+      setIsEditing(false);
+    },
+    onError: (error) => {
+      console.error('Failed to update task:', error);
+    },
+  });
+
+  const deleteTaskMutation = trpc.deleteTask.useMutation({
+    onSuccess: () => {
+      removeTask(task.id);
+    },
+    onError: (error) => {
+      console.error('Failed to delete task:', error);
+    },
+  });
+
+  const handleCompleteToggle = () => {
+    updateTaskMutation.mutate({
+      id: task.id,
+      completed: !task.completed,
+    });
+  };
+
+  const handleSaveEdit = () => {
+    if (!editData.title.trim()) return;
+    
+    updateTaskMutation.mutate({
+      id: task.id,
+      title: editData.title.trim(),
+      description: editData.description.trim() || undefined,
+      priority: editData.priority,
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditData({
+      title: task.title,
+      description: task.description || '',
+      priority: task.priority,
+    });
+    setIsEditing(false);
+  };
+
+  const handleDelete = () => {
+    // Simple confirmation for mobile
+    deleteTaskMutation.mutate({ id: task.id });
+  };
+
   const priorityColors = {
     0: '$gray9', // Low - gray
     1: '$orange9', // Medium - orange  
@@ -16,6 +199,80 @@ const TaskItem = ({ task }: { task: any }) => {
     1: 'Medium', 
     2: 'High',
   };
+
+  const priorityOptions = [
+    { label: 'Low', value: 0 },
+    { label: 'Medium', value: 1 },
+    { label: 'High', value: 2 },
+  ];
+
+  if (isEditing) {
+    return (
+      <Card padding="$4" marginBottom="$3" backgroundColor="$gray1">
+        <YStack space="$3">
+          <Input
+            value={editData.title}
+            onChangeText={(text) => setEditData({ ...editData, title: text })}
+            placeholder="Task title..."
+          />
+          <TextArea
+            value={editData.description}
+            onChangeText={(text) => setEditData({ ...editData, description: text })}
+            placeholder="Task description..."
+            numberOfLines={2}
+          />
+          <Select
+            value={editData.priority.toString()}
+            onValueChange={(value) => setEditData({ ...editData, priority: parseInt(value) })}
+          >
+            <Select.Trigger>
+              <Select.Value />
+            </Select.Trigger>
+            <Adapt when="sm" platform="touch">
+              <Sheet modal dismissOnSnapToBottom>
+                <Sheet.Frame>
+                  <Sheet.ScrollView>
+                    <Adapt.Contents />
+                  </Sheet.ScrollView>
+                </Sheet.Frame>
+                <Sheet.Overlay />
+              </Sheet>
+            </Adapt>
+            <Select.Content zIndex={200000}>
+              <Select.ScrollUpButton />
+              <Select.Viewport>
+                {priorityOptions.map((option) => (
+                  <Select.Item key={option.value} index={option.value} value={option.value.toString()}>
+                    <Select.ItemText>{option.label}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Select.Viewport>
+              <Select.ScrollDownButton />
+            </Select.Content>
+          </Select>
+          <XStack space="$2">
+            <Button
+              onPress={handleSaveEdit}
+              disabled={updateTaskMutation.isLoading || !editData.title.trim()}
+              theme="green"
+              size="$3"
+              flex={1}
+            >
+              {updateTaskMutation.isLoading ? 'Saving...' : 'Save'}
+            </Button>
+            <Button
+              onPress={handleCancelEdit}
+              theme="gray"
+              size="$3"
+              flex={1}
+            >
+              Cancel
+            </Button>
+          </XStack>
+        </YStack>
+      </Card>
+    );
+  }
 
   return (
     <Card padding="$4" marginBottom="$3" backgroundColor="$gray1">
@@ -50,12 +307,36 @@ const TaskItem = ({ task }: { task: any }) => {
             </Text>
           </XStack>
         </YStack>
-        <XStack marginLeft="$3">
-          {/* Simple checkbox representation */}
-          <Text fontSize="$6" color={task.completed ? '$green9' : '$gray8'}>
-            {task.completed ? '✅' : '⭕'}
-          </Text>
-        </XStack>
+        
+        <YStack alignItems="center" space="$2" marginLeft="$3">
+          <Button
+            onPress={handleCompleteToggle}
+            disabled={updateTaskMutation.isLoading}
+            size="$2"
+            chromeless
+          >
+            <Text fontSize="$5" color={task.completed ? '$green9' : '$gray8'}>
+              {task.completed ? '✅' : '⭕'}
+            </Text>
+          </Button>
+          <XStack space="$1">
+            <Button
+              onPress={() => setIsEditing(true)}
+              theme="blue"
+              size="$2"
+            >
+              Edit
+            </Button>
+            <Button
+              onPress={handleDelete}
+              disabled={deleteTaskMutation.isLoading}
+              theme="red"
+              size="$2"
+            >
+              {deleteTaskMutation.isLoading ? '...' : 'Delete'}
+            </Button>
+          </XStack>
+        </YStack>
       </XStack>
     </Card>
   );
@@ -64,6 +345,7 @@ const TaskItem = ({ task }: { task: any }) => {
 export const TaskList = () => {
   const { user } = useUser();
   const { tasks, isLoading, error, setTasks, setLoading, setError } = useTasksStore();
+  const [showForm, setShowForm] = useState(false);
 
   const tasksQuery = trpc.getTasks.useQuery(undefined, {
     enabled: !!user?.id,
@@ -126,12 +408,23 @@ export const TaskList = () => {
 
   return (
     <YStack space="$4" padding="$4">
-      <YStack space="$2">
-        <H2 color="$color">My Tasks</H2>
-        <Text color="$gray10" fontSize="$3">
-          {pendingTasks.length} pending, {completedTasks.length} completed
-        </Text>
-      </YStack>
+      <XStack alignItems="center" justifyContent="space-between">
+        <YStack space="$1">
+          <H2 color="$color">My Tasks</H2>
+          <Text color="$gray10" fontSize="$3">
+            {pendingTasks.length} pending, {completedTasks.length} completed
+          </Text>
+        </YStack>
+        <Button
+          onPress={() => setShowForm(!showForm)}
+          theme="blue"
+          size="$3"
+        >
+          {showForm ? 'Cancel' : 'New Task'}
+        </Button>
+      </XStack>
+
+      {showForm && <TaskForm onSuccess={() => setShowForm(false)} />}
 
       {tasks.length === 0 ? (
         <YStack padding="$8" alignItems="center" space="$2">
