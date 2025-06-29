@@ -3,6 +3,7 @@ import { useAuth, useUser } from "@clerk/clerk-react";
 import { invoke } from "@tauri-apps/api/core";
 import { SignInButton } from "./components/auth/SignInButton";
 import { UserButton } from "./components/auth/UserButton";
+import { TaskList } from "./components/TaskList";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 
@@ -63,7 +64,7 @@ function App() {
 
       {/* Tauri Demo Section */}
       <div style={{ marginBottom: '2rem', padding: '1rem', border: '1px solid #ccc', borderRadius: '8px' }}>
-        <h2>Tauri Integration</h2>
+        <h2>Desktop Features</h2>
         <div className="row">
           <a href="https://vitejs.dev" target="_blank">
             <img src="/vite.svg" className="logo vite" alt="Vite logo" />
@@ -193,6 +194,14 @@ function App() {
               </div>
             </form>
           )}
+        </div>
+      )}
+
+      {/* Tasks Section */}
+      {isSignedIn && (
+        <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '8px', marginBottom: '2rem' }}>
+          <h2>My Tasks</h2>
+          <TaskList />
         </div>
       )}
 

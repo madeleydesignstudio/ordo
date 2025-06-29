@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { ClerkProvider } from "@clerk/clerk-react";
+import { Providers } from "./lib/providers";
 import App from "./App";
 
 // Get the publishable key from environment variables
@@ -15,7 +16,9 @@ if (!PUBLISHABLE_KEY) {
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <ClerkProvider publishableKey={PUBLISHABLE_KEY || ""}>
-      <App />
+      <Providers>
+        <App />
+      </Providers>
     </ClerkProvider>
   </React.StrictMode>,
 );

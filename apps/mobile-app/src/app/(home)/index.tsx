@@ -1,6 +1,6 @@
 import React from 'react';
 import { useUser } from '@clerk/clerk-expo';
-import { YStack, XStack, Text, Button, H2, Avatar, Card } from 'tamagui';
+import { YStack, XStack, Text, Button, H2, Avatar, Card, ScrollView } from 'tamagui';
 import { StatusBar } from 'expo-status-bar';
 import { SignOutButton } from '../../components/auth';
 
@@ -10,8 +10,8 @@ export default function HomePage() {
   return (
     <>
       <StatusBar style="auto" />
-      <YStack flex={1} padding="$6" backgroundColor="$background">
-        <YStack space="$6" paddingTop="$10">
+      <ScrollView flex={1} backgroundColor="$background">
+        <YStack padding="$6" paddingTop="$10" space="$6">
           {/* Header */}
           <YStack space="$4" alignItems="center">
             <Avatar circular size="$10">
@@ -79,7 +79,7 @@ export default function HomePage() {
             <SignOutButton />
           </YStack>
         </YStack>
-      </YStack>
+      </ScrollView>
     </>
   );
 } 

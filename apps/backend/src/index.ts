@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
+import { clerkMiddleware } from '@hono/clerk-auth'
 import { trpcServer } from '@hono/trpc-server'
 import { appRouter } from './trpc/router'
 import { createTRPCContext } from './trpc/context'
@@ -19,8 +19,24 @@ const app = new Hono<{
 
 // CORS middleware
 app.use('*', cors({
-  origin: ['http://localhost:3001'],
+  origin: (origin) => {
+    // Allow any origin in development
+    return origin || '*'
+  },
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
+  allowHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers',
+    'ngrok-skip-browser-warning'
+  ],
+  exposeHeaders: ['Content-Length', 'X-Request-Id'],
   credentials: true,
+  maxAge: 86400, // 24 hours
 }))
 
 // Clerk middleware - automatically uses CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY env vars
@@ -38,20 +54,6 @@ app.use(
 // Health check endpoint
 app.get('/', (c) => {
   return c.json({ message: 'Ordo Backend API', status: 'healthy' })
-})
-
-// Protected test endpoint
-app.get('/protected', async (c) => {
-  const auth = getAuth(c)
-  
-  if (!auth?.userId) {
-    return c.json({ error: 'Unauthorized' }, 401)
-  }
-  
-  return c.json({ 
-    message: 'This is a protected route', 
-    userId: auth.userId 
-  })
 })
 
 // Error handling middleware - should come after routes

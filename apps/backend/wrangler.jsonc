@@ -5,7 +5,8 @@
   "compatibility_date": "2025-06-28",
   "vars": {
     "CLERK_PUBLISHABLE_KEY": "pk_test_Y2F1c2FsLWJsb3dmaXNoLTMyLmNsZXJrLmFjY291bnRzLmRldiQ",
-    "CLERK_SECRET_KEY": "sk_test_gi3VdAueR3Y3Wr4bEjNTUAuqT5HUXK14Vxy7UkVvjT"
+    "CLERK_SECRET_KEY": "sk_test_gi3VdAueR3Y3Wr4bEjNTUAuqT5HUXK14Vxy7UkVvjT",
+    "DATABASE_URL": "postgresql://neon-ordo_owner:npg_NTLrRjHI62UZ@ep-muddy-night-aba4aq3j-pooler.eu-west-2.aws.neon.tech/neon-ordo?sslmode=require&channel_binding=require"
   }
   // "compatibility_flags": [
   //   "nodejs_compat"
