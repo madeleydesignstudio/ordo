@@ -1,0 +1,23 @@
+{
+  "name": "@ordo/emails",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Email utilities with Resend and React Email integration",
+  "exports": {
+   
+  },
+  "scripts": {
+   
+  },
+  "dependencies": {
+   
+  },
+  "devDependencies": {
+    "@ordo/eslint-config": "workspace:*",
+    "@ordo/typescript-config": "workspace:*",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "typescript": "^5.7.3"
+  }
+} 

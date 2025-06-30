@@ -1,0 +1,22 @@
+{
+  "name": "@ordo/payments",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Payment utilities with Polar integration",
+  "exports": {
+
+  },
+  "scripts": {
+ 
+  },
+  "dependencies": {
+ 
+  },
+  "devDependencies": {
+    "@ordo/eslint-config": "workspace:*",
+    "@ordo/typescript-config": "workspace:*",
+    "@types/node": "^20",
+    "typescript": "^5.7.3"
+  }
+} 
