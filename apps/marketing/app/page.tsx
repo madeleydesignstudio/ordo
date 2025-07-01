@@ -1,4 +1,4 @@
-import { Button } from "@ordo/ui/components/button"
+import { Button } from "@workspace/ui/components/button"
 
 export default function Page() {
   return (

@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ordo/ui": "workspace:*",
+    "@workspace/ui": "workspace:*",
     "lucide-react": "^0.475.0",
     "next": "^15.2.3",
     "next-themes": "^0.4.4",
@@ -23,8 +23,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@ordo/eslint-config": "workspace:^",
-    "@ordo/typescript-config": "workspace:*",
+    "@workspace/eslint-config": "workspace:^",
+    "@workspace/typescript-config": "workspace:*",
     "typescript": "^5.7.3"
   }
 }

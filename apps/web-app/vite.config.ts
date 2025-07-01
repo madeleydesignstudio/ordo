@@ -8,4 +8,5 @@ export default defineConfig({
     port: 3001,
   },
   plugins: [tsConfigPaths(), tanstackStart()],
+
 })

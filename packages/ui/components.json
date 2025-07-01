@@ -11,10 +11,10 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@ordo/ui/components",
-    "utils": "@ordo/ui/lib/utils",
-    "hooks": "@ordo/ui/hooks",
-    "lib": "@ordo/ui/lib",
-    "ui": "@ordo/ui/components"
+    "components": "@workspace/ui/components",
+    "utils": "@workspace/ui/lib/utils",
+    "hooks": "@workspace/ui/hooks",
+    "lib": "@workspace/ui/lib",
+    "ui": "@workspace/ui/components"
   }
 }

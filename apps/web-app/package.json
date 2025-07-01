@@ -3,7 +3,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build"
+    "build": "vite build",
+    "db:generate": "cd ../../packages/supabase && bun run db:generate",
+    "db:push": "cd ../../packages/supabase && bun run db:push",
+    "db:pull": "cd ../../packages/supabase && bun run db:pull",
+    "db:studio": "cd ../../packages/supabase && bun run db:studio"
   },
   "private": true,
   "devDependencies": {
@@ -20,6 +24,8 @@
     "@tanstack/react-start": "^1.123.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "vite": "^7.0.0"
+    "vite": "^6.0.3",
+    "@workspace/supabase": "workspace:*",
+    "@workspace/ui": "workspace:*"
   }
 }

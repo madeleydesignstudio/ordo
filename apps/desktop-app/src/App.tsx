@@ -1,50 +1,117 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import { useState, useEffect } from "react";
+import { auth, db } from "./lib/db";
+import {Login} from "./Login";
+import { TaskList } from "@workspace/ui/components/task-list";
+import { Button } from "@workspace/ui/components/button";
+import type { User } from '@supabase/supabase-js';
 import "./App.css";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(false);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        // Check current session
+        const currentUser = await auth.getCurrentUser();
+        setUser(currentUser);
+        setLoading(false);
+
+        // If user exists, create/update their profile
+        if (currentUser) {
+          await auth.upsertUserProfile(currentUser);
+        }
+      } catch (err) {
+        console.error('Auth init error:', err);
+        setLoading(false);
+      }
+    };
+
+    initAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = auth.onAuthStateChange(async (newUser) => {
+      setUser(newUser);
+      if (newUser) {
+        try {
+          await auth.upsertUserProfile(newUser);
+        } catch (err) {
+          console.error('Profile update error:', err);
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLoginSuccess = () => {
+    // The useEffect will handle the user state update
+    console.log('Login successful');
+  };
+
+  const handleSignOut = async () => {
+    try {
+      setAuthLoading(true);
+      await auth.signOut();
+      setUser(null);
+    } catch (err) {
+      console.error('Failed to sign out:', err);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login onLogin={handleLoginSuccess} />;
   }
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-gray-900">Ordo Desktop</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                {user.user_metadata?.avatar_url && (
+                  <img 
+                    src={user.user_metadata.avatar_url} 
+                    alt="Profile" 
+                    className="h-8 w-8 rounded-full"
+                  />
+                )}
+                <span className="text-sm text-gray-700">
+                  {user.user_metadata?.full_name || user.email}
+                </span>
+              </div>
+              <Button 
+                variant="outline" 
+                onClick={handleSignOut}
+                disabled={authLoading}
+              >
+                Sign Out
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+      
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <TaskList user={user} db={db} />
+      </div>
+    </div>
   );
 }
 
