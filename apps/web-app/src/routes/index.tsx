@@ -1,11 +1,10 @@
 // src/routes/index.tsx
-import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@ordo/ui/components/button";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  component: Home,
+  loader: () => {
+    throw redirect({
+      to: "/home",
+    });
+  },
 });
-
-function Home() {
-  return <div className="">Hello</div>;
-}

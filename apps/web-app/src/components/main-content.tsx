@@ -1,5 +1,6 @@
 import { useSidebar } from "@ordo/ui/components/sidebar";
 import { useFocus } from "@/context/focus-context";
+import { useHotkeys } from "react-hotkeys-hook";
 import { ReactNode } from "react";
 
 interface MainContentProps {
@@ -8,8 +9,18 @@ interface MainContentProps {
 }
 
 export function MainContent({ children, className = "" }: MainContentProps) {
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const { isFocused } = useFocus();
+
+  // Add Cmd+S hotkey to toggle sidebar
+  useHotkeys(
+    "meta+s",
+    (event) => {
+      event.preventDefault();
+      toggleSidebar();
+    },
+    { enableOnFormTags: true },
+  );
 
   const leftMargin = isFocused
     ? "ml-[5px]"
