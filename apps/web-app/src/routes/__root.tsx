@@ -7,6 +7,12 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { SidebarProvider, SidebarTrigger } from "@ordo/ui/components/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { TopNav } from "@/components/top-nav";
+import { BottomNav } from "@/components/bottom-nav";
+import { MainContent } from "@/components/main-content";
+import { FocusProvider } from "@/context/focus-context";
 
 import appCss from "../styles/app.css?url";
 
@@ -32,7 +38,7 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <Outlet />
+      {/* Content is now handled by MainContent component */}
     </RootDocument>
   );
 }
@@ -43,10 +49,19 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <head>
         <HeadContent />
       </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
+      <FocusProvider>
+        <SidebarProvider defaultOpen={false}>
+          <AppSidebar />
+          <TopNav />
+          <MainContent>
+            <Outlet />
+          </MainContent>
+          <body>
+            <Scripts />
+          </body>
+          <BottomNav />
+        </SidebarProvider>
+      </FocusProvider>
     </html>
   );
 }

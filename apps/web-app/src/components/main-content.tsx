@@ -1,0 +1,31 @@
+import { useSidebar } from "@ordo/ui/components/sidebar";
+import { useFocus } from "@/context/focus-context";
+import { ReactNode } from "react";
+
+interface MainContentProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function MainContent({ children, className = "" }: MainContentProps) {
+  const { state } = useSidebar();
+  const { isFocused } = useFocus();
+
+  const leftMargin = isFocused
+    ? "ml-[5px]"
+    : state === "expanded"
+      ? "ml-[250px]"
+      : "ml-[85px]";
+  const topPosition = isFocused ? "top-[5px]" : "top-[30px]";
+  const bottomPosition = "bottom-[20px]";
+
+  return (
+    <main
+      className={`fixed ${topPosition} ${bottomPosition} left-0 right-0 overflow-auto transition-all duration-200 ease-linear ${leftMargin} ${className}`}
+    >
+      <div className="h-full w-full bg-background border-t border-l border-b border-border rounded-tl-xl rounded-bl-xl p-4">
+        {children}
+      </div>
+    </main>
+  );
+}
