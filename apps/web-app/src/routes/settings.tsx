@@ -62,21 +62,9 @@ function Settings() {
 
               <div className="flex items-center justify-between p-3 rounded-lg border">
                 <div className="flex-1">
-                  <p className="font-medium">Toggle Focus Mode</p>
+                  <p className="font-medium">Command Search</p>
                   <p className="text-sm text-muted-foreground">
-                    Hide all navigation elements for distraction-free work
-                  </p>
-                </div>
-                <div className="px-3 py-1 bg-muted rounded border text-sm font-mono">
-                  ⌘ + F
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-lg border">
-                <div className="flex-1">
-                  <p className="font-medium">Quick Search</p>
-                  <p className="text-sm text-muted-foreground">
-                    Search across all your content
+                    Open the command palette to search and navigate
                   </p>
                 </div>
                 <div className="px-3 py-1 bg-muted rounded border text-sm font-mono">
@@ -86,61 +74,13 @@ function Settings() {
 
               <div className="flex items-center justify-between p-3 rounded-lg border">
                 <div className="flex-1">
-                  <p className="font-medium">New Project</p>
+                  <p className="font-medium">Toggle Focus Mode</p>
                   <p className="text-sm text-muted-foreground">
-                    Create a new project quickly
+                    Hide all navigation elements for distraction-free work
                   </p>
                 </div>
                 <div className="px-3 py-1 bg-muted rounded border text-sm font-mono">
-                  ⌘ + N
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-lg border">
-                <div className="flex-1">
-                  <p className="font-medium">New Journal Entry</p>
-                  <p className="text-sm text-muted-foreground">
-                    Quickly create a new journal entry
-                  </p>
-                </div>
-                <div className="px-3 py-1 bg-muted rounded border text-sm font-mono">
-                  ⌘ + J
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-lg border">
-                <div className="flex-1">
-                  <p className="font-medium">Save</p>
-                  <p className="text-sm text-muted-foreground">
-                    Save current work (when available)
-                  </p>
-                </div>
-                <div className="px-3 py-1 bg-muted rounded border text-sm font-mono">
-                  ⌘ + S
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-lg border">
-                <div className="flex-1">
-                  <p className="font-medium">Go to Home</p>
-                  <p className="text-sm text-muted-foreground">
-                    Navigate to the home page
-                  </p>
-                </div>
-                <div className="px-3 py-1 bg-muted rounded border text-sm font-mono">
-                  ⌘ + 1
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-lg border">
-                <div className="flex-1">
-                  <p className="font-medium">Go to Projects</p>
-                  <p className="text-sm text-muted-foreground">
-                    Navigate to the project manager
-                  </p>
-                </div>
-                <div className="px-3 py-1 bg-muted rounded border text-sm font-mono">
-                  ⌘ + 2
+                  ⌘ + F
                 </div>
               </div>
             </div>

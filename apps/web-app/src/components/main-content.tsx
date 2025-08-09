@@ -10,7 +10,7 @@ interface MainContentProps {
 
 export function MainContent({ children, className = "" }: MainContentProps) {
   const { state, toggleSidebar } = useSidebar();
-  const { isFocused } = useFocus();
+  const { isFocused, toggleFocus } = useFocus();
 
   // Add Cmd+S hotkey to toggle sidebar
   useHotkeys(
@@ -18,6 +18,16 @@ export function MainContent({ children, className = "" }: MainContentProps) {
     (event) => {
       event.preventDefault();
       toggleSidebar();
+    },
+    { enableOnFormTags: true },
+  );
+
+  // Add Cmd+F hotkey to toggle focus mode
+  useHotkeys(
+    "meta+f",
+    (event) => {
+      event.preventDefault();
+      toggleFocus();
     },
     { enableOnFormTags: true },
   );
@@ -32,10 +42,12 @@ export function MainContent({ children, className = "" }: MainContentProps) {
 
   return (
     <main
-      className={`fixed ${topPosition} ${bottomPosition} left-0 right-0 overflow-auto transition-all duration-200 ease-linear ${leftMargin} ${className}`}
+      className={`fixed ${topPosition} ${bottomPosition} left-0 right-0 transition-all duration-200 ease-linear ${leftMargin} ${className}`}
     >
-      <div className="h-full w-full bg-background border-t border-l border-b border-border rounded-tl-xl rounded-bl-xl p-4">
-        {children}
+      <div className="h-full w-full bg-background border-t border-l border-b border-border rounded-tl-xl rounded-bl-xl overflow-hidden">
+        <div className="h-full w-full overflow-y-auto overflow-x-hidden p-4">
+          {children}
+        </div>
       </div>
     </main>
   );
