@@ -2,7 +2,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@ordo/ui/components/button";
 
-export const Route = createFileRoute("/projects")({
+export const Route = createFileRoute("/projects/")({
   component: Projects,
 });
 
@@ -23,7 +23,8 @@ function Projects() {
             </span>
           </div>
           <p className="text-sm text-muted-foreground mb-4">
-            Complete redesign of the company website with modern UI/UX principles.
+            Complete redesign of the company website with modern UI/UX
+            principles.
           </p>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
@@ -31,7 +32,10 @@ function Projects() {
               <span>65%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-green-600 h-2 rounded-full" style={{ width: "65%" }}></div>
+              <div
+                className="bg-green-600 h-2 rounded-full"
+                style={{ width: "65%" }}
+              ></div>
             </div>
           </div>
           <div className="flex justify-between items-center mt-4 text-xs text-muted-foreground">
@@ -56,7 +60,10 @@ function Projects() {
               <span>20%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-blue-600 h-2 rounded-full" style={{ width: "20%" }}></div>
+              <div
+                className="bg-blue-600 h-2 rounded-full"
+                style={{ width: "20%" }}
+              ></div>
             </div>
           </div>
           <div className="flex justify-between items-center mt-4 text-xs text-muted-foreground">
@@ -81,7 +88,10 @@ function Projects() {
               <span>40%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-yellow-600 h-2 rounded-full" style={{ width: "40%" }}></div>
+              <div
+                className="bg-yellow-600 h-2 rounded-full"
+                style={{ width: "40%" }}
+              ></div>
             </div>
           </div>
           <div className="flex justify-between items-center mt-4 text-xs text-muted-foreground">
@@ -98,7 +108,9 @@ function Projects() {
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
             <div className="flex-1">
               <p className="font-medium">Website Redesign - Phase 1 Complete</p>
-              <p className="text-sm text-muted-foreground">Completed 2 days ago</p>
+              <p className="text-sm text-muted-foreground">
+                Completed 2 days ago
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-4">
@@ -112,7 +124,9 @@ function Projects() {
             <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
             <div className="flex-1">
               <p className="font-medium">Database Migration - Planning Phase</p>
-              <p className="text-sm text-muted-foreground">Scheduled for next week</p>
+              <p className="text-sm text-muted-foreground">
+                Scheduled for next week
+              </p>
             </div>
           </div>
         </div>

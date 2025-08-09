@@ -1,7 +1,7 @@
 // src/routes/notifications.tsx
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/notifications")({
+export const Route = createFileRoute("/notifications/")({
   component: Notifications,
 });
 
@@ -19,7 +19,8 @@ function Notifications() {
             <div className="flex-1">
               <h3 className="text-lg font-semibold">Welcome to Ordo</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Your account has been successfully created. Get started by exploring the features.
+                Your account has been successfully created. Get started by
+                exploring the features.
               </p>
               <p className="text-xs text-muted-foreground mt-2">2 hours ago</p>
             </div>
@@ -32,7 +33,8 @@ function Notifications() {
             <div className="flex-1">
               <h3 className="text-lg font-semibold">System Update</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                New features have been added to the knowledge base. Check them out now.
+                New features have been added to the knowledge base. Check them
+                out now.
               </p>
               <p className="text-xs text-muted-foreground mt-2">1 day ago</p>
             </div>

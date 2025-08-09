@@ -2,7 +2,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@ordo/ui/components/button";
 
-export const Route = createFileRoute("/journal")({
+export const Route = createFileRoute("/journal/")({
   component: Journal,
 });
 
@@ -19,10 +19,15 @@ function Journal() {
           <div className="rounded-lg border bg-card p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Today's Reflection</h3>
-              <span className="text-sm text-muted-foreground">Dec 10, 2024</span>
+              <span className="text-sm text-muted-foreground">
+                Dec 10, 2024
+              </span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Had a productive day working on the website redesign project. Made significant progress on the user interface components and received positive feedback from the team. Need to focus on the mobile responsiveness tomorrow.
+              Had a productive day working on the website redesign project. Made
+              significant progress on the user interface components and received
+              positive feedback from the team. Need to focus on the mobile
+              responsiveness tomorrow.
             </p>
             <div className="flex items-center space-x-4 text-xs text-muted-foreground">
               <span>📝 Daily Reflection</span>
@@ -33,11 +38,16 @@ function Journal() {
 
           <div className="rounded-lg border bg-card p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Project Milestone Achieved</h3>
+              <h3 className="text-lg font-semibold">
+                Project Milestone Achieved
+              </h3>
               <span className="text-sm text-muted-foreground">Dec 9, 2024</span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Successfully completed the first phase of the website redesign. The team is happy with the progress, and we're on track to meet our December deadline. Celebrating this small win before moving to the next phase.
+              Successfully completed the first phase of the website redesign.
+              The team is happy with the progress, and we're on track to meet
+              our December deadline. Celebrating this small win before moving to
+              the next phase.
             </p>
             <div className="flex items-center space-x-4 text-xs text-muted-foreground">
               <span>🎯 Milestone</span>
@@ -52,7 +62,10 @@ function Journal() {
               <span className="text-sm text-muted-foreground">Dec 8, 2024</span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Discovered a new React pattern for state management that could be useful for our current projects. The pattern uses custom hooks to encapsulate complex state logic and makes components more reusable.
+              Discovered a new React pattern for state management that could be
+              useful for our current projects. The pattern uses custom hooks to
+              encapsulate complex state logic and makes components more
+              reusable.
             </p>
             <div className="flex items-center space-x-4 text-xs text-muted-foreground">
               <span>💡 Learning</span>
@@ -110,13 +123,25 @@ function Journal() {
           <div className="rounded-lg border bg-card p-4">
             <h3 className="font-semibold mb-3">Quick Actions</h3>
             <div className="space-y-2">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 Daily Check-in
               </Button>
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 Weekly Review
               </Button>
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 Set New Goal
               </Button>
             </div>

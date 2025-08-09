@@ -2,7 +2,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@ordo/ui/components/button";
 
-export const Route = createFileRoute("/knowledge")({
+export const Route = createFileRoute("/knowledge/")({
   component: Knowledge,
 });
 
@@ -40,7 +40,9 @@ function Knowledge() {
         <div className="md:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Recent Articles</h2>
-            <Button variant="outline" size="sm">View All</Button>
+            <Button variant="outline" size="sm">
+              View All
+            </Button>
           </div>
 
           <div className="space-y-4">
@@ -51,7 +53,8 @@ function Knowledge() {
                     How to Set Up Your First Project
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    A comprehensive guide to getting started with project management in Ordo.
+                    A comprehensive guide to getting started with project
+                    management in Ordo.
                   </p>
                   <div className="flex items-center space-x-4 mt-3 text-xs text-muted-foreground">
                     <span>Getting Started</span>
@@ -71,7 +74,8 @@ function Knowledge() {
                     Advanced Task Management Techniques
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Learn how to optimize your workflow with advanced task management features.
+                    Learn how to optimize your workflow with advanced task
+                    management features.
                   </p>
                   <div className="flex items-center space-x-4 mt-3 text-xs text-muted-foreground">
                     <span>Best Practices</span>
@@ -91,7 +95,8 @@ function Knowledge() {
                     API Integration Guide
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Step-by-step instructions for integrating with external APIs and services.
+                    Step-by-step instructions for integrating with external APIs
+                    and services.
                   </p>
                   <div className="flex items-center space-x-4 mt-3 text-xs text-muted-foreground">
                     <span>API Reference</span>

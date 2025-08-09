@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@ordo/ui/components/button";
 import { Separator } from "@ordo/ui/components/separator";
 
-export const Route = createFileRoute("/settings")({
+export const Route = createFileRoute("/settings/")({
   component: Settings,
 });
 
