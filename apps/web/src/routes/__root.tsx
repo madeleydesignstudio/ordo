@@ -8,6 +8,9 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import { AuthProvider } from "../hooks/useAuth";
+import { ProtectedRoute } from "../components/ProtectedRoute";
+import { Navigation } from "../components/Navigation";
 import appCss from "../styles/app.css?url";
 
 export const Route = createRootRoute({
@@ -32,7 +35,12 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <Outlet />
+      <AuthProvider>
+        <ProtectedRoute>
+          <Navigation />
+          <Outlet />
+        </ProtectedRoute>
+      </AuthProvider>
     </RootDocument>
   );
 }

@@ -1,0 +1,35 @@
+{
+  "name": "@ordo/supabase",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:drop": "drizzle-kit drop",
+    "db:check": "drizzle-kit check",
+    "db:up": "drizzle-kit up",
+    "db:reset": "drizzle-kit drop && drizzle-kit push",
+    "db:seed": "tsx src/db/seed.ts",
+    "db:fresh": "npm run db:reset && npm run db:seed",
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.4.1",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "drizzle-orm": "^0.44.4",
+    "postgres": "^3.4.7"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.4",
+    "@types/node": "^20.19.9",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
