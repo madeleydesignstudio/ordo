@@ -1,0 +1,1 @@
+import{u as n,R as o,j as r,c as a,a as s}from"./main-BLfwxEbd.js";const u=s("src_routes_index_tsx--updateCount_createServerFn_handler","/_serverFn"),c=a({method:"POST"}).handler(u),l=function(){const e=n(),t=o.useLoaderData();return r.jsxs("button",{type:"button",onClick:()=>{c({data:1}).then(()=>{e.invalidate()})},children:["Hello ",t,"! Click me!"]})};export{l as component};
