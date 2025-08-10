@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { AuthProvider } from "../contexts/AuthContext";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -19,7 +20,7 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Ordo - Task Management",
       },
     ],
   }),
@@ -29,7 +30,9 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <Outlet />
+      <AuthProvider>
+        <Outlet />
+      </AuthProvider>
     </RootDocument>
   );
 }
@@ -40,7 +43,14 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body
+        style={{
+          margin: 0,
+          padding: 0,
+          fontFamily: "system-ui, sans-serif",
+          backgroundColor: "#f9fafb",
+        }}
+      >
         {children}
         <Scripts />
       </body>

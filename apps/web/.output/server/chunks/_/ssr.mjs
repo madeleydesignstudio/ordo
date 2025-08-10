@@ -1,6 +1,7 @@
-import { createFileRoute, lazyRouteComponent, createRootRoute, Outlet, HeadContent, Scripts, RouterProvider, createRouter as createRouter$1 } from '@tanstack/react-router';
+import { createRootRoute, Outlet, HeadContent, Scripts, createFileRoute, lazyRouteComponent, RouterProvider, createRouter as createRouter$1 } from '@tanstack/react-router';
 import { jsx, jsxs } from 'react/jsx-runtime';
-import * as fs from 'node:fs';
+import { useContext, createContext, useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { defineHandlerCallback, renderRouterToStream } from '@tanstack/react-router/ssr/server';
 
@@ -1078,258 +1079,9 @@ const serializers = [
     (v2) => BigInt(v2)
   )
 ];
-function warning(condition, message) {
-}
 const startStorage = new AsyncLocalStorage();
 async function runWithStartContext(context, fn) {
   return startStorage.run(context, fn);
-}
-function getStartContext(opts) {
-  const context = startStorage.getStore();
-  if (!context && (opts == null ? void 0 : opts.throwIfNotFound) !== false) {
-    throw new Error(
-      `No Start context found in AsyncLocalStorage. Make sure you are using the function within the server runtime.`
-    );
-  }
-  return context;
-}
-const globalMiddleware = [];
-const getRouterInstance = () => {
-  var _a;
-  return (_a = getStartContext({
-    throwIfNotFound: false
-  })) == null ? void 0 : _a.router;
-};
-function createServerFn(options, __opts) {
-  const resolvedOptions = __opts || options || {};
-  if (typeof resolvedOptions.method === "undefined") {
-    resolvedOptions.method = "GET";
-  }
-  return {
-    options: resolvedOptions,
-    middleware: (middleware) => {
-      return createServerFn(void 0, Object.assign(resolvedOptions, {
-        middleware
-      }));
-    },
-    validator: (validator) => {
-      return createServerFn(void 0, Object.assign(resolvedOptions, {
-        validator
-      }));
-    },
-    type: (type) => {
-      return createServerFn(void 0, Object.assign(resolvedOptions, {
-        type
-      }));
-    },
-    handler: (...args) => {
-      const [extractedFn, serverFn] = args;
-      Object.assign(resolvedOptions, {
-        ...extractedFn,
-        extractedFn,
-        serverFn
-      });
-      const resolvedMiddleware = [...resolvedOptions.middleware || [], serverFnBaseToMiddleware(resolvedOptions)];
-      return Object.assign(async (opts) => {
-        return executeMiddleware$1(resolvedMiddleware, "client", {
-          ...extractedFn,
-          ...resolvedOptions,
-          data: opts == null ? void 0 : opts.data,
-          headers: opts == null ? void 0 : opts.headers,
-          signal: opts == null ? void 0 : opts.signal,
-          context: {},
-          router: getRouterInstance()
-        }).then((d2) => {
-          if (resolvedOptions.response === "full") {
-            return d2;
-          }
-          if (d2.error) throw d2.error;
-          return d2.result;
-        });
-      }, {
-        // This copies over the URL, function ID
-        ...extractedFn,
-        // The extracted function on the server-side calls
-        // this function
-        __executeServer: async (opts_, signal) => {
-          const opts = opts_ instanceof FormData ? extractFormDataContext(opts_) : opts_;
-          opts.type = typeof resolvedOptions.type === "function" ? resolvedOptions.type(opts) : resolvedOptions.type;
-          const ctx = {
-            ...extractedFn,
-            ...opts,
-            signal
-          };
-          const run = () => executeMiddleware$1(resolvedMiddleware, "server", ctx).then((d2) => ({
-            // Only send the result and sendContext back to the client
-            result: d2.result,
-            error: d2.error,
-            context: d2.sendContext
-          }));
-          if (ctx.type === "static") {
-            let response;
-            if (serverFnStaticCache == null ? void 0 : serverFnStaticCache.getItem) {
-              response = await serverFnStaticCache.getItem(ctx);
-            }
-            if (!response) {
-              response = await run().then((d2) => {
-                return {
-                  ctx: d2,
-                  error: null
-                };
-              }).catch((e) => {
-                return {
-                  ctx: void 0,
-                  error: e
-                };
-              });
-              if (serverFnStaticCache == null ? void 0 : serverFnStaticCache.setItem) {
-                await serverFnStaticCache.setItem(ctx, response);
-              }
-            }
-            invariant(response);
-            if (response.error) {
-              throw response.error;
-            }
-            return response.ctx;
-          }
-          return run();
-        }
-      });
-    }
-  };
-}
-async function executeMiddleware$1(middlewares, env, opts) {
-  const flattenedMiddlewares = flattenMiddlewares([...globalMiddleware, ...middlewares]);
-  const next = async (ctx) => {
-    const nextMiddleware = flattenedMiddlewares.shift();
-    if (!nextMiddleware) {
-      return ctx;
-    }
-    if (nextMiddleware.options.validator && (env === "client" ? nextMiddleware.options.validateClient : true)) {
-      ctx.data = await execValidator(nextMiddleware.options.validator, ctx.data);
-    }
-    const middlewareFn = env === "client" ? nextMiddleware.options.client : nextMiddleware.options.server;
-    if (middlewareFn) {
-      return applyMiddleware(middlewareFn, ctx, async (newCtx) => {
-        return next(newCtx).catch((error) => {
-          if (isRedirect(error) || isNotFound(error)) {
-            return {
-              ...newCtx,
-              error
-            };
-          }
-          throw error;
-        });
-      });
-    }
-    return next(ctx);
-  };
-  return next({
-    ...opts,
-    headers: opts.headers || {},
-    sendContext: opts.sendContext || {},
-    context: opts.context || {}
-  });
-}
-let serverFnStaticCache;
-function setServerFnStaticCache(cache) {
-  const previousCache = serverFnStaticCache;
-  serverFnStaticCache = typeof cache === "function" ? cache() : cache;
-  return () => {
-    serverFnStaticCache = previousCache;
-  };
-}
-function createServerFnStaticCache(serverFnStaticCache2) {
-  return serverFnStaticCache2;
-}
-async function sha1Hash(message) {
-  const msgBuffer = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest("SHA-1", msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-  return hashHex;
-}
-setServerFnStaticCache(() => {
-  const getStaticCacheUrl = async (options, hash) => {
-    const filename = await sha1Hash(`${options.functionId}__${hash}`);
-    return `/__tsr/staticServerFnCache/${filename}.json`;
-  };
-  const jsonToFilenameSafeString = (json2) => {
-    const sortedKeysReplacer = (key, value) => value && typeof value === "object" && !Array.isArray(value) ? Object.keys(value).sort().reduce((acc, curr) => {
-      acc[curr] = value[curr];
-      return acc;
-    }, {}) : value;
-    const jsonString = JSON.stringify(json2 ?? "", sortedKeysReplacer);
-    return jsonString.replace(/[/\\?%*:|"<>]/g, "-").replace(/\s+/g, "_");
-  };
-  const staticClientCache = typeof document !== "undefined" ? /* @__PURE__ */ new Map() : null;
-  return createServerFnStaticCache({
-    getItem: async (ctx) => {
-      if (typeof document === "undefined") {
-        const hash = jsonToFilenameSafeString(ctx.data);
-        const url = await getStaticCacheUrl(ctx, hash);
-        const publicUrl = "/Users/mxdeley/madeleydesignstudio/projects/ordo/apps/web/.output/public";
-        const {
-          promises: fs2
-        } = await import('node:fs');
-        const path = await import('node:path');
-        const filePath2 = path.join(publicUrl, url);
-        const [cachedResult, readError] = await fs2.readFile(filePath2, "utf-8").then((c) => [startSerializer.parse(c), null]).catch((e) => [null, e]);
-        if (readError && readError.code !== "ENOENT") {
-          throw readError;
-        }
-        return cachedResult;
-      }
-      return void 0;
-    },
-    setItem: async (ctx, response) => {
-      const {
-        promises: fs2
-      } = await import('node:fs');
-      const path = await import('node:path');
-      const hash = jsonToFilenameSafeString(ctx.data);
-      const url = await getStaticCacheUrl(ctx, hash);
-      const publicUrl = "/Users/mxdeley/madeleydesignstudio/projects/ordo/apps/web/.output/public";
-      const filePath2 = path.join(publicUrl, url);
-      await fs2.mkdir(path.dirname(filePath2), {
-        recursive: true
-      });
-      await fs2.writeFile(filePath2, startSerializer.stringify(response));
-    },
-    fetchItem: async (ctx) => {
-      const hash = jsonToFilenameSafeString(ctx.data);
-      const url = await getStaticCacheUrl(ctx, hash);
-      let result = staticClientCache == null ? void 0 : staticClientCache.get(url);
-      if (!result) {
-        result = await fetch(url, {
-          method: "GET"
-        }).then((r) => r.text()).then((d2) => startSerializer.parse(d2));
-        staticClientCache == null ? void 0 : staticClientCache.set(url, result);
-      }
-      return result;
-    }
-  });
-});
-function extractFormDataContext(formData) {
-  const serializedContext = formData.get("__TSR_CONTEXT");
-  formData.delete("__TSR_CONTEXT");
-  if (typeof serializedContext !== "string") {
-    return {
-      context: {},
-      data: formData
-    };
-  }
-  try {
-    const context = startSerializer.parse(serializedContext);
-    return {
-      context,
-      data: formData
-    };
-  } catch {
-    return {
-      data: formData
-    };
-  }
 }
 function flattenMiddlewares(middlewares) {
   const seen = /* @__PURE__ */ new Set();
@@ -1347,90 +1099,6 @@ function flattenMiddlewares(middlewares) {
   };
   recurse(middlewares);
   return flattened;
-}
-const applyMiddleware = async (middlewareFn, ctx, nextFn) => {
-  return middlewareFn({
-    ...ctx,
-    next: async (userCtx = {}) => {
-      return nextFn({
-        ...ctx,
-        ...userCtx,
-        context: {
-          ...ctx.context,
-          ...userCtx.context
-        },
-        sendContext: {
-          ...ctx.sendContext,
-          ...userCtx.sendContext ?? {}
-        },
-        headers: mergeHeaders(ctx.headers, userCtx.headers),
-        result: userCtx.result !== void 0 ? userCtx.result : ctx.response === "raw" ? userCtx : ctx.result,
-        error: userCtx.error ?? ctx.error
-      });
-    }
-  });
-};
-function execValidator(validator, input) {
-  if (validator == null) return {};
-  if ("~standard" in validator) {
-    const result = validator["~standard"].validate(input);
-    if (result instanceof Promise) throw new Error("Async validation not supported");
-    if (result.issues) throw new Error(JSON.stringify(result.issues, void 0, 2));
-    return result.value;
-  }
-  if ("parse" in validator) {
-    return validator.parse(input);
-  }
-  if (typeof validator === "function") {
-    return validator(input);
-  }
-  throw new Error("Invalid validator type!");
-}
-function serverFnBaseToMiddleware(options) {
-  return {
-    _types: void 0,
-    options: {
-      validator: options.validator,
-      validateClient: options.validateClient,
-      client: async ({
-        next,
-        sendContext,
-        ...ctx
-      }) => {
-        var _a;
-        const payload = {
-          ...ctx,
-          // switch the sendContext over to context
-          context: sendContext,
-          type: typeof ctx.type === "function" ? ctx.type(ctx) : ctx.type
-        };
-        if (ctx.type === "static" && "production" === "production" && typeof document !== "undefined") {
-          invariant(serverFnStaticCache);
-          const result = await serverFnStaticCache.fetchItem(payload);
-          if (result) {
-            if (result.error) {
-              throw result.error;
-            }
-            return next(result.ctx);
-          }
-          warning(result, `No static cache item found for ${payload.functionId}__${JSON.stringify(payload.data)}, falling back to server function...`);
-        }
-        const res = await ((_a = options.extractedFn) == null ? void 0 : _a.call(options, payload));
-        return next(res);
-      },
-      server: async ({
-        next,
-        ...ctx
-      }) => {
-        var _a;
-        const result = await ((_a = options.serverFn) == null ? void 0 : _a.call(options, ctx));
-        return next({
-          ...ctx,
-          result
-        });
-      }
-    }
-  };
 }
 var R = ((a) => (a[a.AggregateError = 1] = "AggregateError", a[a.ArrowFunction = 2] = "ArrowFunction", a[a.ErrorPrototypeStack = 4] = "ErrorPrototypeStack", a[a.ObjectAssign = 8] = "ObjectAssign", a[a.BigIntTypedArray = 16] = "BigIntTypedArray", a))(R || {});
 function Nr(o) {
@@ -3239,9 +2907,9 @@ async function loadVirtualModule(id) {
     case VIRTUAL_MODULES.routeTree:
       return await Promise.resolve().then(() => routeTree_gen);
     case VIRTUAL_MODULES.startManifest:
-      return await import('./_tanstack-start-manifest_v-CE5gweSJ.mjs');
+      return await import('./_tanstack-start-manifest_v-BQuy-vs4.mjs');
     case VIRTUAL_MODULES.serverFnManifest:
-      return await import('./_tanstack-start-server-fn-manifest_v-DzgpWvXx.mjs');
+      return await import('./_tanstack-start-server-fn-manifest_v-DtgTK7xl.mjs');
     default:
       throw new Error(`Unknown virtual module: ${id}`);
   }
@@ -3280,7 +2948,7 @@ async function getStartManifest(opts) {
   };
   return manifest;
 }
-function sanitizeBase$1(base) {
+function sanitizeBase(base) {
   return base.replace(/^\/|\/$/g, "");
 }
 const handleServerAction = async ({
@@ -3292,7 +2960,7 @@ const handleServerAction = async ({
   request.signal.addEventListener("abort", abort);
   const method = request.method;
   const url = new URL(request.url, "http://localhost:3000");
-  const regex = new RegExp(`${sanitizeBase$1("/_serverFn")}/([^/?#]+)`);
+  const regex = new RegExp(`${sanitizeBase("/_serverFn")}/([^/?#]+)`);
   const match = url.pathname.match(regex);
   const serverFnId = match ? match[1] : null;
   const search = Object.fromEntries(url.searchParams.entries());
@@ -3729,6 +3397,63 @@ function isSpecialResponse(err) {
 function isResponse(response) {
   return response instanceof Response;
 }
+const supabaseUrl = "https://afccjdzmczgzpqmzsrnx.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmY2NqZHptY3pnenBxbXpzcm54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2MDA1MzYsImV4cCI6MjA3MDE3NjUzNn0.YsyvBF3xmOHumKN4Ltpvy2J4wRG5h9pvFeO_eAblwo4";
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const AuthContext = createContext(void 0);
+function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === void 0) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
+function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session: session2 } }) => {
+      setSession(session2);
+      setUser(session2?.user ?? null);
+      setLoading(false);
+    });
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange(async (event, session2) => {
+      setSession(session2);
+      setUser(session2?.user ?? null);
+      setLoading(false);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+  const signIn = async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    return { error };
+  };
+  const signUp = async (email, password) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password
+    });
+    return { error };
+  };
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+  const value = {
+    user,
+    session,
+    loading,
+    signIn,
+    signUp,
+    signOut
+  };
+  return /* @__PURE__ */ jsx(AuthContext.Provider, { value, children });
+}
 const Route$1 = createRootRoute({
   head: () => ({
     meta: [{
@@ -3737,55 +3462,33 @@ const Route$1 = createRootRoute({
       name: "viewport",
       content: "width=device-width, initial-scale=1"
     }, {
-      title: "TanStack Start Starter"
+      title: "Ordo - Task Management"
     }]
   }),
   component: RootComponent
 });
 function RootComponent() {
-  return /* @__PURE__ */ jsx(RootDocument, { children: /* @__PURE__ */ jsx(Outlet, {}) });
+  return /* @__PURE__ */ jsx(RootDocument, { children: /* @__PURE__ */ jsx(AuthProvider, { children: /* @__PURE__ */ jsx(Outlet, {}) }) });
 }
 function RootDocument({
   children
 }) {
   return /* @__PURE__ */ jsxs("html", { children: [
     /* @__PURE__ */ jsx("head", { children: /* @__PURE__ */ jsx(HeadContent, {}) }),
-    /* @__PURE__ */ jsxs("body", { children: [
+    /* @__PURE__ */ jsxs("body", { style: {
+      margin: 0,
+      padding: 0,
+      fontFamily: "system-ui, sans-serif",
+      backgroundColor: "#f9fafb"
+    }, children: [
       children,
       /* @__PURE__ */ jsx(Scripts, {})
     ] })
   ] });
 }
-function sanitizeBase(base) {
-  return base.replace(/^\/|\/$/g, "");
-}
-const createServerRpc = (functionId, serverBase, splitImportFn) => {
-  invariant(
-    splitImportFn);
-  const sanitizedAppBase = sanitizeBase("/");
-  const sanitizedServerBase = sanitizeBase(serverBase);
-  const url = `${sanitizedAppBase ? `/${sanitizedAppBase}` : ``}/${sanitizedServerBase}/${functionId}`;
-  return Object.assign(splitImportFn, {
-    url,
-    functionId
-  });
-};
-const $$splitComponentImporter = () => import('./index-rFf_0SU-.mjs');
-const filePath = "count.txt";
-async function readCount() {
-  return parseInt(await fs.promises.readFile(filePath, "utf-8").catch(() => "0"));
-}
-const getCount_createServerFn_handler = createServerRpc("src_routes_index_tsx--getCount_createServerFn_handler", "/_serverFn", (opts, signal) => {
-  return getCount.__executeServer(opts, signal);
-});
-const getCount = createServerFn({
-  method: "GET"
-}).handler(getCount_createServerFn_handler, () => {
-  return readCount();
-});
+const $$splitComponentImporter = () => import('./index-Dzl20-GP.mjs');
 const Route = createFileRoute("/")({
-  component: lazyRouteComponent($$splitComponentImporter, "component"),
-  loader: async () => await getCount()
+  component: lazyRouteComponent($$splitComponentImporter, "component")
 });
 const IndexRoute = Route.update({
   id: "/",
@@ -3815,5 +3518,5 @@ const serverEntry = defineEventHandler(function(event) {
   return serverEntry$1({ request });
 });
 
-export { Route as R, createServerRpc as a, createServerFn as c, serverEntry as default };
+export { serverEntry as default, useAuth as u };
 //# sourceMappingURL=ssr.mjs.map

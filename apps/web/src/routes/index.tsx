@@ -1,48 +1,56 @@
 // src/routes/index.tsx
-import * as fs from "node:fs";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-
-const filePath = "count.txt";
-
-async function readCount() {
-  return parseInt(
-    await fs.promises.readFile(filePath, "utf-8").catch(() => "0"),
-  );
-}
-
-const getCount = createServerFn({
-  method: "GET",
-}).handler(() => {
-  return readCount();
-});
-
-const updateCount = createServerFn({ method: "POST" })
-  .validator((d: number) => d)
-  .handler(async ({ data }) => {
-    const count = await readCount();
-    await fs.promises.writeFile(filePath, `${count + data}`);
-  });
+import { createFileRoute } from "@tanstack/react-router";
+import { ProtectedRoute } from "../components/ProtectedRoute";
+import { Navigation } from "../components/Navigation";
 
 export const Route = createFileRoute("/")({
   component: Home,
-  loader: async () => await getCount(),
 });
 
 function Home() {
-  const router = useRouter();
-  const state = Route.useLoaderData();
-
   return (
-    <button
-      type="button"
-      onClick={() => {
-        updateCount({ data: 1 }).then(() => {
-          router.invalidate();
-        });
-      }}
-    >
-      Hello {state}! Click me!
-    </button>
+    <ProtectedRoute>
+      <Navigation />
+      <main
+        style={{
+          padding: "2rem",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "2rem",
+            marginBottom: "1rem",
+            color: "#1f2937",
+          }}
+        >
+          Welcome to Ordo
+        </h1>
+        <p
+          style={{
+            fontSize: "1.125rem",
+            color: "#6b7280",
+            marginBottom: "2rem",
+          }}
+        >
+          Your personal task management application.
+        </p>
+        <div
+          style={{
+            padding: "2rem",
+            backgroundColor: "white",
+            borderRadius: "8px",
+            border: "1px solid #e5e7eb",
+          }}
+        >
+          <h2 style={{ marginBottom: "1rem", color: "#374151" }}>Dashboard</h2>
+          <p style={{ color: "#6b7280" }}>
+            You are now successfully authenticated! Start building your task
+            management features here.
+          </p>
+        </div>
+      </main>
+    </ProtectedRoute>
   );
 }

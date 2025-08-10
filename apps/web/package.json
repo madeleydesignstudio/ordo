@@ -12,6 +12,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.4.1",
   "dependencies": {
+    "@supabase/supabase-js": "^2.54.0",
     "@tanstack/react-router": "^1.131.2",
     "@tanstack/react-start": "^1.131.2",
     "react": "^19.1.1",

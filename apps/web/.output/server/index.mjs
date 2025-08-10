@@ -4233,24 +4233,24 @@ const plugins = [
 const assets = {
   "/.vite/manifest.json": {
     "type": "application/json",
-    "etag": "\"23e-hA6eaAUT+fWiGz2Km1E3iOx/vGU\"",
-    "mtime": "2025-08-10T20:08:54.733Z",
+    "etag": "\"23e-CfJ8tBgk9MC9Q2CU3SfKXtdn7Uw\"",
+    "mtime": "2025-08-10T20:22:58.564Z",
     "size": 574,
     "path": "../public/.vite/manifest.json"
   },
-  "/assets/index-D_3PDL3I.js": {
+  "/assets/index-D1ykQEHc.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"17d-MaRRy/ifJqTB4ei5nEuRHRjYt2o\"",
-    "mtime": "2025-08-10T20:08:54.733Z",
-    "size": 381,
-    "path": "../public/assets/index-D_3PDL3I.js"
+    "etag": "\"ecb-wCd9QLdHw1qZeXKAcw1iBPTLMaM\"",
+    "mtime": "2025-08-10T20:22:58.564Z",
+    "size": 3787,
+    "path": "../public/assets/index-D1ykQEHc.js"
   },
-  "/assets/main-BLfwxEbd.js": {
+  "/assets/main-D8DiPG9N.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"439fd-Yurp0HTX7zc8hIN3gkFSLSRMnKc\"",
-    "mtime": "2025-08-10T20:08:54.733Z",
-    "size": 276989,
-    "path": "../public/assets/main-BLfwxEbd.js"
+    "etag": "\"5fc1f-39WaCWFMgtATiq1sKHHJwb+vHPE\"",
+    "mtime": "2025-08-10T20:22:58.564Z",
+    "size": 392223,
+    "path": "../public/assets/main-D8DiPG9N.js"
   }
 };
 
@@ -4380,7 +4380,7 @@ function getAsset (id) {
 
 const METHODS = /* @__PURE__ */ new Set(["HEAD", "GET"]);
 const EncodingMap = { gzip: ".gz", br: ".br" };
-const _lSk79X = eventHandler((event) => {
+const _un19Fd = eventHandler((event) => {
   if (event.method && !METHODS.has(event.method)) {
     return;
   }
@@ -4447,7 +4447,7 @@ const _lSk79X = eventHandler((event) => {
 const _lazy_vr5YKA = () => import('./chunks/_/ssr.mjs');
 
 const handlers = [
-  { route: '', handler: _lSk79X, lazy: false, middleware: true, method: undefined },
+  { route: '', handler: _un19Fd, lazy: false, middleware: true, method: undefined },
   { route: '/**', handler: _lazy_vr5YKA, lazy: true, middleware: false, method: undefined }
 ];
 
