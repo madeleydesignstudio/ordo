@@ -1,13 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalEnv": ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY", "DATABASE_URL"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".vercel/**", "dist/**", "build/**", "output/**"],
-      "env": ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY"]
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
