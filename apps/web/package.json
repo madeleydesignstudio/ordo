@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "tsr generate && vite build",
     "build:vercel": "node build.js"
   },
   "keywords": [],
@@ -24,6 +24,7 @@
     "vite": "^7.1.1"
   },
   "devDependencies": {
+    "@tanstack/router-cli": "^1.131.2",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
