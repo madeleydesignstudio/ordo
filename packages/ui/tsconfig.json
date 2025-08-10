@@ -1,9 +1,9 @@
 {
-  "extends": "@ordo/typescript-config/react-library.json",
+  "extends": "@workspace/typescript-config/react-library.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@ordo/ui/*": ["./src/*"]
+      "@workspace/ui/*": ["./src/*"]
     }
   },
   "include": ["."],

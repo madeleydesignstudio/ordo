@@ -1,5 +1,5 @@
 {
-  "name": "@ordo/ui",
+  "name": "@workspace/ui",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -7,16 +7,10 @@
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
-    "@radix-ui/react-dialog": "^1.1.14",
-    "@radix-ui/react-scroll-area": "^1.2.9",
-    "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
-    "@radix-ui/react-tooltip": "^1.2.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cmdk": "^1.1.1",
     "lucide-react": "^0.475.0",
-    "motion": "^12.23.12",
     "next-themes": "^0.4.6",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -25,13 +19,13 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@ordo/eslint-config": "workspace:*",
-    "@ordo/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4.1.11",
     "@turbo/gen": "^2.5.5",
     "@types/node": "^20.19.9",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.2"
   },

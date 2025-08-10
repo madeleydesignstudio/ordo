@@ -3,19 +3,14 @@ import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   server: {
     port: 3001,
   },
   plugins: [
-    tanstackStart({
-      target: "vercel",
-      customViteReactPlugin: true,
-    }),
-    viteReact(),
     tsConfigPaths(),
-    tailwindcss(),
+    tanstackStart({ target: "vercel", customViteReactPlugin: true }),
+    viteReact(),
   ],
 });
