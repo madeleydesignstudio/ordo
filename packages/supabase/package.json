@@ -14,8 +14,7 @@
     "db:reset": "drizzle-kit drop && drizzle-kit push",
     "db:seed": "tsx src/db/seed.ts",
     "db:fresh": "npm run db:reset && npm run db:seed",
-    "build": "echo 'Supabase package - no build needed'",
-    "dev": "tsx watch src/index.ts"
+    "build": "echo 'Supabase package - no build needed'"
   },
   "keywords": [],
   "author": "",

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "tsr generate && vite build",
+    "build": "vite build",
     "build:vercel": "node build.js"
   },
   "keywords": [],
