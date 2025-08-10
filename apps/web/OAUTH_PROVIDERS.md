@@ -9,12 +9,6 @@ Supabase supports the following OAuth providers:
 - **Social Providers:**
   - Google ✅ (Implemented)
   - GitHub ✅ (Implemented)
-  - Facebook
-  - Twitter
-  - Discord
-  - Apple
-  - LinkedIn
-  - Spotify
 
 - **Developer Platforms:**
   - GitLab
@@ -175,7 +169,7 @@ Update `src/components/Auth.tsx` to include the new OAuth button:
    ```bash
    # Start the development server
    pnpm dev
-   
+
    # Navigate to http://localhost:3001
    # Test the new OAuth provider button
    ```
