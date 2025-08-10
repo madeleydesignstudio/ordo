@@ -3,15 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-   "scripts": {
-     "dev": "vite dev",
-     "build": "vite build"
-   },
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.4.1",
   "dependencies": {
+    "@ordo/ui": "workspace:*",
+    "@tailwindcss/vite": "^4.1.11",
     "@tanstack/react-router": "^1.131.2",
     "@tanstack/react-start": "^1.131.2",
     "react": "^19.1.1",
