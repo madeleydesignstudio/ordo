@@ -10,9 +10,9 @@ export default defineConfig({
     port: 3001,
   },
   plugins: [
-    tsConfigPaths(),
-    tanstackStart({ target: "vercel" }),
+    tanstackStart({ target: "vercel", customViteReactPlugin: true }),
     viteReact(),
+    tsConfigPaths(),
     tailwindcss(),
   ],
 });
