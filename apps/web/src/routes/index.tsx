@@ -42,7 +42,7 @@ function Home() {
         });
       }}
     >
-      Add 1 to {state}?
+      Hello {state}! Click me!
     </button>
   );
 }
