@@ -13,8 +13,10 @@ A task management application built with TanStack Start and Supabase authenticat
 
 - **Frontend**: React 19, TanStack Start (React Router)
 - **Authentication**: Supabase Auth
+- **Database**: Supabase with Drizzle ORM (shared package)
 - **Build Tool**: Vite
 - **Package Manager**: pnpm
+- **Architecture**: Monorepo with shared packages
 
 ## Setup Instructions
 
@@ -71,7 +73,7 @@ The app will be available at `http://localhost:3001`
 ## Project Structure
 
 ```
-src/
+apps/web/src/
 ├── components/
 │   ├── LoginForm.tsx       # Authentication form
 │   ├── Navigation.tsx      # Top navigation with user info
@@ -79,11 +81,17 @@ src/
 ├── contexts/
 │   └── AuthContext.tsx     # Authentication state management
 ├── lib/
-│   └── supabase.ts        # Supabase client configuration
+│   └── supabase.ts        # Supabase client instance
 ├── routes/
 │   ├── __root.tsx         # Root layout with AuthProvider
 │   └── index.tsx          # Home page (protected)
-└── types/                 # TypeScript type definitions
+
+packages/supabase/src/
+├── client.ts              # Browser-compatible Supabase client
+├── db/                    # Drizzle ORM setup (server-side)
+├── supabase.ts           # Full Supabase client with auth
+├── types.ts              # Database type definitions
+└── index.ts              # Main exports (server-side)
 ```
 
 ## Environment Variables
@@ -108,6 +116,7 @@ src/
 
 ### Example Usage
 
+**Using Authentication:**
 ```tsx
 import { useAuth } from '../contexts/AuthContext'
 
@@ -121,6 +130,15 @@ function MyComponent() {
     </div>
   )
 }
+```
+
+**Using Shared Supabase Package:**
+```tsx
+// In browser components
+import { createSupabaseClient } from '@ordo/supabase/client'
+
+// In server-side code
+import { db, usersTable, eq } from '@ordo/supabase'
 ```
 
 ## Troubleshooting
@@ -145,11 +163,18 @@ function MyComponent() {
 - Check the [Supabase Auth documentation](https://supabase.com/docs/guides/auth)
 - Review [TanStack Router documentation](https://tanstack.com/router)
 
+## Architecture Benefits
+
+- **Shared Package**: Supabase client and database schemas are shared across apps
+- **Type Safety**: Database types are generated and shared
+- **Separation of Concerns**: Client-side auth separate from server-side database operations
+- **Scalability**: Easy to add new apps that use the same backend
+
 ## Next Steps
 
-- [ ] Add user profiles
-- [ ] Implement task CRUD operations
-- [ ] Add task categories and tags
-- [ ] Implement real-time updates
+- [ ] Add user profiles using shared database schemas
+- [ ] Implement task CRUD operations with Drizzle ORM
+- [ ] Add task categories and tags to database schema
+- [ ] Implement real-time updates with Supabase subscriptions
 - [ ] Add mobile responsiveness
-- [ ] Set up deployment
+- [ ] Set up deployment with shared environment variables

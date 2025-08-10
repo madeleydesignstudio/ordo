@@ -37,10 +37,4 @@ export {
 } from "drizzle-orm";
 
 // Re-export common Drizzle PostgreSQL functions
-export {
-  count,
-  max,
-  min,
-  avg,
-  sum,
-} from "drizzle-orm";
+export { count, max, min, avg, sum } from "drizzle-orm";

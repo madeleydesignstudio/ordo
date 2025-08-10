@@ -2,7 +2,12 @@ import { jsxs, jsx, Fragment } from 'react/jsx-runtime';
 import { u as useAuth } from './ssr.mjs';
 import { useState } from 'react';
 import '@tanstack/react-router';
-import '@supabase/supabase-js';
+import 'stream';
+import 'http';
+import 'url';
+import 'punycode';
+import 'https';
+import 'zlib';
 import 'node:async_hooks';
 import '@tanstack/react-router/ssr/server';
 
@@ -220,4 +225,4 @@ const SplitComponent = function Home() {
 };
 
 export { SplitComponent as component };
-//# sourceMappingURL=index-Dzl20-GP.mjs.map
+//# sourceMappingURL=index-BCYv1hhx.mjs.map

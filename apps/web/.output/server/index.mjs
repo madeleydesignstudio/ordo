@@ -4233,24 +4233,24 @@ const plugins = [
 const assets = {
   "/.vite/manifest.json": {
     "type": "application/json",
-    "etag": "\"23e-CfJ8tBgk9MC9Q2CU3SfKXtdn7Uw\"",
-    "mtime": "2025-08-10T20:22:58.564Z",
+    "etag": "\"23e-OF85FzBNFDJsVy7OtbkIz1qE8SA\"",
+    "mtime": "2025-08-10T20:41:32.974Z",
     "size": 574,
     "path": "../public/.vite/manifest.json"
   },
-  "/assets/index-D1ykQEHc.js": {
+  "/assets/index-B2gRbMpk.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"ecb-wCd9QLdHw1qZeXKAcw1iBPTLMaM\"",
-    "mtime": "2025-08-10T20:22:58.564Z",
+    "etag": "\"ecb-tOY5pLGn8BCveoLATpiN0mXDSqM\"",
+    "mtime": "2025-08-10T20:41:32.974Z",
     "size": 3787,
-    "path": "../public/assets/index-D1ykQEHc.js"
+    "path": "../public/assets/index-B2gRbMpk.js"
   },
-  "/assets/main-D8DiPG9N.js": {
+  "/assets/main-ZGl22hUy.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"5fc1f-39WaCWFMgtATiq1sKHHJwb+vHPE\"",
-    "mtime": "2025-08-10T20:22:58.564Z",
-    "size": 392223,
-    "path": "../public/assets/main-D8DiPG9N.js"
+    "etag": "\"5fc5c-GlkZ6UYjc+cX3P9qxg07ArBPPu4\"",
+    "mtime": "2025-08-10T20:41:32.974Z",
+    "size": 392284,
+    "path": "../public/assets/main-ZGl22hUy.js"
   }
 };
 
