@@ -1,46 +1,72 @@
-// src/routes/home/index.tsx
 import { createFileRoute } from "@tanstack/react-router";
+import { format, parseISO, startOfDay } from "date-fns";
+import { z } from "zod";
+import {
+  MilestonesComponent,
+  RoutineComponent,
+  RecentlyVisitedComponent,
+  WeeklyCalendarComponent,
+} from "@/components/home";
+
+// Search params validation schema
+const homeSearchSchema = z.object({
+  date: z.string().optional(),
+});
 
 export const Route = createFileRoute("/home/")({
   component: Home,
+  validateSearch: homeSearchSchema,
+  searchParams: {
+    date: {
+      default: format(new Date(), "yyyy-MM-dd"),
+    },
+  },
 });
 
 function Home() {
+  const navigate = Route.useNavigate();
+  const { date: dateParam } = Route.useSearch();
+
+  // Parse the date from URL params or use today as fallback
+  const activeDate = dateParam
+    ? startOfDay(parseISO(dateParam))
+    : startOfDay(new Date());
+
+  const dayName = format(activeDate, "EEEE").toUpperCase();
+  const dayWithSuffix = format(activeDate, "do MMMM");
+
+  const handleActiveDateChange = (newDate: Date) => {
+    const newDateParam = format(newDate, "yyyy-MM-dd");
+    navigate({
+      search: { date: newDateParam },
+      replace: true,
+    });
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Home</h1>
+    <div className="h-full flex flex-col p-4 gap-4">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-2xl font-bold tracking-tight">{dayName}</h1>
+        <p className="text-sm text-muted-foreground">{dayWithSuffix}</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="text-lg font-semibold">Welcome Back</h3>
-          <p className="text-sm text-muted-foreground mt-2">
-            Your workspace is ready to go.
-          </p>
-        </div>
-
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="text-lg font-semibold">Recent Activity</h3>
-          <p className="text-sm text-muted-foreground mt-2">
-            No recent activity to show.
-          </p>
-        </div>
-
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="text-lg font-semibold">Quick Actions</h3>
-          <p className="text-sm text-muted-foreground mt-2">
-            Create new projects and tasks.
-          </p>
-        </div>
-
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="text-lg font-semibold">Notifications</h3>
-          <p className="text-sm text-muted-foreground mt-2">
-            You have no new notifications.
-          </p>
-        </div>
+      {/* Top Row - Milestones and Routine */}
+      <div className="flex gap-4 h-48">
+        <MilestonesComponent />
+        <RoutineComponent activeDate={activeDate} />
       </div>
+
+      {/* Recently Visited */}
+      <div className="h-24">
+        <RecentlyVisitedComponent />
+      </div>
+
+      {/* Weekly Calendar */}
+      <WeeklyCalendarComponent
+        activeDate={activeDate}
+        onActiveDateChange={handleActiveDateChange}
+      />
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
 import { Separator } from "@ordo/ui/components/separator";
 import { useFocus } from "@/context/focus-context";
 import { Link, useLocation } from "@tanstack/react-router";
+import { motion, AnimatePresence } from "motion/react";
 import * as React from "react";
 import {
   HomeIcon,
@@ -23,7 +24,6 @@ import {
   NotebookPenIcon,
   SettingsIcon,
 } from "lucide-react";
-
 const items = [
   {
     title: "Home",
@@ -61,8 +61,8 @@ export function AppSidebar() {
   const { isFocused } = useFocus();
   const { state } = useSidebar();
   const location = useLocation();
-  const sidebarTransform = isFocused ? "-translate-x-full" : "";
   const isExpanded = state === "expanded";
+  const sidebarTransform = isFocused ? "-translate-x-full" : "";
 
   return (
     <div
@@ -70,15 +70,47 @@ export function AppSidebar() {
     >
       <Sidebar>
         <SidebarHeader>
-          <div className="p-2">
-            {isExpanded && (
-              <h2 className="text-lg font-semibold tracking-tight">Ordo</h2>
-            )}
+          <div className="p-2 flex items-center justify-center">
+            <motion.div
+              layout
+              className="flex items-center"
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 30,
+                mass: 0.6,
+              }}
+            >
+              <motion.div
+                className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-white font-bold text-sm">O</span>
+              </motion.div>
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.h2
+                    initial={{ opacity: 0, width: 0, marginLeft: 0 }}
+                    animate={{ opacity: 1, width: "auto", marginLeft: 8 }}
+                    exit={{ opacity: 0, width: 0, marginLeft: 0 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 30,
+                      mass: 0.5,
+                    }}
+                    className="text-lg font-semibold tracking-tight overflow-hidden whitespace-nowrap"
+                  >
+                    Ordo
+                  </motion.h2>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            {isExpanded && <SidebarGroupLabel>Navigation</SidebarGroupLabel>}
             <SidebarGroupContent>
               <SidebarMenu className="space-y-[30px]">
                 {items.map((item, index) => (
@@ -97,8 +129,39 @@ export function AppSidebar() {
                           to={item.url}
                           className={isExpanded ? "" : "justify-center"}
                         >
-                          <item.icon className="w-6 h-6" />
-                          {isExpanded && <span>{item.title}</span>}
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="w-6 h-6 flex items-center justify-center"
+                          >
+                            <item.icon className="w-6 h-6" />
+                          </motion.div>
+                          <AnimatePresence>
+                            {isExpanded && (
+                              <motion.span
+                                initial={{
+                                  opacity: 0,
+                                  width: 0,
+                                  marginLeft: 0,
+                                }}
+                                animate={{
+                                  opacity: 1,
+                                  width: "auto",
+                                  marginLeft: 12,
+                                }}
+                                exit={{ opacity: 0, width: 0, marginLeft: 0 }}
+                                transition={{
+                                  type: "spring",
+                                  stiffness: 400,
+                                  damping: 30,
+                                  mass: 0.5,
+                                }}
+                                className="overflow-hidden whitespace-nowrap"
+                              >
+                                {item.title}
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -113,7 +176,46 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter />
+        <SidebarFooter>
+          <div className="p-2 flex items-center justify-center border-t border-sidebar-border">
+            <motion.div
+              layout
+              className="flex items-center"
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 30,
+                mass: 0.6,
+              }}
+            >
+              <motion.div
+                className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded flex items-center justify-center"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-white font-bold text-xs">W</span>
+              </motion.div>
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0, marginLeft: 0 }}
+                    animate={{ opacity: 1, width: "auto", marginLeft: 8 }}
+                    exit={{ opacity: 0, width: 0, marginLeft: 0 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 30,
+                      mass: 0.5,
+                    }}
+                    className="text-sm text-muted-foreground overflow-hidden whitespace-nowrap"
+                  >
+                    Workspace
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
+        </SidebarFooter>
       </Sidebar>
     </div>
   );

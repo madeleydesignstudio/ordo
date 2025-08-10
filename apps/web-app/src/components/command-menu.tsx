@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useNavigate } from "@tanstack/react-router";
+import { useQuickActions, useSearchState } from "@/stores";
 import {
   HomeIcon,
   BellIcon,
@@ -27,20 +28,24 @@ interface CommandMenuProps {
 }
 
 export function CommandMenu({ isOpen, onClose }: CommandMenuProps) {
-  const [search, setSearch] = useState("");
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Reset search and selection when menu closes
+  const { quickActions } = useQuickActions();
+  const {
+    search: { query: search, results, isSearching },
+    setSearchQuery,
+    clearSearch,
+  } = useSearchState();
+
+  // Reset search when menu closes
   useEffect(() => {
     if (!isOpen) {
-      setSearch("");
-      setSelectedIndex(0);
+      clearSearch();
     }
-  }, [isOpen]);
+  }, [isOpen, clearSearch]);
 
-  const commands: CommandItem[] = [
+  const navigationCommands: CommandItem[] = [
     {
       id: "home",
       title: "Go to Home",
@@ -109,12 +114,29 @@ export function CommandMenu({ isOpen, onClose }: CommandMenuProps) {
     },
   ];
 
+  // Combine navigation commands with quick actions from store
+  const quickActionCommands: CommandItem[] = quickActions.map((action) => ({
+    id: action.id,
+    title: action.title,
+    description: action.description,
+    icon: SearchIcon, // Default icon, could be mapped from action.icon
+    action: () => {
+      navigate({ to: action.path });
+      onClose();
+    },
+    category: "Quick Actions",
+  }));
+
+  const commands = [...navigationCommands, ...quickActionCommands];
+
   const filteredCommands = commands.filter(
     (command) =>
       command.title.toLowerCase().includes(search.toLowerCase()) ||
       command.description.toLowerCase().includes(search.toLowerCase()) ||
       command.category.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Reset selected index when filtered commands change
   useEffect(() => {
@@ -185,7 +207,7 @@ export function CommandMenu({ isOpen, onClose }: CommandMenuProps) {
             placeholder="Type a command or search..."
             className="flex-1 px-3 py-3 text-sm bg-transparent outline-none placeholder:text-muted-foreground"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             autoFocus
           />
@@ -249,9 +271,7 @@ export function useCommandMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
   const open = useCallback(() => setIsOpen(true), []);
-  const close = useCallback(() => {
-    setIsOpen(false);
-  }, []);
+  const close = useCallback(() => setIsOpen(false), []);
   const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
 
   // Add Cmd+K hotkey to open command menu

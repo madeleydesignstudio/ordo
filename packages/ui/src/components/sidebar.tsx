@@ -4,6 +4,7 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 
 import { useIsMobile } from "@ordo/ui/hooks/use-mobile";
 import { cn } from "@ordo/ui/lib/utils";
@@ -217,40 +218,86 @@ function Sidebar({
       data-slot="sidebar"
     >
       {/* This is what handles the sidebar gap on desktop */}
-      <div
+      <motion.div
         data-slot="sidebar-gap"
         className={cn(
-          "relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear",
-          "group-data-[collapsible=offcanvas]:w-(--sidebar-width-collapsed)",
+          "relative bg-transparent",
           "group-data-[side=right]:rotate-180",
-          variant === "floating" || variant === "inset"
-            ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)",
         )}
+        animate={{
+          width:
+            state === "collapsed"
+              ? collapsible === "offcanvas"
+                ? SIDEBAR_WIDTH_COLLAPSED
+                : SIDEBAR_WIDTH_ICON
+              : SIDEBAR_WIDTH,
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 30,
+          mass: 0.8,
+        }}
       />
-      <div
+      <motion.div
         data-slot="sidebar-container"
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
-          side === "left"
-            ? "left-0 group-data-[collapsible=offcanvas]:left-0"
-            : "right-0 group-data-[collapsible=offcanvas]:right-0",
-          // Adjust the padding for floating and inset variants.
-          variant === "floating" || variant === "inset"
-            ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)] group-data-[collapsible=offcanvas]:w-[calc(var(--sidebar-width-collapsed)+(--spacing(4))+2px)]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[collapsible=offcanvas]:w-(--sidebar-width-collapsed)",
+          "fixed inset-y-0 z-10 hidden h-svh md:flex",
+          side === "left" ? "left-0" : "right-0",
+          variant === "floating" || variant === "inset" ? "p-2" : "",
           className,
         )}
+        animate={{
+          width:
+            state === "collapsed"
+              ? collapsible === "offcanvas"
+                ? variant === "floating" || variant === "inset"
+                  ? `calc(${SIDEBAR_WIDTH_COLLAPSED} + 1rem + 2px)`
+                  : SIDEBAR_WIDTH_COLLAPSED
+                : variant === "floating" || variant === "inset"
+                  ? `calc(${SIDEBAR_WIDTH_ICON} + 1rem + 2px)`
+                  : SIDEBAR_WIDTH_ICON
+              : variant === "floating" || variant === "inset"
+                ? `calc(${SIDEBAR_WIDTH} + 1rem + 2px)`
+                : SIDEBAR_WIDTH,
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 30,
+          mass: 0.8,
+        }}
         {...props}
       >
-        <div
+        <motion.div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="flex h-full w-full flex-col"
+          className="flex h-full w-full flex-col overflow-hidden"
+          layout
+          transition={{
+            type: "spring",
+            stiffness: 400,
+            damping: 30,
+            mass: 0.6,
+          }}
         >
-          {children}
-        </div>
-      </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={state}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: 0.15,
+                ease: "easeInOut",
+              }}
+              className="flex h-full w-full flex-col"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
@@ -400,17 +447,27 @@ function SidebarGroupLabel({
   asChild = false,
   ...props
 }: React.ComponentProps<"div"> & { asChild?: boolean }) {
+  const { state } = useSidebar();
   const Comp = asChild ? Slot : "div";
 
   return (
-    <Comp
+    <motion.div
       data-slot="sidebar-group-label"
       data-sidebar="group-label"
       className={cn(
-        "text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
-        "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
+        "text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-hidden focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         className,
       )}
+      animate={{
+        marginTop: state === "collapsed" ? -32 : 0,
+        opacity: state === "collapsed" ? 0 : 1,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 400,
+        damping: 35,
+        mass: 0.5,
+      }}
       {...props}
     />
   );

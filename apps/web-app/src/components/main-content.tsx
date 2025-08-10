@@ -45,7 +45,7 @@ export function MainContent({ children, className = "" }: MainContentProps) {
       className={`fixed ${topPosition} ${bottomPosition} left-0 right-0 transition-all duration-200 ease-linear ${leftMargin} ${className}`}
     >
       <div className="h-full w-full bg-background border-t border-l border-b border-border rounded-tl-xl rounded-bl-xl overflow-hidden">
-        <div className="h-full w-full overflow-y-auto overflow-x-hidden p-4">
+        <div className="h-full w-full overflow-y-auto overflow-x-hidden">
           {children}
         </div>
       </div>
