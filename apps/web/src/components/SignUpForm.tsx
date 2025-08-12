@@ -2,23 +2,37 @@ import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Link } from "@tanstack/react-router";
 
-export function LoginForm() {
+export function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn, signInWithGoogle, signInWithGitHub } = useAuth();
+  const { signUp, signInWithGoogle, signInWithGitHub } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const { error } = await signIn(email, password);
+      const { error } = await signUp(email, password);
 
       if (error) {
         setError(error.message);
+      } else {
+        setError("Check your email for the confirmation link!");
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -27,7 +41,7 @@ export function LoginForm() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignUp = async () => {
     setError("");
     setLoading(true);
     try {
@@ -42,7 +56,7 @@ export function LoginForm() {
     }
   };
 
-  const handleGitHubSignIn = async () => {
+  const handleGitHubSignUp = async () => {
     setError("");
     setLoading(true);
     try {
@@ -68,7 +82,9 @@ export function LoginForm() {
         backgroundColor: "#fff",
       }}
     >
-      <h2 style={{ textAlign: "center", marginBottom: "1.5rem" }}>Sign In</h2>
+      <h2 style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+        Create Account
+      </h2>
 
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "1rem" }}>
@@ -94,7 +110,7 @@ export function LoginForm() {
           />
         </div>
 
-        <div style={{ marginBottom: "1.5rem" }}>
+        <div style={{ marginBottom: "1rem" }}>
           <label
             htmlFor="password"
             style={{ display: "block", marginBottom: "0.5rem" }}
@@ -117,10 +133,33 @@ export function LoginForm() {
           />
         </div>
 
+        <div style={{ marginBottom: "1.5rem" }}>
+          <label
+            htmlFor="confirmPassword"
+            style={{ display: "block", marginBottom: "0.5rem" }}
+          >
+            Confirm Password
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            style={{
+              width: "100%",
+              padding: "0.75rem",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              fontSize: "1rem",
+            }}
+          />
+        </div>
+
         {error && (
           <div
             style={{
-              color: "#dc2626",
+              color: error.includes("Check your email") ? "#059669" : "#dc2626",
               marginBottom: "1rem",
               fontSize: "0.875rem",
             }}
@@ -143,7 +182,7 @@ export function LoginForm() {
             cursor: loading ? "not-allowed" : "pointer",
           }}
         >
-          {loading ? "Loading..." : "Sign In"}
+          {loading ? "Creating Account..." : "Create Account"}
         </button>
       </form>
 
@@ -156,13 +195,13 @@ export function LoginForm() {
             fontSize: "0.875rem",
           }}
         >
-          Or continue with
+          Or sign up with
         </div>
 
         <div style={{ display: "flex", gap: "0.75rem" }}>
           <button
             type="button"
-            onClick={handleGoogleSignIn}
+            onClick={handleGoogleSignUp}
             disabled={loading}
             style={{
               flex: 1,
@@ -202,7 +241,7 @@ export function LoginForm() {
 
           <button
             type="button"
-            onClick={handleGitHubSignIn}
+            onClick={handleGitHubSignUp}
             disabled={loading}
             style={{
               flex: 1,
@@ -229,17 +268,17 @@ export function LoginForm() {
 
       <div style={{ textAlign: "center", marginTop: "1rem" }}>
         <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-          Don't have an account?{" "}
+          Already have an account?{" "}
         </span>
         <Link
-          to="/signup"
+          to="/login"
           style={{
             color: "#3b82f6",
             textDecoration: "none",
             fontSize: "0.875rem",
           }}
         >
-          Sign Up
+          Sign In
         </Link>
       </div>
     </div>
