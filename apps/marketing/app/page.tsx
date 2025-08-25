@@ -5,7 +5,7 @@ export default function Page() {
   return (
     <div className="flex items-center justify-center min-h-svh">
       <div className="flex flex-col items-center justify-center gap-4">
-        <Link href="/app.getordo.co">Dashboard</Link>
+        <Link href="https://app.getordo.co">Dashboard</Link>
       </div>
     </div>
   );
