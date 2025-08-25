@@ -27,10 +27,14 @@ export function SignUpForm() {
     setLoading(true);
 
     try {
-      const { error } = await signUp(email, password);
+      const { error, user } = await signUp(email, password);
 
       if (error) {
         setError(error.message);
+      } else if (user) {
+        setError(
+          "Account created successfully! Check your email for the welcome message and confirmation link.",
+        );
       } else {
         setError("Check your email for the confirmation link!");
       }

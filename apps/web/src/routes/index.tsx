@@ -11,41 +11,14 @@ function Home() {
   return (
     <ProtectedRoute>
       <Navigation />
-      <main
-        style={{
-          padding: "2rem",
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "2rem",
-            marginBottom: "1rem",
-            color: "#1f2937",
-          }}
-        >
-          Welcome to Ordo
-        </h1>
-        <p
-          style={{
-            fontSize: "1.125rem",
-            color: "#6b7280",
-            marginBottom: "2rem",
-          }}
-        >
+      <main className="p-8 max-w-6xl mx-auto">
+        <h1 className="text-3xl mb-4 text-gray-800">Welcome to Ordo</h1>
+        <p className="text-lg text-gray-500 mb-8">
           Your personal task management application.
         </p>
-        <div
-          style={{
-            padding: "2rem",
-            backgroundColor: "white",
-            borderRadius: "8px",
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          <h2 style={{ marginBottom: "1rem", color: "#374151" }}>Dashboard</h2>
-          <p style={{ color: "#6b7280" }}>
+        <div className="p-8 bg-white rounded-lg border border-gray-200">
+          <h2 className="mb-4 text-gray-700">Dashboard</h2>
+          <p className="text-gray-500">
             You are now successfully authenticated! Start building your task
             management features here.
           </p>

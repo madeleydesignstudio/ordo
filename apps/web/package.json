@@ -12,11 +12,19 @@
   "license": "ISC",
   "packageManager": "pnpm@10.4.1",
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
+    "@ordo/emails": "workspace:*",
     "@ordo/supabase": "workspace:*",
+    "@ordo/ui": "workspace:*",
+    "@tailwindcss/vite": "^4.1.12",
     "@tanstack/react-router": "^1.131.2",
     "@tanstack/react-start": "^1.131.2",
+    "lucide-react": "^0.475.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-hook-form": "^7.62.0",
+    "tailwindcss": "^4.1.11",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.19.9",

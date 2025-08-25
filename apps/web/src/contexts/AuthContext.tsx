@@ -1,15 +1,24 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { type User, type Session } from "@ordo/supabase/client";
 import { supabase } from "../lib/supabase";
+import {
+  sendSignupEmail,
+  sendResetEmail,
+  getUserEmailData,
+} from "../lib/auth-emails";
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (
+    email: string,
+    password: string,
+  ) => Promise<{ error: any; user: User | null }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signInWithGitHub: () => Promise<{ error: any }>;
+  resetPassword: (email: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -57,11 +66,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
-    return { error };
+
+    // If signup successful and user exists, send welcome email
+    if (!error && data.user) {
+      try {
+        const userEmailData = getUserEmailData(data.user);
+        await sendSignupEmail(userEmailData);
+      } catch (emailError) {
+        console.error("Failed to send welcome email:", emailError);
+        // Don't fail the signup if email fails
+      }
+    }
+
+    return { error, user: data.user || null };
   };
 
   const signInWithGoogle = async () => {
@@ -84,6 +105,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   };
 
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    // If reset successful, send reset email
+    if (!error) {
+      try {
+        // Generate a simple token for demo purposes
+        // In production, you'd use the actual Supabase reset token
+        const resetToken = btoa(email + Date.now()).replace(
+          /[^a-zA-Z0-9]/g,
+          "",
+        );
+        await sendResetEmail({
+          email,
+          resetToken,
+        });
+      } catch (emailError) {
+        console.error("Failed to send reset email:", emailError);
+        // Don't fail the reset if email fails
+      }
+    }
+
+    return { error };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -96,6 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signInWithGoogle,
     signInWithGitHub,
+    resetPassword,
     signOut,
   };
 

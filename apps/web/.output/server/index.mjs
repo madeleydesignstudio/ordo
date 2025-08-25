@@ -4233,24 +4233,52 @@ const plugins = [
 const assets = {
   "/.vite/manifest.json": {
     "type": "application/json",
-    "etag": "\"23e-OF85FzBNFDJsVy7OtbkIz1qE8SA\"",
-    "mtime": "2025-08-10T20:41:32.974Z",
-    "size": 574,
+    "etag": "\"76d-g5aazCkfnaLkvPV8LdipqB4WdoI\"",
+    "mtime": "2025-08-25T14:47:17.192Z",
+    "size": 1901,
     "path": "../public/.vite/manifest.json"
   },
-  "/assets/index-B2gRbMpk.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": "\"ecb-tOY5pLGn8BCveoLATpiN0mXDSqM\"",
-    "mtime": "2025-08-10T20:41:32.974Z",
-    "size": 3787,
-    "path": "../public/assets/index-B2gRbMpk.js"
+  "/assets/app-CbAXlDre.css": {
+    "type": "text/css; charset=utf-8",
+    "etag": "\"1d9b-A9q+/pFBQ62Q34liqq1BlsAY2lA\"",
+    "mtime": "2025-08-25T14:47:17.192Z",
+    "size": 7579,
+    "path": "../public/assets/app-CbAXlDre.css"
   },
-  "/assets/main-ZGl22hUy.js": {
+  "/assets/callback-B393yh1k.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"5fc5c-GlkZ6UYjc+cX3P9qxg07ArBPPu4\"",
-    "mtime": "2025-08-10T20:41:32.974Z",
-    "size": 392284,
-    "path": "../public/assets/main-ZGl22hUy.js"
+    "etag": "\"88b-Dy5CsezfC0JJYNM4jP3UNH2Tf6Y\"",
+    "mtime": "2025-08-25T14:47:17.192Z",
+    "size": 2187,
+    "path": "../public/assets/callback-B393yh1k.js"
+  },
+  "/assets/index-G7V7ufBn.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": "\"692-OKBJOwBpNe8BOG7KCMCCJqPa2T8\"",
+    "mtime": "2025-08-25T14:47:17.192Z",
+    "size": 1682,
+    "path": "../public/assets/index-G7V7ufBn.js"
+  },
+  "/assets/login-D3R3Nidf.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": "\"13a7-wGwdC1j9S80B6QfkXojCMfD0FbA\"",
+    "mtime": "2025-08-25T14:47:17.192Z",
+    "size": 5031,
+    "path": "../public/assets/login-D3R3Nidf.js"
+  },
+  "/assets/main-Cyx24ME8.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": "\"60040-4rp2dWsjMOs6qNg1+fnAyRK+Xbk\"",
+    "mtime": "2025-08-25T14:47:17.192Z",
+    "size": 393280,
+    "path": "../public/assets/main-Cyx24ME8.js"
+  },
+  "/assets/signup-CtJ0nY8Z.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": "\"1618-Zd6nS+2+AMv7+i7Zf9cAWOMakMA\"",
+    "mtime": "2025-08-25T14:47:17.192Z",
+    "size": 5656,
+    "path": "../public/assets/signup-CtJ0nY8Z.js"
   }
 };
 
@@ -4380,7 +4408,7 @@ function getAsset (id) {
 
 const METHODS = /* @__PURE__ */ new Set(["HEAD", "GET"]);
 const EncodingMap = { gzip: ".gz", br: ".br" };
-const _un19Fd = eventHandler((event) => {
+const _fNBT3A = eventHandler((event) => {
   if (event.method && !METHODS.has(event.method)) {
     return;
   }
@@ -4447,7 +4475,7 @@ const _un19Fd = eventHandler((event) => {
 const _lazy_vr5YKA = () => import('./chunks/_/ssr.mjs');
 
 const handlers = [
-  { route: '', handler: _un19Fd, lazy: false, middleware: true, method: undefined },
+  { route: '', handler: _fNBT3A, lazy: false, middleware: true, method: undefined },
   { route: '/**', handler: _lazy_vr5YKA, lazy: true, middleware: false, method: undefined }
 ];
 

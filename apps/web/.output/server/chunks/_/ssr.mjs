@@ -2931,7 +2931,7 @@ async function loadVirtualModule(id) {
     case VIRTUAL_MODULES.routeTree:
       return await Promise.resolve().then(() => routeTree_gen);
     case VIRTUAL_MODULES.startManifest:
-      return await import('./_tanstack-start-manifest_v-CvhYR7XG.mjs');
+      return await import('./_tanstack-start-manifest_v-Dn9OVPwE.mjs');
     case VIRTUAL_MODULES.serverFnManifest:
       return await import('./_tanstack-start-server-fn-manifest_v-DtgTK7xl.mjs');
     default:
@@ -13966,6 +13966,24 @@ function AuthProvider({ children }) {
     });
     return { error };
   };
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
+    });
+    return { error };
+  };
+  const signInWithGitHub = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
+    });
+    return { error };
+  };
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -13975,11 +13993,14 @@ function AuthProvider({ children }) {
     loading,
     signIn,
     signUp,
+    signInWithGoogle,
+    signInWithGitHub,
     signOut
   };
   return /* @__PURE__ */ jsx(AuthContext.Provider, { value, children });
 }
-const Route$1 = createRootRoute({
+const appCss = "/assets/app-CbAXlDre.css";
+const Route$4 = createRootRoute({
   head: () => ({
     meta: [{
       charSet: "utf-8"
@@ -13988,6 +14009,10 @@ const Route$1 = createRootRoute({
       content: "width=device-width, initial-scale=1"
     }, {
       title: "Ordo - Task Management"
+    }],
+    links: [{
+      rel: "stylesheet",
+      href: appCss
     }]
   }),
   component: RootComponent
@@ -14011,19 +14036,49 @@ function RootDocument({
     ] })
   ] });
 }
-const $$splitComponentImporter = () => import('./index-BCYv1hhx.mjs');
-const Route = createFileRoute("/")({
+const $$splitComponentImporter$3 = () => import('./signup-n7J-XZI4.mjs');
+const Route$3 = createFileRoute("/signup")({
+  component: lazyRouteComponent($$splitComponentImporter$3, "component")
+});
+const $$splitComponentImporter$2 = () => import('./login-Beo-A6ts.mjs');
+const Route$2 = createFileRoute("/login")({
+  component: lazyRouteComponent($$splitComponentImporter$2, "component")
+});
+const $$splitComponentImporter$1 = () => import('./index-CLiQ8g0Y.mjs');
+const Route$1 = createFileRoute("/")({
+  component: lazyRouteComponent($$splitComponentImporter$1, "component")
+});
+const $$splitComponentImporter = () => import('./callback-DLhrsBmD.mjs');
+const Route = createFileRoute("/auth/callback")({
   component: lazyRouteComponent($$splitComponentImporter, "component")
 });
-const IndexRoute = Route.update({
+const SignupRoute = Route$3.update({
+  id: "/signup",
+  path: "/signup",
+  getParentRoute: () => Route$4
+});
+const LoginRoute = Route$2.update({
+  id: "/login",
+  path: "/login",
+  getParentRoute: () => Route$4
+});
+const IndexRoute = Route$1.update({
   id: "/",
   path: "/",
-  getParentRoute: () => Route$1
+  getParentRoute: () => Route$4
+});
+const AuthCallbackRoute = Route.update({
+  id: "/auth/callback",
+  path: "/auth/callback",
+  getParentRoute: () => Route$4
 });
 const rootRouteChildren = {
-  IndexRoute
+  IndexRoute,
+  LoginRoute,
+  SignupRoute,
+  AuthCallbackRoute
 };
-const routeTree = Route$1._addFileChildren(rootRouteChildren)._addFileTypes();
+const routeTree = Route$4._addFileChildren(rootRouteChildren)._addFileTypes();
 const routeTree_gen = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   routeTree
@@ -14043,5 +14098,5 @@ const serverEntry = defineEventHandler(function(event) {
   return serverEntry$1({ request });
 });
 
-export { serverEntry as default, useAuth as u };
+export { serverEntry as default, supabase as s, useAuth as u };
 //# sourceMappingURL=ssr.mjs.map

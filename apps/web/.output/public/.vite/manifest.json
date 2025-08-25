@@ -1,17 +1,54 @@
 {
   "../../../../../../../~start/default-client-entry.tsx": {
-    "file": "assets/main-ZGl22hUy.js",
+    "file": "assets/main-Cyx24ME8.js",
     "name": "main",
     "src": "../../../../../../../~start/default-client-entry.tsx",
     "isEntry": true,
     "dynamicImports": [
-      "src/routes/index.tsx?tsr-split=component"
+      "src/routes/signup.tsx?tsr-split=component",
+      "src/routes/login.tsx?tsr-split=component",
+      "src/routes/index.tsx?tsr-split=component",
+      "src/routes/auth/callback.tsx?tsr-split=component"
+    ],
+    "assets": [
+      "assets/app-CbAXlDre.css"
+    ]
+  },
+  "/home/danielcmadeley/madeleydesignstudio/active-projects/ordo/apps/web/src/styles/app.css": {
+    "file": "assets/app-CbAXlDre.css",
+    "src": "/home/danielcmadeley/madeleydesignstudio/active-projects/ordo/apps/web/src/styles/app.css"
+  },
+  "src/routes/auth/callback.tsx?tsr-split=component": {
+    "file": "assets/callback-B393yh1k.js",
+    "name": "callback",
+    "src": "src/routes/auth/callback.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "../../../../../../../~start/default-client-entry.tsx"
     ]
   },
   "src/routes/index.tsx?tsr-split=component": {
-    "file": "assets/index-B2gRbMpk.js",
+    "file": "assets/index-G7V7ufBn.js",
     "name": "index",
     "src": "src/routes/index.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "../../../../../../../~start/default-client-entry.tsx"
+    ]
+  },
+  "src/routes/login.tsx?tsr-split=component": {
+    "file": "assets/login-D3R3Nidf.js",
+    "name": "login",
+    "src": "src/routes/login.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "../../../../../../../~start/default-client-entry.tsx"
+    ]
+  },
+  "src/routes/signup.tsx?tsr-split=component": {
+    "file": "assets/signup-CtJ0nY8Z.js",
+    "name": "signup",
+    "src": "src/routes/signup.tsx?tsr-split=component",
     "isDynamicEntry": true,
     "imports": [
       "../../../../../../../~start/default-client-entry.tsx"

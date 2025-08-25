@@ -21,31 +21,14 @@ function Login() {
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          fontSize: "1.125rem",
-          color: "#6b7280",
-        }}
-      >
+      <div className="flex justify-center items-center h-screen text-lg text-gray-500">
         Loading...
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#f9fafb",
-      }}
-    >
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <LoginForm />
     </div>
   );

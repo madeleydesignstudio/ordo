@@ -1,0 +1,12 @@
+{
+  "extends": "@ordo/typescript-config/react-library.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "dist",
+    "paths": {
+      "@ordo/emails/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

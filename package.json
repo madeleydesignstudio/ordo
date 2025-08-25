@@ -1,5 +1,5 @@
 {
-  "name": "shadcn-ui-monorepo",
+  "name": "ordo",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -9,8 +9,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@workspace/eslint-config": "workspace:*",
-    "@workspace/typescript-config": "workspace:*",
+    "@ordo/eslint-config": "workspace:*",
+    "@ordo/typescript-config": "workspace:*",
     "prettier": "^3.6.2",
     "turbo": "^2.5.5",
     "typescript": "5.7.3"
