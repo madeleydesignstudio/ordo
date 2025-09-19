@@ -15,4 +15,10 @@ export default defineConfig({
     viteReact(),
     tailwindcss(),
   ],
+  optimizeDeps: {
+    exclude: ["@electric-sql/pglite"],
+  },
+  worker: {
+    format: "es",
+  },
 });

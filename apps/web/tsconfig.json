@@ -1,10 +1,16 @@
 {
+  "extends": "@ordo/typescript-config/nextjs.json",
   "compilerOptions": {
     "jsx": "react-jsx",
     "moduleResolution": "Bundler",
     "module": "ESNext",
     "target": "ES2022",
     "skipLibCheck": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@ordo/ui/*": ["../../packages/ui/src/*"]
+    }
   }
 }

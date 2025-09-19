@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@ordo/ui/components/button";
+import { TodoApp } from "../components/TodoApp";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -7,9 +7,8 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   return (
-    <div className="text-red-400">
-      Hello dfss
-      <Button variant={"destructive"}>Click me</Button>
+    <div className="min-h-screen bg-background">
+      <TodoApp />
     </div>
   );
 }
