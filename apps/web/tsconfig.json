@@ -6,6 +6,5 @@
     "target": "ES2022",
     "skipLibCheck": true,
     "strictNullChecks": true
-  },
-  "include": ["src/**/*"]
+  }
 }

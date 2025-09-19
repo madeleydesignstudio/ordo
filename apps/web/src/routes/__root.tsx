@@ -7,8 +7,6 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { AuthProvider } from "../contexts/AuthContext";
-import { Toaster } from "@ordo/ui/components/sonner";
 
 import appCss from "../styles/app.css?url";
 
@@ -23,7 +21,7 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Ordo - Task Management",
+        title: "TanStack Start Starter",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
@@ -34,9 +32,7 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <AuthProvider>
-        <Outlet />
-      </AuthProvider>
+      <Outlet />
     </RootDocument>
   );
 }
@@ -47,16 +43,8 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <head>
         <HeadContent />
       </head>
-      <body
-        style={{
-          margin: 0,
-          padding: 0,
-          fontFamily: "system-ui, sans-serif",
-          backgroundColor: "#f9fafb",
-        }}
-      >
+      <body>
         {children}
-        <Toaster />
         <Scripts />
       </body>
     </html>

@@ -8,198 +8,39 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createServerRootRoute } from '@tanstack/react-start/server'
-
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as EmailPreviewRouteImport } from './routes/email-preview'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
-import { ServerRoute as ApiSendWelcomeEmailServerRouteImport } from './routes/api/send-welcome-email'
-import { ServerRoute as ApiSendResetEmailServerRouteImport } from './routes/api/send-reset-email'
 
-const rootServerRouteImport = createServerRootRoute()
-
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmailPreviewRoute = EmailPreviewRouteImport.update({
-  id: '/email-preview',
-  path: '/email-preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSendWelcomeEmailServerRoute =
-  ApiSendWelcomeEmailServerRouteImport.update({
-    id: '/api/send-welcome-email',
-    path: '/api/send-welcome-email',
-    getParentRoute: () => rootServerRouteImport,
-  } as any)
-const ApiSendResetEmailServerRoute = ApiSendResetEmailServerRouteImport.update({
-  id: '/api/send-reset-email',
-  path: '/api/send-reset-email',
-  getParentRoute: () => rootServerRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/email-preview': typeof EmailPreviewRoute
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/signup': typeof SignupRoute
-  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/email-preview': typeof EmailPreviewRoute
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/signup': typeof SignupRoute
-  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/email-preview': typeof EmailPreviewRoute
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/signup': typeof SignupRoute
-  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/email-preview'
-    | '/forgot-password'
-    | '/login'
-    | '/reset-password'
-    | '/signup'
-    | '/auth/callback'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/email-preview'
-    | '/forgot-password'
-    | '/login'
-    | '/reset-password'
-    | '/signup'
-    | '/auth/callback'
-  id:
-    | '__root__'
-    | '/'
-    | '/email-preview'
-    | '/forgot-password'
-    | '/login'
-    | '/reset-password'
-    | '/signup'
-    | '/auth/callback'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  EmailPreviewRoute: typeof EmailPreviewRoute
-  ForgotPasswordRoute: typeof ForgotPasswordRoute
-  LoginRoute: typeof LoginRoute
-  ResetPasswordRoute: typeof ResetPasswordRoute
-  SignupRoute: typeof SignupRoute
-  AuthCallbackRoute: typeof AuthCallbackRoute
-}
-export interface FileServerRoutesByFullPath {
-  '/api/send-reset-email': typeof ApiSendResetEmailServerRoute
-  '/api/send-welcome-email': typeof ApiSendWelcomeEmailServerRoute
-}
-export interface FileServerRoutesByTo {
-  '/api/send-reset-email': typeof ApiSendResetEmailServerRoute
-  '/api/send-welcome-email': typeof ApiSendWelcomeEmailServerRoute
-}
-export interface FileServerRoutesById {
-  __root__: typeof rootServerRouteImport
-  '/api/send-reset-email': typeof ApiSendResetEmailServerRoute
-  '/api/send-welcome-email': typeof ApiSendWelcomeEmailServerRoute
-}
-export interface FileServerRouteTypes {
-  fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/api/send-reset-email' | '/api/send-welcome-email'
-  fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/api/send-reset-email' | '/api/send-welcome-email'
-  id: '__root__' | '/api/send-reset-email' | '/api/send-welcome-email'
-  fileServerRoutesById: FileServerRoutesById
-}
-export interface RootServerRouteChildren {
-  ApiSendResetEmailServerRoute: typeof ApiSendResetEmailServerRoute
-  ApiSendWelcomeEmailServerRoute: typeof ApiSendWelcomeEmailServerRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/email-preview': {
-      id: '/email-preview'
-      path: '/email-preview'
-      fullPath: '/email-preview'
-      preLoaderRoute: typeof EmailPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -207,50 +48,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/callback': {
-      id: '/auth/callback'
-      path: '/auth/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-  }
-}
-declare module '@tanstack/react-start/server' {
-  interface ServerFileRoutesByPath {
-    '/api/send-welcome-email': {
-      id: '/api/send-welcome-email'
-      path: '/api/send-welcome-email'
-      fullPath: '/api/send-welcome-email'
-      preLoaderRoute: typeof ApiSendWelcomeEmailServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/api/send-reset-email': {
-      id: '/api/send-reset-email'
-      path: '/api/send-reset-email'
-      fullPath: '/api/send-reset-email'
-      preLoaderRoute: typeof ApiSendResetEmailServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  EmailPreviewRoute: EmailPreviewRoute,
-  ForgotPasswordRoute: ForgotPasswordRoute,
-  LoginRoute: LoginRoute,
-  ResetPasswordRoute: ResetPasswordRoute,
-  SignupRoute: SignupRoute,
-  AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-const rootServerRouteChildren: RootServerRouteChildren = {
-  ApiSendResetEmailServerRoute: ApiSendResetEmailServerRoute,
-  ApiSendWelcomeEmailServerRoute: ApiSendWelcomeEmailServerRoute,
-}
-export const serverRouteTree = rootServerRouteImport
-  ._addFileChildren(rootServerRouteChildren)
-  ._addFileTypes<FileServerRouteTypes>()
