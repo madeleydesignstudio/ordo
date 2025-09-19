@@ -8,12 +8,17 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PGlite } from "@electric-sql/pglite";
 import { live } from "@electric-sql/pglite/live";
 import { PGliteProvider } from "@electric-sql/pglite-react";
 import type { PGliteWithLive } from "@electric-sql/pglite/live";
+import { todoService } from "../lib/todoService";
 
 import appCss from "../styles/app.css?url";
+
+// Create a client
+const queryClient = new QueryClient();
 
 export const Route = createRootRoute({
   head: () => ({
@@ -47,11 +52,18 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 
   useEffect(() => {
     async function initDb() {
-      const database = await PGlite.create({
-        dataDir: "idb://my-app-db",
-        extensions: { live },
-      });
-      setDb(database);
+      try {
+        const database = await PGlite.create({
+          dataDir: "idb://ordo-db",
+          extensions: { live },
+        });
+        setDb(database);
+        todoService.setDatabase(database);
+        await todoService.initialize();
+        console.log("✅ PGLite initialized successfully");
+      } catch (error) {
+        console.error("❌ Failed to initialize PGLite:", error);
+      }
     }
     initDb();
   }, []);
@@ -63,7 +75,9 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
           <HeadContent />
         </head>
         <body>
-          <div>Loading database...</div>
+          <div style={{ padding: "20px", textAlign: "center" }}>
+            Loading database...
+          </div>
           <Scripts />
         </body>
       </html>
@@ -76,10 +90,12 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <HeadContent />
       </head>
       <body>
-        <PGliteProvider db={db}>
-          {children}
-          <Scripts />
-        </PGliteProvider>
+        <QueryClientProvider client={queryClient}>
+          <PGliteProvider db={db}>
+            {children}
+            <Scripts />
+          </PGliteProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );
