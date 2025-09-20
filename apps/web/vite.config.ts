@@ -22,39 +22,25 @@ export default defineConfig({
     viteReact(),
     tailwindcss(),
     VitePWA({
-      registerType: "autoUpdate",
-      injectRegister: "auto",
+      registerType: "prompt",
+      injectRegister: false,
       workbox: {
-        globPatterns: ["**/*.{js,css,html,wasm,data}"],
+        globPatterns: ["**/*.{js,css,wasm,data}"],
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
-        skipWaiting: true,
-        clientsClaim: true,
+        skipWaiting: false,
+        clientsClaim: false,
         cleanupOutdatedCaches: true,
+        navigateFallback: null,
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/.*\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+            urlPattern: /\.(?:wasm|data)$/,
             handler: "CacheFirst",
             options: {
-              cacheName: "images",
+              cacheName: "pglite-assets",
               expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30,
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 7,
               },
-            },
-          },
-          {
-            urlPattern: /\.(?:js|css)$/,
-            handler: "StaleWhileRevalidate",
-            options: {
-              cacheName: "static-resources",
-            },
-          },
-          {
-            urlPattern: ({ request }) => request.destination === "document",
-            handler: "NetworkFirst",
-            options: {
-              cacheName: "pages",
-              networkTimeoutSeconds: 3,
             },
           },
         ],
