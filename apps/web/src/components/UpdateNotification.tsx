@@ -1,5 +1,6 @@
 import React from "react";
 import { useAppUpdates } from "../hooks/useAppUpdates";
+import { isMobileDevice, isPWAInstalled } from "../utils/mobileUpdateHelper";
 
 interface UpdateNotificationProps {}
 
@@ -12,9 +13,61 @@ function UpdateNotification({}: UpdateNotificationProps) {
     dismissUpdate,
   } = useAppUpdates();
 
+  const isMobile = isMobileDevice();
+  const isPWA = isPWAInstalled();
+
   if (!showUpdatePrompt) return null;
 
   const isDeploymentUpdate = updateType === "deployment";
+
+  // Mobile-specific messaging
+  const getTitle = () => {
+    if (isMobile && isPWA) {
+      return isDeploymentUpdate ? "App Update Available!" : "PWA Update Ready";
+    } else if (isMobile) {
+      return isDeploymentUpdate
+        ? "New Version Available!"
+        : "Mobile Update Ready";
+    }
+    return isDeploymentUpdate ? "New Version Available!" : "App Update Ready";
+  };
+
+  const getMessage = () => {
+    if (isMobile && isPWA) {
+      return isDeploymentUpdate
+        ? "A new version has been deployed. Tap to refresh and get the latest features. This will clear your app cache to ensure the best experience."
+        : "The PWA has been updated in the background. Tap to apply the changes and restart the app.";
+    } else if (isMobile) {
+      return isDeploymentUpdate
+        ? "A new version has been deployed. Tap to refresh your browser and get the latest features. This may take a moment on mobile."
+        : "The mobile app has been updated in the background. Tap to apply the changes.";
+    }
+    return isDeploymentUpdate
+      ? "A new version has been deployed. Refresh to get the latest features and improvements."
+      : "The app has been updated in the background. Refresh to apply the changes.";
+  };
+
+  const getButtonText = () => {
+    if (isMobile) {
+      return isChecking ? "Refreshing..." : "Tap to Refresh";
+    }
+    return isChecking ? "Refreshing..." : "Refresh Now";
+  };
+
+  const getFooterText = () => {
+    if (isMobile && isPWA) {
+      return isDeploymentUpdate
+        ? "This will clear cache and restart your PWA"
+        : "Quick PWA restart to apply updates";
+    } else if (isMobile) {
+      return isDeploymentUpdate
+        ? "This will clear cache and reload the mobile page"
+        : "Quick mobile refresh to apply updates";
+    }
+    return isDeploymentUpdate
+      ? "This will clear cache and reload the page"
+      : "Quick refresh to apply updates";
+  };
 
   return (
     <>
@@ -55,18 +108,18 @@ function UpdateNotification({}: UpdateNotificationProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <div style={{ marginBottom: "16px", fontSize: "48px" }}>
-          {isDeploymentUpdate ? "🚀" : "🔄"}
+          {isMobile && isPWA ? "📱" : isDeploymentUpdate ? "🚀" : "🔄"}
         </div>
 
         <h3
           style={{
             margin: "0 0 12px 0",
             color: "#1f2937",
-            fontSize: "20px",
+            fontSize: isMobile ? "18px" : "20px",
             fontWeight: "bold",
           }}
         >
-          {isDeploymentUpdate ? "New Version Available!" : "App Update Ready"}
+          {getTitle()}
         </h3>
 
         <p
@@ -74,11 +127,10 @@ function UpdateNotification({}: UpdateNotificationProps) {
             margin: "0 0 24px 0",
             color: "#6b7280",
             lineHeight: "1.5",
+            fontSize: isMobile ? "14px" : "16px",
           }}
         >
-          {isDeploymentUpdate
-            ? "A new version has been deployed. Refresh to get the latest features and improvements."
-            : "The app has been updated in the background. Refresh to apply the changes."}
+          {getMessage()}
         </p>
 
         <div
@@ -106,7 +158,7 @@ function UpdateNotification({}: UpdateNotificationProps) {
               minWidth: "120px",
             }}
           >
-            {isChecking ? "Refreshing..." : "Refresh Now"}
+            {getButtonText()}
           </button>
 
           <button
@@ -139,13 +191,18 @@ function UpdateNotification({}: UpdateNotificationProps) {
         <div
           style={{
             marginTop: "16px",
-            fontSize: "12px",
+            fontSize: isMobile ? "11px" : "12px",
             color: "#9ca3af",
+            textAlign: "center",
           }}
         >
-          {isDeploymentUpdate
-            ? "This will clear cache and reload the page"
-            : "Quick refresh to apply updates"}
+          {getFooterText()}
+          {isMobile && (
+            <div style={{ marginTop: "4px", fontSize: "10px" }}>
+              💡 Tip: Keep your {isPWA ? "PWA" : "mobile browser"} updated for
+              the best experience
+            </div>
+          )}
         </div>
       </div>
     </>

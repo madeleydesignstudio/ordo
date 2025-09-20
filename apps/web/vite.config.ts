@@ -57,6 +57,38 @@ export default defineConfig({
               },
             },
           },
+          // Enhanced caching for mobile with aggressive update checking
+          {
+            urlPattern: /\/version\.json$/,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "version-cache",
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 1,
+                maxAgeSeconds: 0, // Don't cache version.json
+              },
+              cacheKeyWillBeUsed: async ({ request }) => {
+                // Always include timestamp to prevent caching
+                const url = new URL(request.url);
+                url.searchParams.set("_t", Date.now().toString());
+                return url.toString();
+              },
+            },
+          },
+          // Cache app shell with network-first for mobile
+          {
+            urlPattern: /^https?:\/\/[^\/]+\/$/,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "app-shell",
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 5,
+                maxAgeSeconds: 60 * 60, // 1 hour
+              },
+            },
+          },
         ],
       },
       includeAssets: ["icon.svg"],
