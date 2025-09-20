@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { todoService, type Todo } from "../lib/todoService";
 
@@ -6,9 +6,30 @@ const DEFAULT_TODO_NAME = "Arthur";
 const DEFAULT_USER_ID = "user-123"; // TODO: Replace with actual user ID from auth
 const TOP_TODOS_LIMIT = 3;
 
+// Build timestamp for cache busting
+declare const __BUILD_TIMESTAMP__: number;
+
 export function TodoApp() {
   const queryClient = useQueryClient();
   const [newTodoName, setNewTodoName] = useState(DEFAULT_TODO_NAME);
+
+  // Force cache invalidation on new builds
+  useEffect(() => {
+    const lastBuildTimestamp = localStorage.getItem("buildTimestamp");
+    const currentBuildTimestamp = __BUILD_TIMESTAMP__.toString();
+
+    if (lastBuildTimestamp && lastBuildTimestamp !== currentBuildTimestamp) {
+      // Clear all caches on new build
+      queryClient.clear();
+      if ("caches" in window) {
+        caches.keys().then((names) => {
+          names.forEach((name) => caches.delete(name));
+        });
+      }
+    }
+
+    localStorage.setItem("buildTimestamp", currentBuildTimestamp);
+  }, [queryClient]);
 
   const {
     data: todos = [],
