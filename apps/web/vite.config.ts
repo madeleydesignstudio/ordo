@@ -1,7 +1,6 @@
 // vite.config.ts
 import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
@@ -27,132 +26,117 @@ export default defineConfig({
   define: {
     __BUILD_TIMESTAMP__: buildTimestamp,
   },
-  server: {
-    port: 3001,
+  base: "/", // Absolute paths for Vercel deployment
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
+    sourcemap: false,
+    minify: "terser",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          query: ["@tanstack/react-query"],
+          pglite: ["@electric-sql/pglite"],
+        },
+      },
+    },
   },
   plugins: [
     tsConfigPaths(),
-    tanstackStart({ customViteReactPlugin: true, target: "vercel" }),
     viteReact(),
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
       injectRegister: "auto",
-      includeAssets: ["icon.svg", "offline.html"],
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,wasm,data}"],
-        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
+        // CRITICAL: Cache ALL resources for complete offline operation
+        globPatterns: [
+          "**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff2,wasm,data}",
+        ],
+        maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // 50MB for PGLite
+        navigateFallback: "index.html",
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
+
+        // Cache everything immediately on install
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
-        navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/, /^\/api/],
-        // OFFLINE-FIRST: Comprehensive caching strategy
-        mode: "production",
-        offlineGoogleAnalytics: false,
+
         runtimeCaching: [
-          // PGLite assets - cache first for offline functionality
+          // PGLite WASM files - absolutely critical for offline database
           {
             urlPattern: /\.(?:wasm|data)$/,
             handler: "CacheFirst",
             options: {
-              cacheName: "pglite-assets",
+              cacheName: "pglite-wasm-v1",
               expiration: {
-                maxEntries: 10,
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year - never expire
+              },
+            },
+          },
+          // App shell - serve from cache first always
+          {
+            urlPattern: /^.*\.(js|css|html)$/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "app-shell-v1",
+              expiration: {
+                maxEntries: 200,
                 maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
               },
             },
           },
-          // Version checking - offline-first with fallback
+          // Images and icons
           {
-            urlPattern: /\/version\.json$/,
+            urlPattern: /\.(?:png|jpg|jpeg|svg|ico|webp|gif)$/,
             handler: "CacheFirst",
             options: {
-              cacheName: "version-cache",
-              expiration: {
-                maxEntries: 1,
-                maxAgeSeconds: 60 * 60 * 24, // Cache for 24 hours
-              },
-              networkTimeoutSeconds: 1, // Very short timeout
-            },
-          },
-          // App shell and routes - cache first for true offline support
-          {
-            urlPattern: /^https?:\/\/[^\/]+\/?(\?.*)?$/,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "app-shell",
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
-              },
-            },
-          },
-          // API calls - cache with network fallback but don't block offline
-          {
-            urlPattern: /^https?:\/\/.*\.supabase\.co\/.*$/,
-            handler: "NetworkFirst",
-            options: {
-              cacheName: "api-cache",
-              networkTimeoutSeconds: 3,
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60, // 1 hour
-              },
-            },
-          },
-          // Static assets - cache first
-          {
-            urlPattern:
-              /^https?:\/\/[^\/]+\/.*\.(js|css|png|jpg|jpeg|svg|ico|woff2?)$/,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "static-resources",
+              cacheName: "images-v1",
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
               },
             },
           },
         ],
       },
-      devOptions: {
-        enabled: false, // Disable in dev to avoid conflicts
-      },
+      includeAssets: ["**/*"],
       manifest: {
-        name: "Ordo Todo App",
+        name: "Ordo - Offline Todo App",
         short_name: "Ordo",
-        description: "Offline-first todo app with PGlite",
+        description: "True offline-first todo app that works without internet",
         theme_color: "#4F46E5",
-        start_url: "/",
-        display: "standalone",
         background_color: "#ffffff",
-        orientation: "any",
+        display: "standalone",
+        orientation: "portrait-primary",
+        start_url: "/",
         scope: "/",
-        id: "ordo-todo-app",
+        id: "ordo-offline-todo",
+        categories: ["productivity", "utilities"],
         icons: [
           {
             src: "/icon.svg",
-            sizes: "192x192",
+            sizes: "any",
             type: "image/svg+xml",
             purpose: "any maskable",
-          },
-          {
-            src: "/icon.svg",
-            sizes: "512x512",
-            type: "image/svg+xml",
-            purpose: "any",
           },
         ],
         shortcuts: [
           {
             name: "Add Todo",
-            short_name: "Add",
-            description: "Add a new todo item",
+            description: "Quickly add a new todo",
             url: "/?action=add",
-            icons: [{ src: "/icon.svg", sizes: "96x96" }],
+            icons: [{ src: "/icon.svg", sizes: "192x192" }],
           },
         ],
+        launch_handler: {
+          client_mode: "navigate-existing",
+        },
+      },
+      devOptions: {
+        enabled: true,
       },
     }),
   ],
@@ -161,5 +145,13 @@ export default defineConfig({
   },
   worker: {
     format: "es",
+  },
+  server: {
+    port: 3001,
+    host: true,
+  },
+  preview: {
+    port: 3000,
+    host: true,
   },
 });
