@@ -28,25 +28,20 @@ export function TodoApp() {
     };
   }, []);
 
-  // Force cache invalidation on new builds (only when online)
+  // OFFLINE-FIRST: Remove cache invalidation for true offline operation
   useEffect(() => {
-    if (!isOnline) return;
-
-    const lastBuildTimestamp = localStorage.getItem("buildTimestamp");
+    // Only store build timestamp, no network-dependent cache operations
     const currentBuildTimestamp = __BUILD_TIMESTAMP__.toString();
+    const storedTimestamp = localStorage.getItem("buildTimestamp");
 
-    if (lastBuildTimestamp && lastBuildTimestamp !== currentBuildTimestamp) {
-      // Clear all caches on new build
-      queryClient.clear();
-      if ("caches" in window) {
-        caches.keys().then((names) => {
-          names.forEach((name) => caches.delete(name));
-        });
-      }
+    if (!storedTimestamp) {
+      localStorage.setItem("buildTimestamp", currentBuildTimestamp);
+      console.log("📦 Stored initial build timestamp for offline operation");
     }
 
-    localStorage.setItem("buildTimestamp", currentBuildTimestamp);
-  }, [queryClient, isOnline]);
+    // No cache clearing - let service worker handle cache management
+    // This ensures the app works completely offline from first load
+  }, []);
 
   const {
     data: todos = [],
@@ -143,12 +138,93 @@ export function TodoApp() {
     );
   }
 
+  const handleManualSync = async () => {
+    if (!isOnline) {
+      alert("Cannot sync while offline. Connect to internet and try again.");
+      return;
+    }
+    pushToCloudMutation.mutate();
+  };
+
+  const checkForUpdates = async () => {
+    if (!isOnline) {
+      alert("Cannot check for updates while offline.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/version.json?t=${Date.now()}`, {
+        cache: "no-store",
+      });
+      if (response.ok) {
+        const serverVersion = await response.json();
+        const storedVersion = localStorage.getItem("app_version");
+
+        if (storedVersion && serverVersion.version !== storedVersion) {
+          if (confirm("New version available! Refresh to update?")) {
+            localStorage.setItem("app_version", serverVersion.version);
+            window.location.reload();
+          }
+        } else {
+          alert("You're running the latest version!");
+        }
+      }
+    } catch (error) {
+      alert("Failed to check for updates");
+    }
+  };
+
   return (
     <div style={{ padding: "20px", fontFamily: "system-ui" }}>
-      <h2>📝 Offline-First Todo App</h2>
-      <p style={{ color: "#666", marginBottom: "20px" }}>
-        TanStack Query + PGLite for reactive offline-first experience
-      </p>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "20px",
+        }}
+      >
+        <div>
+          <h2>📝 Offline-First Todo App</h2>
+          <p style={{ color: "#666", margin: "0" }}>
+            TanStack Query + PGLite • Works completely offline!
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <div
+            style={{
+              padding: "4px 8px",
+              borderRadius: "12px",
+              fontSize: "12px",
+              fontWeight: "bold",
+              backgroundColor: isOnline ? "#22c55e" : "#ef4444",
+              color: "white",
+            }}
+          >
+            {isOnline ? "🌐 Online" : "📴 Offline"}
+          </div>
+          <button
+            onClick={checkForUpdates}
+            disabled={!isOnline}
+            style={{
+              padding: "4px 8px",
+              fontSize: "12px",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              background: isOnline ? "white" : "#f5f5f5",
+              color: isOnline ? "#666" : "#999",
+              cursor: isOnline ? "pointer" : "not-allowed",
+            }}
+            title={
+              isOnline
+                ? "Check for app updates"
+                : "Go online to check for updates"
+            }
+          >
+            🔄 Updates
+          </button>
+        </div>
+      </div>
 
       <div style={{ marginBottom: "20px" }}>
         <input
@@ -174,7 +250,7 @@ export function TodoApp() {
           {clearAllMutation.isPending ? "Clearing..." : "🗑️ Clear All"}
         </button>
         <button
-          onClick={handlePushToCloud}
+          onClick={handleManualSync}
           disabled={
             pushToCloudMutation.isPending || todos.length === 0 || !isOnline
           }
@@ -186,13 +262,15 @@ export function TodoApp() {
                 ? "#ff4444"
                 : pushToCloudMutation.isSuccess
                   ? "#4caf50"
-                  : undefined,
-            color:
-              !isOnline ||
-              pushToCloudMutation.isError ||
-              pushToCloudMutation.isSuccess
-                ? "white"
-                : undefined,
+                  : "#4F46E5",
+            color: "white",
+            border: "none",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            cursor:
+              !isOnline || pushToCloudMutation.isPending
+                ? "not-allowed"
+                : "pointer",
             opacity: !isOnline ? 0.6 : 1,
           }}
           title={
@@ -208,12 +286,12 @@ export function TodoApp() {
           {!isOnline
             ? "📴 Offline"
             : pushToCloudMutation.isPending
-              ? "Syncing..."
+              ? "⏳ Syncing..."
               : pushToCloudMutation.isError
-                ? "❌ Retry Sync"
+                ? "❌ Retry"
                 : pushToCloudMutation.isSuccess
                   ? "✅ Synced"
-                  : "☁️ Push to Cloud"}
+                  : "☁️ Sync"}
         </button>
       </div>
 
@@ -379,8 +457,13 @@ function AppBenefits() {
       {isOnline ? "🌐" : "📴 (offline)"}
       <br />• Data persists across browser sessions in IndexedDB
       <br />• Same schema for local and cloud databases
-      <br />• <strong>Works completely offline!</strong>{" "}
-      {!isOnline ? "← You're offline now!" : ""}
+      <br />• <strong>True offline-first!</strong> No internet required to start
+      or use
+      <br />• Auto-sync when online, manual sync available
+      <br />•{" "}
+      {!isOnline
+        ? "🚫 Currently offline - but fully functional!"
+        : "🌐 Online - sync available!"}
     </div>
   );
 }

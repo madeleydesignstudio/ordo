@@ -59,15 +59,41 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const [db, setDb] = useState<PGliteWithLive | null>(null);
   const [isOnline, setIsOnline] = useState(true); // Default to true to avoid hydration mismatch
   const [dbError, setDbError] = useState<string | null>(null);
+  const [isOfflineFirstLaunch, setIsOfflineFirstLaunch] = useState(false);
 
   useEffect(() => {
     const setupOnlineDetection = () => {
       if (typeof navigator === "undefined") return;
 
-      setIsOnline(navigator.onLine);
+      const currentlyOnline = navigator.onLine;
+      setIsOnline(currentlyOnline);
 
-      const handleOnline = () => setIsOnline(true);
-      const handleOffline = () => setIsOnline(false);
+      // Detect if this is an offline-first launch
+      if (!currentlyOnline) {
+        setIsOfflineFirstLaunch(true);
+        console.log(
+          "🚫 OFFLINE-FIRST LAUNCH: App starting without internet connection",
+        );
+        console.log(
+          "✅ This is exactly what offline-first means - the app works!",
+        );
+      } else {
+        console.log("🌐 Online launch detected");
+      }
+
+      const handleOnline = () => {
+        setIsOnline(true);
+        if (isOfflineFirstLaunch) {
+          console.log(
+            "🌐 Internet connection restored after offline-first launch",
+          );
+          setTimeout(() => setIsOfflineFirstLaunch(false), 5000);
+        }
+      };
+      const handleOffline = () => {
+        setIsOnline(false);
+        console.log("📴 Going offline - app continues to work normally");
+      };
 
       window.addEventListener("online", handleOnline);
       window.addEventListener("offline", handleOffline);
@@ -79,7 +105,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
     };
 
     return setupOnlineDetection();
-  }, []);
+  }, [isOfflineFirstLaunch]);
 
   useEffect(() => {
     const initializeDatabase = async (): Promise<void> => {
@@ -182,7 +208,14 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <QueryClientProvider client={queryClient}>
           <PGliteProvider db={db!}>
             <OfflineBanner isOnline={isOnline} />
-            <MainContent isOnline={isOnline}>
+            <OfflineFirstBanner
+              isOfflineFirstLaunch={isOfflineFirstLaunch}
+              isOnline={isOnline}
+            />
+            <MainContent
+              isOnline={isOnline}
+              isOfflineFirstLaunch={isOfflineFirstLaunch}
+            >
               {children}
               <UpdateNotification />
               <UpdateStatusIndicator />
@@ -246,13 +279,52 @@ function OfflineBanner({ isOnline }: OfflineBannerProps) {
   );
 }
 
+interface OfflineFirstBannerProps {
+  isOfflineFirstLaunch: boolean;
+  isOnline: boolean;
+}
+
+function OfflineFirstBanner({
+  isOfflineFirstLaunch,
+  isOnline,
+}: OfflineFirstBannerProps) {
+  if (!isOfflineFirstLaunch) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: isOnline ? "0" : "40px",
+        left: 0,
+        right: 0,
+        background: "#4F46E5",
+        color: "white",
+        padding: "8px 12px",
+        textAlign: "center",
+        zIndex: 999,
+        fontSize: "14px",
+        fontWeight: "bold",
+      }}
+    >
+      🎉 OFFLINE-FIRST SUCCESS! App launched without internet & works perfectly!
+      {isOnline && " 🌐 Now online - sync available"}
+    </div>
+  );
+}
+
 interface MainContentProps {
   isOnline: boolean;
+  isOfflineFirstLaunch: boolean;
   children: ReactNode;
 }
 
-function MainContent({ isOnline, children }: MainContentProps) {
-  return <div style={{ paddingTop: !isOnline ? "40px" : "0" }}>{children}</div>;
+function MainContent({
+  isOnline,
+  isOfflineFirstLaunch,
+  children,
+}: MainContentProps) {
+  const topPadding = (!isOnline ? 40 : 0) + (isOfflineFirstLaunch ? 40 : 0);
+  return <div style={{ paddingTop: `${topPadding}px` }}>{children}</div>;
 }
 
 interface DatabaseErrorBannerProps {

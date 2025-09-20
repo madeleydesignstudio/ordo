@@ -85,82 +85,27 @@ export function useAppUpdates(): UseAppUpdatesReturn {
     }
   }, []);
 
-  // Offline-friendly deployment update check
+  // Completely disabled deployment update check for offline-first operation
   const checkForDeploymentUpdate = useCallback(async () => {
     if (isDismissed) return;
 
-    // Skip version checks if offline
-    if (!navigator.onLine) {
-      console.log("📴 Offline - skipping version check");
-      return;
-    }
+    // OFFLINE-FIRST: Never check for updates automatically
+    // This prevents any network dependencies on startup
+    console.log("🚫 Update checking disabled for offline-first operation");
 
-    try {
-      setIsChecking(true);
-
-      const cacheBuster = Date.now();
-      const random = Math.random().toString(36).substring(2);
-
-      // Shorter timeout to avoid blocking offline usage
-      const response = await fetch(
-        `/version.json?t=${cacheBuster}&r=${random}`,
-        {
-          method: "GET",
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-          },
-          cache: "no-store",
-          signal: AbortSignal.timeout(5000), // Reduced timeout
-        },
-      );
-
-      if (!response.ok) {
-        console.warn("Could not fetch version info:", response.status);
-        return;
-      }
-
-      const serverVersion: VersionInfo = await response.json();
-      const storedVersion = localStorage.getItem("app_version");
-
-      console.log("Version check:", {
-        stored: storedVersion,
-        server: serverVersion.version,
-        online: navigator.onLine,
-      });
-
-      if (storedVersion && serverVersion.version !== storedVersion) {
-        console.log("🚀 New deployment detected:", {
-          stored: storedVersion,
-          server: serverVersion.version,
-        });
-
-        localStorage.setItem("app_version", serverVersion.version);
-        setUpdateType("deployment");
-        setShowUpdatePrompt(true);
-      } else if (!storedVersion) {
-        localStorage.setItem("app_version", serverVersion.version);
-        localStorage.setItem("last_version_check", Date.now().toString());
-      }
-    } catch (error) {
-      console.warn("Version check failed (continuing offline):", error);
-
-      // Only do fallback check if we've never stored a version
-      if (!localStorage.getItem("app_version")) {
-        try {
-          if (typeof (globalThis as any).__BUILD_TIMESTAMP__ !== "undefined") {
-            const currentVersion = (
-              globalThis as any
-            ).__BUILD_TIMESTAMP__.toString();
-            localStorage.setItem("app_version", currentVersion);
-            console.log("📦 Stored initial version from build timestamp");
-          }
-        } catch (fallbackError) {
-          console.warn("Fallback version storage failed:", fallbackError);
+    // Only store initial version from build timestamp if never set
+    if (!localStorage.getItem("app_version")) {
+      try {
+        if (typeof (globalThis as any).__BUILD_TIMESTAMP__ !== "undefined") {
+          const currentVersion = (
+            globalThis as any
+          ).__BUILD_TIMESTAMP__.toString();
+          localStorage.setItem("app_version", currentVersion);
+          console.log("📦 Stored initial version from build timestamp");
         }
+      } catch (error) {
+        console.warn("Failed to store build timestamp:", error);
       }
-    } finally {
-      setIsChecking(false);
     }
   }, [isDismissed]);
 
@@ -257,54 +202,20 @@ export function useAppUpdates(): UseAppUpdatesReturn {
     }
   }, [showUpdatePrompt, updateType, isDismissed]);
 
-  // Offline-friendly periodic deployment checks
+  // OFFLINE-FIRST: Completely disable automatic update checking
   useEffect(() => {
-    // Skip update checks on initial load to allow offline startup
-    const initialTimeout = setTimeout(() => {
-      if (navigator.onLine) {
-        checkForDeploymentUpdate();
-      }
-    }, 5000); // Longer delay to let app initialize offline
+    // Only initialize version on first load, no network calls
+    checkForDeploymentUpdate();
 
-    // Less aggressive checking to avoid blocking offline usage
-    const checkInterval = 60000; // Check every minute when online
-    const interval = setInterval(() => {
-      if (navigator.onLine) {
-        checkForDeploymentUpdate();
-      }
-    }, checkInterval);
+    console.log(
+      "🚫 Automatic update checking disabled for offline-first operation",
+    );
+    console.log(
+      "💡 To check for updates manually, user must explicitly request it",
+    );
 
-    // Event listeners for when app becomes active
-    const handleVisibilityChange = () => {
-      if (!document.hidden && navigator.onLine) {
-        console.log("🔍 Tab visible and online, checking for updates...");
-        setTimeout(checkForDeploymentUpdate, 1000);
-      }
-    };
-
-    const handleFocus = () => {
-      if (navigator.onLine) {
-        console.log("🔍 Window focused and online, checking for updates...");
-        setTimeout(checkForDeploymentUpdate, 1000);
-      }
-    };
-
-    const handleOnline = () => {
-      console.log("🌐 Back online, checking for updates...");
-      setTimeout(checkForDeploymentUpdate, 2000);
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("focus", handleFocus);
-    window.addEventListener("online", handleOnline);
-
-    return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("focus", handleFocus);
-      window.removeEventListener("online", handleOnline);
-    };
+    // No automatic periodic checks, no network event listeners
+    // This ensures the app works completely offline
   }, [checkForDeploymentUpdate]);
 
   return {

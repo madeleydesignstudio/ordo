@@ -2,7 +2,6 @@ import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import { eq, desc } from "drizzle-orm";
 import { todos, type Todo, type NewTodo } from "@ordo/supabase";
-import { cloudTodoService } from "@ordo/supabase";
 
 interface TodoStats {
   count: number;
@@ -202,7 +201,26 @@ export class TodoService {
     try {
       this.validateDatabase();
 
+      // OFFLINE-FIRST: Only sync when explicitly requested and online
+      if (!navigator.onLine) {
+        return {
+          success: false,
+          count: 0,
+          error: "Cannot sync while offline",
+        };
+      }
+
       const localTodos = await this.getAllTodos();
+      if (localTodos.length === 0) {
+        return {
+          success: true,
+          count: 0,
+        };
+      }
+
+      // Lazy load cloud service only when needed
+      const { cloudTodoService } = await import("@ordo/supabase");
+
       const todosToSync = localTodos.map((todo) => ({
         id: todo.id,
         name: todo.name,
@@ -211,11 +229,15 @@ export class TodoService {
         updatedAt: todo.updatedAt,
       }));
 
+      console.log("☁️ Syncing todos to cloud...", {
+        count: todosToSync.length,
+      });
       return await cloudTodoService.pushLocalTodos(todosToSync, userId);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
 
+      console.warn("❌ Cloud sync failed:", errorMessage);
       return {
         success: false,
         count: 0,

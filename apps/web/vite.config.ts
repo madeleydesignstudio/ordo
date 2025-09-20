@@ -38,6 +38,7 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       injectRegister: "auto",
+      includeAssets: ["icon.svg", "offline.html"],
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,wasm,data}"],
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
@@ -45,7 +46,10 @@ export default defineConfig({
         clientsClaim: true,
         cleanupOutdatedCaches: true,
         navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/, /^\/api/],
+        // OFFLINE-FIRST: Comprehensive caching strategy
+        mode: "production",
+        offlineGoogleAnalytics: false,
         runtimeCaching: [
           // PGLite assets - cache first for offline functionality
           {
@@ -59,28 +63,41 @@ export default defineConfig({
               },
             },
           },
-          // Version checking - allow offline fallback
+          // Version checking - offline-first with fallback
           {
             urlPattern: /\/version\.json$/,
-            handler: "NetworkFirst",
+            handler: "CacheFirst",
             options: {
               cacheName: "version-cache",
-              networkTimeoutSeconds: 2,
               expiration: {
                 maxEntries: 1,
-                maxAgeSeconds: 60 * 5, // Cache for 5 minutes to reduce network dependency
+                maxAgeSeconds: 60 * 60 * 24, // Cache for 24 hours
               },
+              networkTimeoutSeconds: 1, // Very short timeout
             },
           },
-          // App shell - cache first for true offline support
+          // App shell and routes - cache first for true offline support
           {
-            urlPattern: /^https?:\/\/[^\/]+\/?$/,
+            urlPattern: /^https?:\/\/[^\/]+\/?(\?.*)?$/,
             handler: "CacheFirst",
             options: {
               cacheName: "app-shell",
               expiration: {
-                maxEntries: 5,
-                maxAgeSeconds: 60 * 60 * 24, // 24 hours
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+              },
+            },
+          },
+          // API calls - cache with network fallback but don't block offline
+          {
+            urlPattern: /^https?:\/\/.*\.supabase\.co\/.*$/,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "api-cache",
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60, // 1 hour
               },
             },
           },
@@ -99,7 +116,9 @@ export default defineConfig({
           },
         ],
       },
-      includeAssets: ["icon.svg"],
+      devOptions: {
+        enabled: false, // Disable in dev to avoid conflicts
+      },
       manifest: {
         name: "Ordo Todo App",
         short_name: "Ordo",
@@ -108,13 +127,30 @@ export default defineConfig({
         start_url: "/",
         display: "standalone",
         background_color: "#ffffff",
-        orientation: "portrait-primary",
+        orientation: "any",
+        scope: "/",
+        id: "ordo-todo-app",
         icons: [
           {
             src: "/icon.svg",
             sizes: "192x192",
             type: "image/svg+xml",
             purpose: "any maskable",
+          },
+          {
+            src: "/icon.svg",
+            sizes: "512x512",
+            type: "image/svg+xml",
+            purpose: "any",
+          },
+        ],
+        shortcuts: [
+          {
+            name: "Add Todo",
+            short_name: "Add",
+            description: "Add a new todo item",
+            url: "/?action=add",
+            icons: [{ src: "/icon.svg", sizes: "96x96" }],
           },
         ],
       },
