@@ -13,7 +13,8 @@ import { live } from "@electric-sql/pglite/live";
 import { PGliteProvider } from "@electric-sql/pglite-react";
 import type { PGliteWithLive } from "@electric-sql/pglite/live";
 import { todoService } from "../lib/todoService";
-import PWAUpdatePrompt from "../components/PWAUpdatePrompt";
+import UpdateNotification from "../components/UpdateNotification";
+import UpdateStatusIndicator from "../components/UpdateStatusIndicator";
 
 import appCss from "../styles/app.css?url";
 
@@ -79,80 +80,6 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
     return setupOnlineDetection();
   }, []);
 
-  // Force cache invalidation on version change with network check
-  useEffect(() => {
-    const checkVersion = async () => {
-      try {
-        // Check server version
-        const response = await fetch("/version.json?" + Date.now(), {
-          cache: "no-store",
-          headers: { "Cache-Control": "no-cache" },
-        });
-
-        if (!response.ok) return;
-
-        const serverVersion = await response.json();
-        const lastVersion = localStorage.getItem("app_version");
-        const serverTimestamp = serverVersion.timestamp?.toString();
-
-        if (lastVersion && serverTimestamp && lastVersion !== serverTimestamp) {
-          // New version detected on server - clear all caches and reload
-          console.log("New server version detected, clearing caches...");
-
-          // Clear localStorage except for essential data
-          const todoData = localStorage.getItem("pglite-data");
-          localStorage.clear();
-          if (todoData) localStorage.setItem("pglite-data", todoData);
-          localStorage.setItem("app_version", serverTimestamp);
-
-          // Clear all caches
-          if ("caches" in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(cacheNames.map((name) => caches.delete(name)));
-          }
-
-          // Unregister service workers
-          if ("serviceWorker" in navigator) {
-            const registrations =
-              await navigator.serviceWorker.getRegistrations();
-            await Promise.all(registrations.map((reg) => reg.unregister()));
-          }
-
-          // Force hard reload with cache busting
-          window.location.href =
-            window.location.origin +
-            "/?v=" +
-            serverTimestamp +
-            "&cb=" +
-            Date.now();
-          return;
-        }
-
-        // Store current version if first visit
-        if (serverTimestamp) {
-          localStorage.setItem("app_version", serverTimestamp);
-        }
-      } catch (error) {
-        // Fallback to build timestamp check
-        const lastVersion = localStorage.getItem("app_version");
-        const currentVersion = __BUILD_TIMESTAMP__.toString();
-
-        if (lastVersion && lastVersion !== currentVersion) {
-          localStorage.setItem("app_version", currentVersion);
-          window.location.reload();
-        } else {
-          localStorage.setItem("app_version", currentVersion);
-        }
-      }
-    };
-
-    checkVersion();
-
-    // Check for updates every 30 seconds
-    const interval = setInterval(checkVersion, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
   useEffect(() => {
     const initializeDatabase = async (): Promise<void> => {
       try {
@@ -198,7 +125,8 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
             <OfflineBanner isOnline={isOnline} />
             <MainContent isOnline={isOnline}>
               {children}
-              <PWAUpdatePrompt />
+              <UpdateNotification />
+              <UpdateStatusIndicator />
             </MainContent>
             <Scripts />
           </PGliteProvider>
