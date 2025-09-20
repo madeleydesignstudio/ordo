@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build"
+    "build": "vite build",
+    "preview": "node .output/server/index.mjs",
+    "serve": "bun run build && bun run preview"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.8",
@@ -26,6 +28,8 @@
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.3",
     "typescript": "^5.9.2",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-plugin-pwa": "^1.0.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "workbox-window": "^7.3.0"
   }
 }

@@ -14,6 +14,7 @@ import { live } from "@electric-sql/pglite/live";
 import { PGliteProvider } from "@electric-sql/pglite-react";
 import type { PGliteWithLive } from "@electric-sql/pglite/live";
 import { todoService } from "../lib/todoService";
+import PWAUpdatePrompt from "../components/PWAUpdatePrompt";
 
 import appCss from "../styles/app.css?url";
 
@@ -31,10 +32,14 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Ordo Todo App - Offline First",
       },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", href: "/icon.svg", type: "image/svg+xml" },
+    ],
   }),
   component: RootComponent,
 });
@@ -49,6 +54,26 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const [db, setDb] = useState<PGliteWithLive | null>(null);
+  const [isOnline, setIsOnline] = useState(true); // Default to true to avoid hydration mismatch
+
+  // Online/offline detection
+  useEffect(() => {
+    if (typeof navigator !== "undefined") {
+      // Set initial state after hydration
+      setIsOnline(navigator.onLine);
+
+      const handleOnline = () => setIsOnline(true);
+      const handleOffline = () => setIsOnline(false);
+
+      window.addEventListener("online", handleOnline);
+      window.addEventListener("offline", handleOffline);
+
+      return () => {
+        window.removeEventListener("online", handleOnline);
+        window.removeEventListener("offline", handleOffline);
+      };
+    }
+  }, []);
 
   useEffect(() => {
     async function initDb() {
@@ -76,6 +101,19 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         </head>
         <body>
           <div style={{ padding: "20px", textAlign: "center" }}>
+            {!isOnline && (
+              <div
+                style={{
+                  background: "#ff9800",
+                  color: "white",
+                  padding: "8px",
+                  marginBottom: "10px",
+                  borderRadius: "4px",
+                }}
+              >
+                📱 Offline Mode - Loading from cache...
+              </div>
+            )}
             Loading database...
           </div>
           <Scripts />
@@ -92,7 +130,27 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         <QueryClientProvider client={queryClient}>
           <PGliteProvider db={db}>
-            {children}
+            {!isOnline && (
+              <div
+                style={{
+                  position: "fixed",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  background: "#4caf50",
+                  color: "white",
+                  padding: "8px",
+                  textAlign: "center",
+                  zIndex: 1000,
+                }}
+              >
+                📱 Offline Mode - App fully functional!
+              </div>
+            )}
+            <div style={{ paddingTop: !isOnline ? "40px" : "0" }}>
+              {children}
+              <PWAUpdatePrompt />
+            </div>
             <Scripts />
           </PGliteProvider>
         </QueryClientProvider>
