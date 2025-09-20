@@ -17,7 +17,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "dev": "echo 'Supabase package ready for development'",
-    "build": "tsc"
+    "build": "echo 'Supabase package uses TypeScript source files directly'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.48.0",
