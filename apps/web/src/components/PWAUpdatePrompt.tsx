@@ -3,130 +3,121 @@ import React, { useState, useEffect } from "react";
 interface PWAUpdatePromptProps {}
 
 function PWAUpdatePrompt({}: PWAUpdatePromptProps) {
-  const [offlineReady, setOfflineReady] = useState(false);
   const [needRefresh, setNeedRefresh] = useState(false);
-  const [registration, setRegistration] =
-    useState<ServiceWorkerRegistration | null>(null);
+  const [offlineReady, setOfflineReady] = useState(false);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js", { scope: "/" })
-        .then((reg) => {
-          console.log("✅ SW Registered:", reg);
-          setRegistration(reg);
-
-          // Check if there's a waiting service worker
-          if (reg.waiting) {
-            setNeedRefresh(true);
-          }
-
-          // Listen for updates
-          reg.addEventListener("updatefound", () => {
-            const newWorker = reg.installing;
-            if (newWorker) {
-              newWorker.addEventListener("statechange", () => {
-                if (newWorker.state === "installed") {
-                  if (navigator.serviceWorker.controller) {
-                    // New update available
-                    setNeedRefresh(true);
-                  } else {
-                    // App is ready for offline use
-                    setOfflineReady(true);
-                  }
-                }
-              });
-            }
-          });
-        })
-        .catch((error) => {
-          console.log("❌ SW registration failed:", error);
-        });
-
-      // Listen for controlling service worker changes
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-        window.location.reload();
+      // Listen for PWA events from vite-plugin-pwa
+      window.addEventListener("vite:pwa-update", (event: any) => {
+        if (event.detail) {
+          setNeedRefresh(true);
+        }
       });
 
-      // Check if app is ready for offline use
-      if (navigator.serviceWorker.controller) {
+      // Check for existing service worker
+      navigator.serviceWorker.ready.then(() => {
         setOfflineReady(true);
-      }
-    }
-  }, []);
+      });
 
-  const updateServiceWorker = async () => {
-    if (registration && registration.waiting) {
-      registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      // Listen for service worker updates
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (needRefresh) {
+          window.location.reload();
+        }
+      });
+    }
+  }, [needRefresh]);
+
+  const updateApp = () => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistration().then((reg) => {
+        if (reg && reg.waiting) {
+          reg.waiting.postMessage({ type: "SKIP_WAITING" });
+          setNeedRefresh(false);
+        }
+      });
     }
   };
 
-  const close = () => {
-    setOfflineReady(false);
+  const dismiss = () => {
     setNeedRefresh(false);
   };
 
   return (
-    <div style={{ position: "fixed", zIndex: 1000 }}>
-      {(offlineReady || needRefresh) && (
+    <>
+      {offlineReady && !needRefresh && (
         <div
           style={{
             position: "fixed",
-            right: "16px",
             bottom: "16px",
-            padding: "12px 16px",
+            left: "16px",
+            padding: "8px 12px",
+            background: "#4caf50",
+            color: "white",
+            borderRadius: "4px",
+            fontSize: "12px",
+            zIndex: 1000,
+          }}
+        >
+          ✓ Ready to work offline
+        </div>
+      )}
+
+      {needRefresh && (
+        <div
+          style={{
+            position: "fixed",
+            top: "16px",
+            right: "16px",
+            padding: "16px",
             background: "#4F46E5",
             color: "white",
             borderRadius: "8px",
             boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            maxWidth: "300px",
+            zIndex: 10000,
+            maxWidth: "320px",
           }}
         >
-          <div>
-            {offlineReady && !needRefresh ? (
-              <span>🎉 App ready to work offline!</span>
-            ) : (
-              <span>🔄 New content available!</span>
-            )}
+          <div style={{ marginBottom: "12px" }}>
+            <strong>🚀 New version available!</strong>
+            <br />
+            <small>Refresh to get the latest features</small>
           </div>
           <div style={{ display: "flex", gap: "8px" }}>
-            {needRefresh && (
-              <button
-                onClick={updateServiceWorker}
-                style={{
-                  background: "white",
-                  color: "#4F46E5",
-                  border: "none",
-                  padding: "4px 8px",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                }}
-              >
-                Update
-              </button>
-            )}
             <button
-              onClick={close}
+              onClick={updateApp}
+              style={{
+                background: "white",
+                color: "#4F46E5",
+                border: "none",
+                padding: "8px 16px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: "bold",
+              }}
+            >
+              Refresh Now
+            </button>
+            <button
+              onClick={dismiss}
               style={{
                 background: "rgba(255, 255, 255, 0.2)",
                 color: "white",
-                border: "none",
-                padding: "4px 8px",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                padding: "8px 12px",
                 borderRadius: "4px",
                 cursor: "pointer",
-                fontSize: "12px",
+                fontSize: "14px",
               }}
             >
-              ✕
+              Later
             </button>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

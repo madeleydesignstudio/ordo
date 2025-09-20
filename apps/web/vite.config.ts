@@ -29,19 +29,32 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
         skipWaiting: true,
         clientsClaim: true,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            urlPattern: /^https:\/\/.*\.(?:png|jpg|jpeg|svg|gif|webp)$/,
             handler: "CacheFirst",
             options: {
-              cacheName: "google-fonts-cache",
+              cacheName: "images",
               expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // <== 365 days
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
               },
-              cacheKeyWillBeUsed: async ({ request }) => {
-                return `${request.url}?${Date.now()}`;
-              },
+            },
+          },
+          {
+            urlPattern: /\.(?:js|css)$/,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "static-resources",
+            },
+          },
+          {
+            urlPattern: ({ request }) => request.destination === "document",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "pages",
+              networkTimeoutSeconds: 3,
             },
           },
         ],
@@ -55,7 +68,7 @@ export default defineConfig({
         start_url: "/",
         display: "standalone",
         background_color: "#ffffff",
-        version: buildTimestamp.toString(),
+
         icons: [
           {
             src: "/icon.svg",
