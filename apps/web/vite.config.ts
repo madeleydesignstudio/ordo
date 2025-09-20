@@ -5,9 +5,23 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
+import { writeFileSync } from "fs";
+import { join } from "path";
 
 // Add build timestamp for cache busting
 const buildTimestamp = Date.now();
+
+// Generate version file
+const versionData = {
+  version: buildTimestamp.toString(),
+  timestamp: buildTimestamp,
+  updated: new Date().toISOString(),
+};
+
+writeFileSync(
+  join(process.cwd(), "public", "version.json"),
+  JSON.stringify(versionData, null, 2),
+);
 
 export default defineConfig({
   define: {

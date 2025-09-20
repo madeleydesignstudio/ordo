@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "prebuild": "node scripts/update-version.js",
     "build": "vite build",
     "preview": "node .vercel/output/functions/__fallback.func/index.mjs",
     "serve": "bun run build && bun run preview"
