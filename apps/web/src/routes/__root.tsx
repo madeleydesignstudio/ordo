@@ -1,4 +1,3 @@
-// src/routes/__root.tsx
 /// <reference types="vite/client" />
 import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
@@ -18,8 +17,8 @@ import PWAUpdatePrompt from "../components/PWAUpdatePrompt";
 
 import appCss from "../styles/app.css?url";
 
-// Create a client
 const queryClient = new QueryClient();
+const DATABASE_NAME = "idb://ordo-db";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -56,10 +55,10 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const [db, setDb] = useState<PGliteWithLive | null>(null);
   const [isOnline, setIsOnline] = useState(true); // Default to true to avoid hydration mismatch
 
-  // Online/offline detection
   useEffect(() => {
-    if (typeof navigator !== "undefined") {
-      // Set initial state after hydration
+    const setupOnlineDetection = () => {
+      if (typeof navigator === "undefined") return;
+
       setIsOnline(navigator.onLine);
 
       const handleOnline = () => setIsOnline(true);
@@ -72,25 +71,29 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         window.removeEventListener("online", handleOnline);
         window.removeEventListener("offline", handleOffline);
       };
-    }
+    };
+
+    return setupOnlineDetection();
   }, []);
 
   useEffect(() => {
-    async function initDb() {
+    const initializeDatabase = async (): Promise<void> => {
       try {
         const database = await PGlite.create({
-          dataDir: "idb://ordo-db",
+          dataDir: DATABASE_NAME,
           extensions: { live },
         });
+
         setDb(database);
         todoService.setDatabase(database);
         await todoService.initialize();
-        console.log("✅ PGLite initialized successfully");
       } catch (error) {
-        console.error("❌ Failed to initialize PGLite:", error);
+        console.error("Failed to initialize PGLite:", error);
+        // TODO: Add user-friendly error handling
       }
-    }
-    initDb();
+    };
+
+    initializeDatabase();
   }, []);
 
   if (!db) {
@@ -100,22 +103,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
           <HeadContent />
         </head>
         <body>
-          <div style={{ padding: "20px", textAlign: "center" }}>
-            {!isOnline && (
-              <div
-                style={{
-                  background: "#ff9800",
-                  color: "white",
-                  padding: "8px",
-                  marginBottom: "10px",
-                  borderRadius: "4px",
-                }}
-              >
-                📱 Offline Mode - Loading from cache...
-              </div>
-            )}
-            Loading database...
-          </div>
+          <LoadingScreen isOnline={isOnline} />
           <Scripts />
         </body>
       </html>
@@ -130,31 +118,75 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         <QueryClientProvider client={queryClient}>
           <PGliteProvider db={db}>
-            {!isOnline && (
-              <div
-                style={{
-                  position: "fixed",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  background: "#4caf50",
-                  color: "white",
-                  padding: "8px",
-                  textAlign: "center",
-                  zIndex: 1000,
-                }}
-              >
-                📱 Offline Mode - App fully functional!
-              </div>
-            )}
-            <div style={{ paddingTop: !isOnline ? "40px" : "0" }}>
+            <OfflineBanner isOnline={isOnline} />
+            <MainContent isOnline={isOnline}>
               {children}
               <PWAUpdatePrompt />
-            </div>
+            </MainContent>
             <Scripts />
           </PGliteProvider>
         </QueryClientProvider>
       </body>
     </html>
   );
+}
+
+interface LoadingScreenProps {
+  isOnline: boolean;
+}
+
+function LoadingScreen({ isOnline }: LoadingScreenProps) {
+  return (
+    <div style={{ padding: "20px", textAlign: "center" }}>
+      {!isOnline && (
+        <div
+          style={{
+            background: "#ff9800",
+            color: "white",
+            padding: "8px",
+            marginBottom: "10px",
+            borderRadius: "4px",
+          }}
+        >
+          📱 Offline Mode - Loading from cache...
+        </div>
+      )}
+      Loading database...
+    </div>
+  );
+}
+
+interface OfflineBannerProps {
+  isOnline: boolean;
+}
+
+function OfflineBanner({ isOnline }: OfflineBannerProps) {
+  if (isOnline) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        background: "#4caf50",
+        color: "white",
+        padding: "8px",
+        textAlign: "center",
+        zIndex: 1000,
+      }}
+    >
+      📱 Offline Mode - App fully functional!
+    </div>
+  );
+}
+
+interface MainContentProps {
+  isOnline: boolean;
+  children: ReactNode;
+}
+
+function MainContent({ isOnline, children }: MainContentProps) {
+  return <div style={{ paddingTop: !isOnline ? "40px" : "0" }}>{children}</div>;
 }

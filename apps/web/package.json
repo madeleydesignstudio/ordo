@@ -6,17 +6,19 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "preview": "node .output/server/index.mjs",
+    "preview": "node .vercel/output/functions/__fallback.func/index.mjs",
     "serve": "bun run build && bun run preview"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.8",
     "@electric-sql/pglite-react": "^0.2.26",
+    "@ordo/supabase": "workspace:*",
     "@ordo/ui": "workspace:*",
     "@tailwindcss/vite": "^4.1.13",
     "@tanstack/react-query": "^5.89.0",
     "@tanstack/react-router": "^1.131.48",
     "@tanstack/react-start": "^1.131.48",
+    "drizzle-orm": "^0.36.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "tailwindcss": "^4.1.13",

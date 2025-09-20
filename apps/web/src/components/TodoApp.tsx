@@ -2,11 +2,14 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { todoService, type Todo } from "../lib/todoService";
 
+const DEFAULT_TODO_NAME = "Arthur";
+const DEFAULT_USER_ID = "user-123"; // TODO: Replace with actual user ID from auth
+const TOP_TODOS_LIMIT = 3;
+
 export function TodoApp() {
   const queryClient = useQueryClient();
-  const [newTodoName, setNewTodoName] = useState("Arthur");
+  const [newTodoName, setNewTodoName] = useState(DEFAULT_TODO_NAME);
 
-  // Query all todos
   const {
     data: todos = [],
     isLoading,
@@ -16,54 +19,60 @@ export function TodoApp() {
     queryFn: () => todoService.getAllTodos(),
   });
 
-  // Query stats
   const { data: stats } = useQuery({
     queryKey: ["todo-stats"],
     queryFn: () => todoService.getTodoStats(),
   });
 
-  // Query top todos
   const { data: topTodos = [] } = useQuery({
     queryKey: ["top-todos"],
-    queryFn: () => todoService.getTopTodos(3),
+    queryFn: () => todoService.getTopTodos(TOP_TODOS_LIMIT),
   });
 
-  // Create todo mutation
+  const invalidateQueries = () => {
+    queryClient.invalidateQueries({ queryKey: ["todos"] });
+    queryClient.invalidateQueries({ queryKey: ["todo-stats"] });
+    queryClient.invalidateQueries({ queryKey: ["top-todos"] });
+  };
+
   const createMutation = useMutation({
     mutationFn: (todo: { name: string; number: number }) =>
       todoService.createTodo(todo),
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["todos"] });
-      queryClient.invalidateQueries({ queryKey: ["todo-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["top-todos"] });
-    },
+    onSuccess: invalidateQueries,
   });
 
-  // Delete todo mutation
   const deleteMutation = useMutation({
     mutationFn: (id: string) => todoService.deleteTodo(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["todos"] });
-      queryClient.invalidateQueries({ queryKey: ["todo-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["top-todos"] });
-    },
+    onSuccess: invalidateQueries,
   });
 
-  // Clear all mutation
   const clearAllMutation = useMutation({
     mutationFn: () => todoService.clearAllTodos(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["todos"] });
-      queryClient.invalidateQueries({ queryKey: ["todo-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["top-todos"] });
+    onSuccess: invalidateQueries,
+  });
+
+  const pushToCloudMutation = useMutation({
+    mutationFn: () => todoService.pushToCloud(DEFAULT_USER_ID),
+    onSuccess: (result) => {
+      if (result.success) {
+        // Could add a toast notification here in the future
+        console.log(`Successfully synced ${result.count} todos to cloud`);
+      }
+    },
+    onError: (error) => {
+      console.error("Failed to sync to cloud:", error);
+      // Could add error toast notification here in the future
     },
   });
 
+  const generateRandomNumber = () => Math.floor(Math.random() * 100);
+
   const handleAddTodo = () => {
+    if (!newTodoName.trim()) return;
+
     createMutation.mutate({
       name: newTodoName,
-      number: Math.floor(Math.random() * 100),
+      number: generateRandomNumber(),
     });
   };
 
@@ -73,6 +82,10 @@ export function TodoApp() {
 
   const handleClearAll = () => {
     clearAllMutation.mutate();
+  };
+
+  const handlePushToCloud = () => {
+    pushToCloudMutation.mutate();
   };
 
   if (isLoading) {
@@ -94,7 +107,6 @@ export function TodoApp() {
         TanStack Query + PGLite for reactive offline-first experience
       </p>
 
-      {/* Add Todo Form */}
       <div style={{ marginBottom: "20px" }}>
         <input
           type="text"
@@ -118,12 +130,42 @@ export function TodoApp() {
         <button onClick={handleClearAll} disabled={clearAllMutation.isPending}>
           {clearAllMutation.isPending ? "Clearing..." : "🗑️ Clear All"}
         </button>
+        <button
+          onClick={handlePushToCloud}
+          disabled={pushToCloudMutation.isPending || todos.length === 0}
+          style={{
+            marginLeft: "10px",
+            backgroundColor: pushToCloudMutation.isError
+              ? "#ff4444"
+              : pushToCloudMutation.isSuccess
+                ? "#4caf50"
+                : undefined,
+            color:
+              pushToCloudMutation.isError || pushToCloudMutation.isSuccess
+                ? "white"
+                : undefined,
+          }}
+          title={
+            pushToCloudMutation.isError
+              ? "Sync failed - click to retry"
+              : pushToCloudMutation.isSuccess
+                ? "Sync successful!"
+                : "Sync todos to cloud"
+          }
+        >
+          {pushToCloudMutation.isPending
+            ? "Syncing..."
+            : pushToCloudMutation.isError
+              ? "❌ Retry Sync"
+              : pushToCloudMutation.isSuccess
+                ? "✅ Synced"
+                : "☁️ Push to Cloud"}
+        </button>
       </div>
 
       <div
         style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}
       >
-        {/* Todos List */}
         <div>
           <h3>🚀 All Todos ({todos.length})</h3>
           {todos.length === 0 ? (
@@ -133,102 +175,140 @@ export function TodoApp() {
               style={{ display: "flex", flexDirection: "column", gap: "8px" }}
             >
               {todos.map((todo) => (
-                <div
+                <TodoItem
                   key={todo.id}
-                  style={{
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    padding: "12px",
-                    backgroundColor: "#f9f9f9",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <div>
-                    <div>
-                      <strong>{todo.name}</strong> ({todo.number})
-                    </div>
-                    <div style={{ fontSize: "12px", color: "#666" }}>
-                      {todo.created_at.toLocaleString()}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteTodo(todo.id)}
-                    disabled={deleteMutation.isPending}
-                    style={{
-                      background: "#ff4444",
-                      color: "white",
-                      border: "none",
-                      padding: "4px 8px",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    ❌
-                  </button>
-                </div>
+                  todo={todo}
+                  onDelete={handleDeleteTodo}
+                  isDeleting={deleteMutation.isPending}
+                />
               ))}
             </div>
           )}
         </div>
 
-        {/* Analytics */}
         <div>
           <h3>📊 Analytics</h3>
-          <div style={{ marginBottom: "15px" }}>
-            <strong>Stats:</strong>
-            <br />
-            Total: {stats?.count || 0} todos
-            <br />
-            Average number: {stats?.avgNumber || 0}
-          </div>
-
-          <div>
-            <strong>🏆 Top 3 by number:</strong>
-            {topTodos.length === 0 ? (
-              <p style={{ color: "#666" }}>No todos yet</p>
-            ) : (
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: "4px" }}
-              >
-                {topTodos.map((todo, index) => (
-                  <div
-                    key={todo.id}
-                    style={{
-                      border: "1px solid #ddd",
-                      borderRadius: "4px",
-                      padding: "8px",
-                      fontSize: "14px",
-                      backgroundColor: "#f0f8ff",
-                    }}
-                  >
-                    #{index + 1} {todo.name} ({todo.number})
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <TodoStats stats={stats} />
+          <TopTodosList todos={topTodos} />
         </div>
       </div>
 
-      {/* Status */}
-      <div
+      <AppBenefits />
+    </div>
+  );
+}
+
+interface TodoItemProps {
+  todo: Todo;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
+}
+
+function TodoItem({ todo, onDelete, isDeleting }: TodoItemProps) {
+  return (
+    <div
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: "4px",
+        padding: "12px",
+        backgroundColor: "#f9f9f9",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      <div>
+        <div>
+          <strong>{todo.name}</strong> ({todo.number})
+        </div>
+        <div style={{ fontSize: "12px", color: "#666" }}>
+          {todo.createdAt.toLocaleString()}
+        </div>
+      </div>
+      <button
+        onClick={() => onDelete(todo.id)}
+        disabled={isDeleting}
         style={{
-          marginTop: "20px",
-          fontSize: "12px",
-          color: "#666",
-          border: "1px solid #eee",
-          padding: "10px",
+          background: "#ff4444",
+          color: "white",
+          border: "none",
+          padding: "4px 8px",
           borderRadius: "4px",
+          cursor: "pointer",
         }}
       >
-        <strong>✨ Benefits:</strong>
-        <br />• PGLite: Full PostgreSQL database in browser (offline-first)
-        <br />• TanStack Query: Optimistic updates, caching, background refetch
-        <br />• No complex sync logic: Each tool does what it's designed for
-        <br />• Data persists across browser sessions in IndexedDB
-      </div>
+        ❌
+      </button>
+    </div>
+  );
+}
+
+interface TodoStatsProps {
+  stats?: { count: number; avgNumber: number };
+}
+
+function TodoStats({ stats }: TodoStatsProps) {
+  return (
+    <div style={{ marginBottom: "15px" }}>
+      <strong>Stats:</strong>
+      <br />
+      Total: {stats?.count || 0} todos
+      <br />
+      Average number: {stats?.avgNumber || 0}
+    </div>
+  );
+}
+
+interface TopTodosListProps {
+  todos: Todo[];
+}
+
+function TopTodosList({ todos }: TopTodosListProps) {
+  return (
+    <div>
+      <strong>🏆 Top {TOP_TODOS_LIMIT} by number:</strong>
+      {todos.length === 0 ? (
+        <p style={{ color: "#666" }}>No todos yet</p>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          {todos.map((todo, index) => (
+            <div
+              key={todo.id}
+              style={{
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                padding: "8px",
+                fontSize: "14px",
+                backgroundColor: "#f0f8ff",
+              }}
+            >
+              #{index + 1} {todo.name} ({todo.number})
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AppBenefits() {
+  return (
+    <div
+      style={{
+        marginTop: "20px",
+        fontSize: "12px",
+        color: "#666",
+        border: "1px solid #eee",
+        padding: "10px",
+        borderRadius: "4px",
+      }}
+    >
+      <strong>✨ Benefits:</strong>
+      <br />• PGlite + Drizzle: Type-safe offline PostgreSQL database
+      <br />• TanStack Query: Optimistic updates, caching, background refetch
+      <br />• Cloud Sync: Push local data to Supabase PostgreSQL
+      <br />• Data persists across browser sessions in IndexedDB
+      <br />• Same schema for local and cloud databases
     </div>
   );
 }

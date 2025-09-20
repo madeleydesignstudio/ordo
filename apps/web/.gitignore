@@ -35,3 +35,23 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Local database files
 data/
+
+# Compiled TypeScript files (but keep config files)
+src/**/*.js
+src/**/*.js.map
+src/**/*.d.ts
+src/**/*.d.ts.map
+vite.config.js
+vite.config.d.ts
+vite.config.d.ts.map
+
+# Tanstack Router generated files
+routeTree.gen.js
+routeTree.gen.d.ts
+routeTree.gen.d.ts.map
+
+# Vercel
+.vercel
+
+# Nitro
+.nitro

@@ -1,122 +1,168 @@
 import { PGlite } from "@electric-sql/pglite";
+import { drizzle } from "drizzle-orm/pglite";
+import { eq, desc } from "drizzle-orm";
+import { todos, type Todo, type NewTodo } from "@ordo/supabase";
+import { cloudTodoService } from "@ordo/supabase";
 
-export interface Todo {
-  id: string;
-  name: string;
-  number: number;
-  created_at: Date;
+interface TodoStats {
+  count: number;
+  avgNumber: number;
+}
+
+interface SyncResult {
+  success: boolean;
+  count: number;
+  error?: string;
 }
 
 export class TodoService {
-  private db: PGlite | null = null;
+  private client: PGlite | null = null;
+  private db: ReturnType<typeof drizzle> | null = null;
 
-  setDatabase(database: PGlite) {
-    this.db = database;
+  private static readonly REQUIRED_COLUMNS = [
+    "id",
+    "name",
+    "number",
+    "created_at",
+    "updated_at",
+    "user_id",
+  ];
+
+  private static readonly CREATE_TABLE_SQL = `
+    CREATE TABLE todos (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      number INTEGER NOT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      user_id TEXT
+    );
+  `;
+
+  setDatabase(database: PGlite): void {
+    this.client = database;
+    this.db = drizzle(database, { schema: { todos } });
   }
 
-  async initialize() {
-    if (!this.db) throw new Error("Database not set");
+  async initialize(): Promise<void> {
+    this.validateDatabase();
 
-    await this.db.exec(`
+    const needsMigration = await this.checkSchemaMigration();
+
+    if (needsMigration) {
+      await this.resetDatabase();
+    } else {
+      await this.createTableIfNotExists();
+    }
+  }
+
+  private validateDatabase(): void {
+    if (!this.db || !this.client) {
+      throw new Error("Database not set");
+    }
+  }
+
+  private async checkSchemaMigration(): Promise<boolean> {
+    if (!this.client) return false;
+
+    try {
+      const result = await this.client.query(`
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_name = 'todos'
+      `);
+
+      const columns = result.rows.map((row) => (row as any).column_name);
+
+      return (
+        result.rows.length === 0 ||
+        !TodoService.REQUIRED_COLUMNS.every((col) => columns.includes(col))
+      );
+    } catch (error) {
+      return true;
+    }
+  }
+
+  private async createTableIfNotExists(): Promise<void> {
+    if (!this.client) return;
+
+    await this.client.exec(`
       CREATE TABLE IF NOT EXISTS todos (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         number INTEGER NOT NULL,
-        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        user_id TEXT
       );
     `);
+  }
 
-    console.log("✅ Todo table initialized");
+  private async resetDatabase(): Promise<void> {
+    if (!this.client) return;
+
+    await this.client.exec(`DROP TABLE IF EXISTS todos;`);
+    await this.client.exec(TodoService.CREATE_TABLE_SQL);
   }
 
   async getAllTodos(): Promise<Todo[]> {
-    if (!this.db) throw new Error("Database not set");
-
-    const result = await this.db.query(
-      "SELECT * FROM todos ORDER BY created_at DESC",
-    );
-
-    return result.rows.map((row: any) => ({
-      id: row.id,
-      name: row.name,
-      number: row.number,
-      created_at: new Date(row.created_at),
-    }));
+    this.validateDatabase();
+    return await this.db!.select().from(todos).orderBy(desc(todos.createdAt));
   }
 
-  async createTodo(todo: Omit<Todo, "id" | "created_at">): Promise<Todo> {
-    if (!this.db) throw new Error("Database not set");
+  async createTodo(
+    todo: Omit<Todo, "id" | "createdAt" | "updatedAt" | "userId">,
+  ): Promise<Todo> {
+    this.validateDatabase();
 
-    const newTodo: Todo = {
+    const newTodo: NewTodo = {
       id: crypto.randomUUID(),
       name: todo.name,
       number: todo.number,
-      created_at: new Date(),
+      createdAt: new Date(),
     };
 
-    await this.db.query(
-      "INSERT INTO todos (id, name, number, created_at) VALUES ($1, $2, $3, $4)",
-      [
-        newTodo.id,
-        newTodo.name,
-        newTodo.number,
-        newTodo.created_at.toISOString(),
-      ],
-    );
+    const [created] = await this.db!.insert(todos).values(newTodo).returning();
 
-    console.log("✅ Todo created:", newTodo.name);
-    return newTodo;
+    if (!created) {
+      throw new Error("Failed to create todo");
+    }
+
+    return created;
   }
 
   async updateTodo(
     id: string,
     updates: Partial<Pick<Todo, "name" | "number">>,
   ): Promise<Todo> {
-    if (!this.db) throw new Error("Database not set");
+    this.validateDatabase();
 
-    const result = await this.db.query("SELECT * FROM todos WHERE id = $1", [
-      id,
-    ]);
-    if (result.rows.length === 0) {
+    const [updated] = await this.db!.update(todos)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(todos.id, id))
+      .returning();
+
+    if (!updated) {
       throw new Error("Todo not found");
     }
 
-    const current = result.rows[0] as any;
-    const updated: Todo = {
-      id: current.id,
-      name: updates.name ?? current.name,
-      number: updates.number ?? current.number,
-      created_at: new Date(current.created_at),
-    };
-
-    await this.db.query(
-      "UPDATE todos SET name = $1, number = $2 WHERE id = $3",
-      [updated.name, updated.number, id],
-    );
-
-    console.log("✅ Todo updated:", updated.name);
     return updated;
   }
 
   async deleteTodo(id: string): Promise<void> {
-    if (!this.db) throw new Error("Database not set");
-
-    await this.db.query("DELETE FROM todos WHERE id = $1", [id]);
-    console.log("✅ Todo deleted:", id);
+    this.validateDatabase();
+    await this.db!.delete(todos).where(eq(todos.id, id));
   }
 
   async clearAllTodos(): Promise<void> {
-    if (!this.db) throw new Error("Database not set");
-
-    await this.db.exec("DELETE FROM todos");
-    console.log("✅ All todos cleared");
+    this.validateDatabase();
+    await this.db!.delete(todos);
   }
 
-  // Advanced queries for analytics
-  async getTodoStats(): Promise<{ count: number; avgNumber: number }> {
-    if (!this.db) throw new Error("Database not set");
+  async getTodoStats(): Promise<TodoStats> {
+    this.validateDatabase();
 
-    const result = await this.db.query(`
+    const result = await this.client!.query(`
       SELECT
         COUNT(*) as count,
         COALESCE(AVG(number), 0) as avg_number
@@ -125,27 +171,71 @@ export class TodoService {
 
     const row = result.rows[0] as any;
     return {
-      count: row.count,
-      avgNumber: Math.round(row.avg_number * 100) / 100,
+      count: parseInt(row.count),
+      avgNumber: Math.round(parseFloat(row.avg_number) * 100) / 100,
     };
   }
 
   async getTopTodos(limit: number = 5): Promise<Todo[]> {
-    if (!this.db) throw new Error("Database not set");
+    this.validateDatabase();
 
-    const result = await this.db.query(
+    const result = await this.client!.query(
       "SELECT * FROM todos ORDER BY number DESC LIMIT $1",
       [limit],
     );
 
-    return result.rows.map((row: any) => ({
+    return result.rows.map((row: any) => this.mapRowToTodo(row));
+  }
+
+  private mapRowToTodo(row: any): Todo {
+    return {
       id: row.id,
       name: row.name,
       number: row.number,
-      created_at: new Date(row.created_at),
-    }));
+      createdAt: new Date(row.created_at),
+      updatedAt: row.updated_at ? new Date(row.updated_at) : null,
+      userId: row.user_id,
+    };
+  }
+
+  async pushToCloud(userId: string): Promise<SyncResult> {
+    try {
+      this.validateDatabase();
+
+      const localTodos = await this.getAllTodos();
+      const todosToSync = localTodos.map((todo) => ({
+        id: todo.id,
+        name: todo.name,
+        number: todo.number,
+        createdAt: todo.createdAt,
+        updatedAt: todo.updatedAt,
+      }));
+
+      return await cloudTodoService.pushLocalTodos(todosToSync, userId);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      return {
+        success: false,
+        count: 0,
+        error: errorMessage,
+      };
+    }
+  }
+
+  async hasTodosToSync(): Promise<boolean> {
+    try {
+      const todos = await this.getAllTodos();
+      return todos.length > 0;
+    } catch (error) {
+      return false;
+    }
   }
 }
 
 // Singleton instance
 export const todoService = new TodoService();
+
+// Re-export types for compatibility
+export type { Todo, NewTodo };
