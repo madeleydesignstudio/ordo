@@ -12,9 +12,26 @@ declare const __BUILD_TIMESTAMP__: number;
 export function TodoApp() {
   const queryClient = useQueryClient();
   const [newTodoName, setNewTodoName] = useState(DEFAULT_TODO_NAME);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  // Force cache invalidation on new builds
+  // Online/offline detection
   useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  // Force cache invalidation on new builds (only when online)
+  useEffect(() => {
+    if (!isOnline) return;
+
     const lastBuildTimestamp = localStorage.getItem("buildTimestamp");
     const currentBuildTimestamp = __BUILD_TIMESTAMP__.toString();
 
@@ -29,7 +46,7 @@ export function TodoApp() {
     }
 
     localStorage.setItem("buildTimestamp", currentBuildTimestamp);
-  }, [queryClient]);
+  }, [queryClient, isOnline]);
 
   const {
     data: todos = [],
@@ -73,7 +90,12 @@ export function TodoApp() {
   });
 
   const pushToCloudMutation = useMutation({
-    mutationFn: () => todoService.pushToCloud(DEFAULT_USER_ID),
+    mutationFn: () => {
+      if (!isOnline) {
+        throw new Error("Cannot sync to cloud while offline");
+      }
+      return todoService.pushToCloud(DEFAULT_USER_ID);
+    },
     onSuccess: (result) => {
       if (result.success) {
         // Could add a toast notification here in the future
@@ -153,34 +175,45 @@ export function TodoApp() {
         </button>
         <button
           onClick={handlePushToCloud}
-          disabled={pushToCloudMutation.isPending || todos.length === 0}
+          disabled={
+            pushToCloudMutation.isPending || todos.length === 0 || !isOnline
+          }
           style={{
             marginLeft: "10px",
-            backgroundColor: pushToCloudMutation.isError
-              ? "#ff4444"
-              : pushToCloudMutation.isSuccess
-                ? "#4caf50"
-                : undefined,
+            backgroundColor: !isOnline
+              ? "#999"
+              : pushToCloudMutation.isError
+                ? "#ff4444"
+                : pushToCloudMutation.isSuccess
+                  ? "#4caf50"
+                  : undefined,
             color:
-              pushToCloudMutation.isError || pushToCloudMutation.isSuccess
+              !isOnline ||
+              pushToCloudMutation.isError ||
+              pushToCloudMutation.isSuccess
                 ? "white"
                 : undefined,
+            opacity: !isOnline ? 0.6 : 1,
           }}
           title={
-            pushToCloudMutation.isError
-              ? "Sync failed - click to retry"
-              : pushToCloudMutation.isSuccess
-                ? "Sync successful!"
-                : "Sync todos to cloud"
+            !isOnline
+              ? "Go online to sync todos to cloud"
+              : pushToCloudMutation.isError
+                ? "Sync failed - click to retry"
+                : pushToCloudMutation.isSuccess
+                  ? "Sync successful!"
+                  : "Sync todos to cloud"
           }
         >
-          {pushToCloudMutation.isPending
-            ? "Syncing..."
-            : pushToCloudMutation.isError
-              ? "❌ Retry Sync"
-              : pushToCloudMutation.isSuccess
-                ? "✅ Synced"
-                : "☁️ Push to Cloud"}
+          {!isOnline
+            ? "📴 Offline"
+            : pushToCloudMutation.isPending
+              ? "Syncing..."
+              : pushToCloudMutation.isError
+                ? "❌ Retry Sync"
+                : pushToCloudMutation.isSuccess
+                  ? "✅ Synced"
+                  : "☁️ Push to Cloud"}
         </button>
       </div>
 
@@ -313,6 +346,21 @@ function TopTodosList({ todos }: TopTodosListProps) {
 }
 
 function AppBenefits() {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
   return (
     <div
       style={{
@@ -327,9 +375,12 @@ function AppBenefits() {
       <strong>✨ Benefits:</strong>
       <br />• PGlite + Drizzle: Type-safe offline PostgreSQL database
       <br />• TanStack Query: Optimistic updates, caching, background refetch
-      <br />• Cloud Sync: Push local data to Supabase PostgreSQL
+      <br />• Cloud Sync: Push local data to Supabase PostgreSQL{" "}
+      {isOnline ? "🌐" : "📴 (offline)"}
       <br />• Data persists across browser sessions in IndexedDB
       <br />• Same schema for local and cloud databases
+      <br />• <strong>Works completely offline!</strong>{" "}
+      {!isOnline ? "← You're offline now!" : ""}
     </div>
   );
 }

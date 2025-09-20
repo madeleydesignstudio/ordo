@@ -36,16 +36,18 @@ export default defineConfig({
     viteReact(),
     tailwindcss(),
     VitePWA({
-      registerType: "prompt",
-      injectRegister: false,
+      registerType: "autoUpdate",
+      injectRegister: "auto",
       workbox: {
-        globPatterns: ["**/*.{js,css,wasm,data}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,wasm,data}"],
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
-        skipWaiting: false,
-        clientsClaim: false,
+        skipWaiting: true,
+        clientsClaim: true,
         cleanupOutdatedCaches: true,
-        navigateFallback: null,
+        navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         runtimeCaching: [
+          // PGLite assets - cache first for offline functionality
           {
             urlPattern: /\.(?:wasm|data)$/,
             handler: "CacheFirst",
@@ -53,39 +55,45 @@ export default defineConfig({
               cacheName: "pglite-assets",
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 7,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
               },
             },
           },
-          // Enhanced caching for mobile with aggressive update checking
+          // Version checking - allow offline fallback
           {
             urlPattern: /\/version\.json$/,
             handler: "NetworkFirst",
             options: {
               cacheName: "version-cache",
-              networkTimeoutSeconds: 3,
+              networkTimeoutSeconds: 2,
               expiration: {
                 maxEntries: 1,
-                maxAgeSeconds: 0, // Don't cache version.json
-              },
-              cacheKeyWillBeUsed: async ({ request }) => {
-                // Always include timestamp to prevent caching
-                const url = new URL(request.url);
-                url.searchParams.set("_t", Date.now().toString());
-                return url.toString();
+                maxAgeSeconds: 60 * 5, // Cache for 5 minutes to reduce network dependency
               },
             },
           },
-          // Cache app shell with network-first for mobile
+          // App shell - cache first for true offline support
           {
-            urlPattern: /^https?:\/\/[^\/]+\/$/,
-            handler: "NetworkFirst",
+            urlPattern: /^https?:\/\/[^\/]+\/?$/,
+            handler: "CacheFirst",
             options: {
               cacheName: "app-shell",
-              networkTimeoutSeconds: 3,
               expiration: {
                 maxEntries: 5,
-                maxAgeSeconds: 60 * 60, // 1 hour
+                maxAgeSeconds: 60 * 60 * 24, // 24 hours
+              },
+            },
+          },
+          // Static assets - cache first
+          {
+            urlPattern:
+              /^https?:\/\/[^\/]+\/.*\.(js|css|png|jpg|jpeg|svg|ico|woff2?)$/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "static-resources",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
               },
             },
           },
@@ -100,12 +108,13 @@ export default defineConfig({
         start_url: "/",
         display: "standalone",
         background_color: "#ffffff",
-
+        orientation: "portrait-primary",
         icons: [
           {
             src: "/icon.svg",
             sizes: "192x192",
             type: "image/svg+xml",
+            purpose: "any maskable",
           },
         ],
       },

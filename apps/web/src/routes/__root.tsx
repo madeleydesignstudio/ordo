@@ -58,6 +58,7 @@ function RootComponent() {
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const [db, setDb] = useState<PGliteWithLive | null>(null);
   const [isOnline, setIsOnline] = useState(true); // Default to true to avoid hydration mismatch
+  const [dbError, setDbError] = useState<string | null>(null);
 
   useEffect(() => {
     const setupOnlineDetection = () => {
@@ -83,24 +84,39 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   useEffect(() => {
     const initializeDatabase = async (): Promise<void> => {
       try {
+        console.log("🔄 Initializing PGLite database...");
+
         const database = await PGlite.create({
           dataDir: DATABASE_NAME,
           extensions: { live },
         });
 
+        console.log("✅ PGLite database created successfully");
         setDb(database);
         todoService.setDatabase(database);
         await todoService.initialize();
+        console.log("✅ Todo service initialized");
+
+        // Clear any previous errors
+        setDbError(null);
       } catch (error) {
-        console.error("Failed to initialize PGLite:", error);
-        // TODO: Add user-friendly error handling
+        console.error("❌ Failed to initialize PGLite:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown database error";
+        setDbError(errorMessage);
+
+        // Don't prevent the app from loading - show error state instead
+        console.log("⚠️ App will continue without database functionality");
       }
     };
 
-    initializeDatabase();
+    // Add a small delay to ensure the app doesn't block on database initialization
+    const timeoutId = setTimeout(initializeDatabase, 100);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
-  if (!db) {
+  if (!db && !dbError) {
     return (
       <html>
         <head>
@@ -114,6 +130,49 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
     );
   }
 
+  // Show error state but still render the app
+  if (dbError && !db) {
+    return (
+      <html>
+        <head>
+          <HeadContent />
+        </head>
+        <body>
+          <QueryClientProvider client={queryClient}>
+            <OfflineBanner isOnline={isOnline} />
+            <DatabaseErrorBanner error={dbError} />
+            <MainContent isOnline={isOnline}>
+              <div style={{ padding: "20px", textAlign: "center" }}>
+                <h2>⚠️ Database Unavailable</h2>
+                <p>The app is running but database features are disabled.</p>
+                <p style={{ fontSize: "12px", color: "#666" }}>
+                  Error: {dbError}
+                </p>
+                <button
+                  onClick={() => window.location.reload()}
+                  style={{
+                    padding: "8px 16px",
+                    background: "#4F46E5",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    marginTop: "16px",
+                  }}
+                >
+                  Retry
+                </button>
+              </div>
+              <UpdateNotification />
+              <UpdateStatusIndicator />
+            </MainContent>
+            <Scripts />
+          </QueryClientProvider>
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html>
       <head>
@@ -121,7 +180,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          <PGliteProvider db={db}>
+          <PGliteProvider db={db!}>
             <OfflineBanner isOnline={isOnline} />
             <MainContent isOnline={isOnline}>
               {children}
@@ -194,4 +253,29 @@ interface MainContentProps {
 
 function MainContent({ isOnline, children }: MainContentProps) {
   return <div style={{ paddingTop: !isOnline ? "40px" : "0" }}>{children}</div>;
+}
+
+interface DatabaseErrorBannerProps {
+  error: string;
+}
+
+function DatabaseErrorBanner({ error }: DatabaseErrorBannerProps) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        background: "#ff9800",
+        color: "white",
+        padding: "8px",
+        textAlign: "center",
+        zIndex: 1001,
+        fontSize: "14px",
+      }}
+    >
+      ⚠️ Database Error: App running in limited mode
+    </div>
+  );
 }
