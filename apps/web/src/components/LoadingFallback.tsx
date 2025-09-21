@@ -1,10 +1,10 @@
-import React from "react";
-
 interface LoadingFallbackProps {
   message?: string;
 }
 
-export function LoadingFallback({ message = "Loading..." }: LoadingFallbackProps) {
+export function LoadingFallback({
+  message = "Loading...",
+}: LoadingFallbackProps) {
   return (
     <div
       style={{
