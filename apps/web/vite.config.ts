@@ -55,8 +55,7 @@ export default defineConfig({
       manifest: {
         name: "Ordo Task Manager",
         short_name: "Ordo",
-        description:
-          "Offline-first task manager powered by Drizzle ORM and PGlite",
+        description: "Offline-first task manager powered by Drizzle ORM and PGlite",
         theme_color: "#ffffff",
         background_color: "#ffffff",
         display: "standalone",

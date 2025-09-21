@@ -4,15 +4,8 @@ import { useDatabase, type Task } from "../hooks/useDatabase";
 import { LoadingFallback } from "./LoadingFallback";
 
 export function TaskManager() {
-  const {
-    db,
-    isInitialized,
-    isLoading,
-    error,
-    tasks,
-    clearDatabase,
-    resetDatabase,
-  } = useDatabase();
+  const { db, isInitialized, isLoading, error, tasks, clearDatabase, resetDatabase } =
+    useDatabase();
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
@@ -35,7 +28,15 @@ export function TaskManager() {
     fetchData();
   }, [isInitialized, db]);
 
-  // Show error message if database failed to initialize
+  const buttonStyle = {
+    padding: "10px 20px",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    marginRight: "10px",
+  };
+
   if (error) {
     return (
       <div style={{ textAlign: "center", padding: "40px", color: "red" }}>
@@ -43,32 +44,19 @@ export function TaskManager() {
         <p>{error}</p>
         <button
           onClick={() => window.location.reload()}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#007cba",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            marginRight: "10px",
-          }}
+          style={{ ...buttonStyle, backgroundColor: "#007cba" }}
         >
           Reload Page
         </button>
         <button
           onClick={() => {
-            if ("indexedDB" in window) {
-              indexedDB.deleteDatabase("ordo-db");
-            }
+            if ("indexedDB" in window) indexedDB.deleteDatabase("ordo-db");
             window.location.reload();
           }}
           style={{
-            padding: "10px 20px",
+            ...buttonStyle,
             backgroundColor: "#dc3545",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
+            marginRight: "0",
           }}
         >
           Reset Database & Reload
@@ -77,19 +65,13 @@ export function TaskManager() {
     );
   }
 
-  // Show loading state
-  if (isLoading) {
-    return <LoadingFallback message="🔄 Initializing database..." />;
-  }
-
-  // Show warning if database is not initialized
-  if (!isInitialized || !db) {
+  if (isLoading) return <LoadingFallback message="🔄 Initializing database..." />;
+  if (!isInitialized || !db)
     return (
       <div style={{ textAlign: "center", padding: "40px", color: "orange" }}>
-        <div>⚠️ Database not ready. Please refresh the page.</div>
+        ⚠️ Database not ready. Please refresh the page.
       </div>
     );
-  }
 
   // Add new task
   async function addTask(e: React.FormEvent) {
@@ -128,9 +110,7 @@ export function TaskManager() {
         .returning();
 
       if (updatedTask[0]) {
-        setAllTasks((prev) =>
-          prev.map((task) => (task.id === taskId ? updatedTask[0] : task)),
-        );
+        setAllTasks((prev) => prev.map((task) => (task.id === taskId ? updatedTask[0] : task)));
       }
     } catch (err) {
       console.error("Failed to toggle task:", err);
@@ -151,19 +131,10 @@ export function TaskManager() {
     }
   }
 
-  // Reset database for development
   async function handleResetDatabase() {
-    if (
-      !confirm(
-        "Are you sure you want to reset the database? This will delete all data!",
-      )
-    ) {
-      return;
-    }
-
+    if (!confirm("Are you sure you want to reset the database? This will delete all data!")) return;
     try {
       await resetDatabase();
-      // Reload the page to reinitialize everything
       window.location.reload();
     } catch (err) {
       console.error("Failed to reset database:", err);
@@ -171,12 +142,8 @@ export function TaskManager() {
     }
   }
 
-  // Clear all data
   async function handleClearData() {
-    if (!confirm("Are you sure you want to clear all data?")) {
-      return;
-    }
-
+    if (!confirm("Are you sure you want to clear all data?")) return;
     try {
       await clearDatabase();
       setAllTasks([]);
@@ -253,12 +220,9 @@ export function TaskManager() {
           <button
             type="submit"
             style={{
-              padding: "8px 16px",
+              ...buttonStyle,
               backgroundColor: "#2196F3",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
+              padding: "8px 16px",
             }}
           >
             Add Task
@@ -384,9 +348,7 @@ export function TaskManager() {
                     <h3
                       style={{
                         margin: "0 0 8px 0",
-                        textDecoration: task.completed
-                          ? "line-through"
-                          : "none",
+                        textDecoration: task.completed ? "line-through" : "none",
                         color: task.completed ? "#666" : "#333",
                       }}
                     >
@@ -398,9 +360,7 @@ export function TaskManager() {
                           margin: "0 0 8px 0",
                           color: "#666",
                           fontSize: "14px",
-                          textDecoration: task.completed
-                            ? "line-through"
-                            : "none",
+                          textDecoration: task.completed ? "line-through" : "none",
                         }}
                       >
                         {task.description}
@@ -408,21 +368,17 @@ export function TaskManager() {
                     )}
                     <div style={{ fontSize: "12px", color: "#999" }}>
                       Created: {task.createdAt.toLocaleDateString()}
-                      {task.dueDate && (
-                        <> • Due: {task.dueDate.toLocaleDateString()}</>
-                      )}
+                      {task.dueDate && <> • Due: {task.dueDate.toLocaleDateString()}</>}
                     </div>
                   </div>
                   <button
                     onClick={() => deleteTask(task.id)}
                     style={{
-                      padding: "6px 12px",
+                      ...buttonStyle,
                       backgroundColor: "#f44336",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
+                      padding: "6px 12px",
                       fontSize: "12px",
+                      marginRight: "0",
                     }}
                   >
                     Delete
@@ -465,12 +421,9 @@ export function TaskManager() {
           <button
             onClick={handleClearData}
             style={{
-              padding: "8px 16px",
+              ...buttonStyle,
               backgroundColor: "#ff9800",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
+              padding: "8px 16px",
               fontSize: "12px",
             }}
           >
@@ -479,32 +432,26 @@ export function TaskManager() {
           <button
             onClick={handleResetDatabase}
             style={{
-              padding: "8px 16px",
+              ...buttonStyle,
               backgroundColor: "#f44336",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
+              padding: "8px 16px",
               fontSize: "12px",
+              marginRight: "0",
             }}
           >
             Reset Database & Reload
           </button>
         </div>
         <div style={{ fontSize: "12px", color: "#666" }}>
-          <strong>Clear All Data:</strong> Removes all users and tasks but keeps
-          the schema.
+          <strong>Clear All Data:</strong> Removes all tasks but keeps the schema.
           <br />
-          <strong>Reset Database:</strong> Drops and recreates the entire
-          database, then reloads the page.
+          <strong>Reset Database:</strong> Drops and recreates the entire database, then reloads the
+          page.
         </div>
       </details>
 
-      {/* Debug Info */}
       <details style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
-        <summary style={{ cursor: "pointer", marginBottom: "10px" }}>
-          Debug Info
-        </summary>
+        <summary style={{ cursor: "pointer", marginBottom: "10px" }}>Debug Info</summary>
         <pre
           style={{
             backgroundColor: "#f5f5f5",
@@ -515,80 +462,8 @@ export function TaskManager() {
         >
           Tasks: {allTasks.length}
           {"\n"}Database Status: {isInitialized ? "Ready" : "Not Ready"}
-          {"\n"}Storage: IndexedDB (idb://ordo-db)
-          {"\n"}Persistent: Yes - Data survives page refresh
-          {"\n"}Origin: {window.location.origin}
-          {"\n"}Protocol: {window.location.protocol}
-          {"\n"}Storage Available:{" "}
-          {typeof Storage !== "undefined" ? "Yes" : "No"}
-          {"\n"}IndexedDB Available:{" "}
-          {typeof indexedDB !== "undefined" ? "Yes" : "No"}
+          {"\n"}Storage: IndexedDB (idb://ordo-db){"\n"}Persistent: Yes - Data survives page refresh
         </pre>
-
-        {/* Storage Diagnostics */}
-        <button
-          onClick={async () => {
-            try {
-              console.log("=== Storage Diagnostics ===");
-
-              // Check storage estimate
-              if (navigator.storage && navigator.storage.estimate) {
-                const estimate = await navigator.storage.estimate();
-                console.log("Storage quota:", estimate.quota || 0);
-                console.log("Storage usage:", estimate.usage || 0);
-                console.log(
-                  "Storage available:",
-                  (estimate.quota || 0) - (estimate.usage || 0),
-                );
-              }
-
-              // Check persistent storage
-              if (navigator.storage && navigator.storage.persisted) {
-                const isPersistent = await navigator.storage.persisted();
-                console.log("Storage is persistent:", isPersistent);
-              }
-
-              // List IndexedDB databases
-              if (indexedDB.databases) {
-                const databases = await indexedDB.databases();
-                console.log(
-                  "IndexedDB databases:",
-                  databases.map((db) => ({
-                    name: db.name,
-                    version: db.version,
-                  })),
-                );
-              }
-
-              // Check localStorage
-              console.log(
-                "localStorage available:",
-                typeof localStorage !== "undefined",
-              );
-              console.log(
-                "sessionStorage available:",
-                typeof sessionStorage !== "undefined",
-              );
-
-              alert("Storage diagnostics logged to console");
-            } catch (error) {
-              console.error("Storage diagnostic error:", error);
-              alert("Storage diagnostic failed - check console");
-            }
-          }}
-          style={{
-            padding: "6px 12px",
-            backgroundColor: "#2196F3",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "11px",
-            marginTop: "10px",
-          }}
-        >
-          Run Storage Diagnostics
-        </button>
       </details>
     </div>
   );
