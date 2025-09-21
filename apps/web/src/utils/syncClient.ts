@@ -95,10 +95,13 @@ export class SyncClient {
   async pullTasksSince(timestamp: Date): Promise<SyncResponse> {
     try {
       const isoTimestamp = timestamp.toISOString();
-      const response = await fetch(`${this.baseUrl}/sync/tasks/since/${isoTimestamp}`, {
-        method: "GET",
-        signal: AbortSignal.timeout(30000), // 30 second timeout
-      });
+      const response = await fetch(
+        `${this.baseUrl}/sync/tasks/since/${isoTimestamp}`,
+        {
+          method: "GET",
+          signal: AbortSignal.timeout(30000), // 30 second timeout
+        },
+      );
 
       const result = await response.json();
       return result;
@@ -115,7 +118,7 @@ export class SyncClient {
   // Full bidirectional sync
   async syncBidirectional(
     localTasks: SyncTask[],
-    lastSyncTime?: Date
+    lastSyncTime?: Date,
   ): Promise<{
     pushResult: SyncResult;
     pullResult: SyncResponse;
@@ -144,7 +147,7 @@ export const createSyncClient = (baseUrl?: string) => new SyncClient(baseUrl);
 export async function smartSync(
   client: SyncClient,
   localTasks: SyncTask[],
-  lastSyncTime?: Date
+  _lastSyncTime?: Date,
 ): Promise<{
   synced: boolean;
   result?: { pushResult: SyncResult };
@@ -184,8 +187,14 @@ export function convertTaskToSyncFormat(task: any): SyncTask {
     title: task.title,
     description: task.description,
     completed: task.completed,
-    createdAt: task.createdAt instanceof Date ? task.createdAt : new Date(task.createdAt),
-    updatedAt: task.updatedAt instanceof Date ? task.updatedAt : new Date(task.updatedAt),
+    createdAt:
+      task.createdAt instanceof Date
+        ? task.createdAt
+        : new Date(task.createdAt),
+    updatedAt:
+      task.updatedAt instanceof Date
+        ? task.updatedAt
+        : new Date(task.updatedAt),
     dueDate: task.dueDate
       ? task.dueDate instanceof Date
         ? task.dueDate

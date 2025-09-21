@@ -2,10 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import {
   SyncClient,
   createSyncClient,
-  smartSync,
   convertTaskToSyncFormat,
-  type SyncResult,
-  type SyncResponse,
 } from "../utils/syncClient";
 import type { Task } from "./useDatabase";
 
@@ -32,7 +29,7 @@ export function useSync(baseUrl?: string) {
     error: null,
   });
 
-  const clientRef = useRef<SyncClient>();
+  const clientRef = useRef<SyncClient | undefined>(undefined);
 
   // Initialize client lazily
   const getClient = useCallback(() => {
@@ -55,7 +52,7 @@ export function useSync(baseUrl?: string) {
   // Sync tasks to cloud
   const syncToCloud = useCallback(
     async (
-      localTasks: Task[]
+      localTasks: Task[],
     ): Promise<{
       success: boolean;
       stats: SyncStats;
@@ -123,7 +120,8 @@ export function useSync(baseUrl?: string) {
           message: successMessage,
         };
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown sync error";
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown sync error";
 
         setSyncState((prev) => ({
           ...prev,
@@ -140,7 +138,7 @@ export function useSync(baseUrl?: string) {
         };
       }
     },
-    [getClient, syncState.lastSyncTime]
+    [getClient],
   );
 
   // Pull tasks from cloud (for future bidirectional sync)
@@ -200,7 +198,8 @@ export function useSync(baseUrl?: string) {
         message: `Pulled ${result.tasks.length} tasks from cloud`,
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown pull error";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown pull error";
 
       setSyncState((prev) => ({
         ...prev,

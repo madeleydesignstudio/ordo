@@ -5,8 +5,15 @@ import { LoadingFallback } from "./LoadingFallback";
 import { eq } from "@ordo/local-db";
 
 export function TaskManager() {
-  const { db, isInitialized, isLoading, error, tasks, clearDatabase, resetDatabase } =
-    useDatabase();
+  const {
+    db,
+    isInitialized,
+    isLoading,
+    error,
+    tasks,
+    clearDatabase,
+    resetDatabase,
+  } = useDatabase();
   const {
     isLoading: isSyncing,
     status: syncStatus,
@@ -20,7 +27,7 @@ export function TaskManager() {
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
-  const [backendAvailable, setBackendAvailable] = useState<boolean | null>(null);
+  const [backendAvailable, setBackendAvailable] = useState<boolean>(false);
 
   // Fetch tasks
   useEffect(() => {
@@ -69,8 +76,7 @@ export function TaskManager() {
   };
 
   // Check if we should show sync button
-  const showSyncButton =
-    navigator.onLine && (backendAvailable === true || backendAvailable === null);
+  const showSyncButton = navigator.onLine;
 
   if (error) {
     return (
@@ -100,7 +106,8 @@ export function TaskManager() {
     );
   }
 
-  if (isLoading) return <LoadingFallback message="🔄 Initializing database..." />;
+  if (isLoading)
+    return <LoadingFallback message="🔄 Initializing database..." />;
   if (!isInitialized || !db)
     return (
       <div style={{ textAlign: "center", padding: "40px", color: "orange" }}>
@@ -145,7 +152,9 @@ export function TaskManager() {
         .returning();
 
       if (updatedTask[0]) {
-        setAllTasks((prev) => prev.map((task) => (task.id === taskId ? updatedTask[0] : task)));
+        setAllTasks((prev) =>
+          prev.map((task) => (task.id === taskId ? updatedTask[0] : task)),
+        );
       }
     } catch (err) {
       console.error("Failed to toggle task:", err);
@@ -167,7 +176,12 @@ export function TaskManager() {
   }
 
   async function handleResetDatabase() {
-    if (!confirm("Are you sure you want to reset the database? This will delete all data!")) return;
+    if (
+      !confirm(
+        "Are you sure you want to reset the database? This will delete all data!",
+      )
+    )
+      return;
     try {
       await resetDatabase();
       window.location.reload();
@@ -286,10 +300,14 @@ export function TaskManager() {
             }}
           >
             <div>
-              <h3 style={{ margin: "0 0 5px 0", color: "#1976d2" }}>☁️ Cloud Sync</h3>
+              <h3 style={{ margin: "0 0 5px 0", color: "#1976d2" }}>
+                ☁️ Cloud Sync
+              </h3>
               <p style={{ margin: "0", fontSize: "14px", color: "#666" }}>
                 Sync your tasks to the cloud database
-                {lastSyncTime && <span> • Last sync: {lastSyncTime.toLocaleString()}</span>}
+                {lastSyncTime && (
+                  <span> • Last sync: {lastSyncTime.toLocaleString()}</span>
+                )}
               </p>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -327,13 +345,18 @@ export function TaskManager() {
                 style={{
                   ...buttonStyle,
                   backgroundColor: isSyncing ? "#ccc" : "#2196F3",
-                  cursor: isSyncing || allTasks.length === 0 ? "not-allowed" : "pointer",
+                  cursor:
+                    isSyncing || allTasks.length === 0
+                      ? "not-allowed"
+                      : "pointer",
                   padding: "8px 16px",
                   fontSize: "14px",
                   marginRight: "0",
                 }}
               >
-                {isSyncing ? "🔄 Syncing..." : `📤 Sync ${allTasks.length} Tasks`}
+                {isSyncing
+                  ? "🔄 Syncing..."
+                  : `📤 Sync ${allTasks.length} Tasks`}
               </button>
             </div>
           </div>
@@ -349,7 +372,8 @@ export function TaskManager() {
                 border: "1px solid #ff9800",
               }}
             >
-              ⚠️ Sync backend is not available. Make sure the sync server is running on port 3001.
+              ⚠️ Sync backend is not available. Make sure the sync server is
+              running on port 3001.
             </div>
           )}
           {!navigator.onLine && (
@@ -505,7 +529,9 @@ export function TaskManager() {
                     <h3
                       style={{
                         margin: "0 0 8px 0",
-                        textDecoration: task.completed ? "line-through" : "none",
+                        textDecoration: task.completed
+                          ? "line-through"
+                          : "none",
                         color: task.completed ? "#666" : "#333",
                       }}
                     >
@@ -517,7 +543,9 @@ export function TaskManager() {
                           margin: "0 0 8px 0",
                           color: "#666",
                           fontSize: "14px",
-                          textDecoration: task.completed ? "line-through" : "none",
+                          textDecoration: task.completed
+                            ? "line-through"
+                            : "none",
                         }}
                       >
                         {task.description}
@@ -525,7 +553,9 @@ export function TaskManager() {
                     )}
                     <div style={{ fontSize: "12px", color: "#999" }}>
                       Created: {task.createdAt.toLocaleDateString()}
-                      {task.dueDate && <> • Due: {task.dueDate.toLocaleDateString()}</>}
+                      {task.dueDate && (
+                        <> • Due: {task.dueDate.toLocaleDateString()}</>
+                      )}
                     </div>
                   </div>
                   <button
@@ -600,15 +630,18 @@ export function TaskManager() {
           </button>
         </div>
         <div style={{ fontSize: "12px", color: "#666" }}>
-          <strong>Clear All Data:</strong> Removes all tasks but keeps the schema.
+          <strong>Clear All Data:</strong> Removes all tasks but keeps the
+          schema.
           <br />
-          <strong>Reset Database:</strong> Drops and recreates the entire database, then reloads the
-          page.
+          <strong>Reset Database:</strong> Drops and recreates the entire
+          database, then reloads the page.
         </div>
       </details>
 
       <details style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
-        <summary style={{ cursor: "pointer", marginBottom: "10px" }}>Debug Info</summary>
+        <summary style={{ cursor: "pointer", marginBottom: "10px" }}>
+          Debug Info
+        </summary>
         <pre
           style={{
             backgroundColor: "#f5f5f5",
@@ -619,7 +652,8 @@ export function TaskManager() {
         >
           Tasks: {allTasks.length}
           {"\n"}Database Status: {isInitialized ? "Ready" : "Not Ready"}
-          {"\n"}Storage: IndexedDB (idb://ordo-db){"\n"}Persistent: Yes - Data survives page refresh
+          {"\n"}Storage: IndexedDB (idb://ordo-db){"\n"}Persistent: Yes - Data
+          survives page refresh
         </pre>
       </details>
     </div>
