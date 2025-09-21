@@ -9,10 +9,7 @@ interface ErrorBoundaryProps {
   children: React.ReactNode;
 }
 
-export class ErrorBoundary extends React.Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
@@ -40,9 +37,7 @@ export class ErrorBoundary extends React.Component<
             fontFamily: "system-ui, sans-serif",
           }}
         >
-          <h1 style={{ color: "#c33", margin: "0 0 20px 0" }}>
-            ⚠️ Something went wrong
-          </h1>
+          <h1 style={{ color: "#c33", margin: "0 0 20px 0" }}>⚠️ Something went wrong</h1>
           <p style={{ margin: "0 0 20px 0" }}>
             The application encountered an error and couldn't load properly.
           </p>
@@ -72,6 +67,7 @@ export class ErrorBoundary extends React.Component<
             </pre>
           </details>
           <button
+            type="button"
             onClick={() => window.location.reload()}
             style={{
               padding: "10px 20px",
@@ -86,6 +82,7 @@ export class ErrorBoundary extends React.Component<
             Reload Page
           </button>
           <button
+            type="button"
             onClick={() => {
               // Clear IndexedDB storage
               if ("indexedDB" in window) {

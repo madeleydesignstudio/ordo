@@ -10,7 +10,6 @@ export async function clearDatabase(db: any) {
   }
   try {
     await db.delete(tasks);
-    console.log("Database cleared successfully");
   } catch (error) {
     console.error("Failed to clear database:", error);
     throw error;

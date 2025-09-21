@@ -1,4 +1,4 @@
-import { PGlite } from "@electric-sql/pglite";
+import type { PGlite } from "@electric-sql/pglite";
 
 // Type to accept both PGlite and PGliteWithLive
 type PGliteClient = PGlite | any;
@@ -15,7 +15,7 @@ async function needsMigration(client: PGliteClient): Promise<boolean> {
       WHERE table_name = 'tasks' AND column_name = 'user_id'
     `);
     return result.rows.length > 0;
-  } catch (error) {
+  } catch (_error) {
     // If table doesn't exist at all, no migration needed
     return false;
   }
@@ -33,7 +33,6 @@ export async function runMigrations(client: PGliteClient) {
   try {
     // Check if we need to migrate from old schema
     if (await needsMigration(client)) {
-      console.log("Old schema detected, dropping and recreating tables...");
       await dropTables(client);
     }
 
@@ -73,7 +72,6 @@ export async function runMigrations(client: PGliteClient) {
         EXECUTE FUNCTION update_updated_at_column();
     `);
 
-    console.log("Database migrations completed successfully");
     return { success: true };
   } catch (error) {
     console.error("Migration failed:", error);
@@ -94,7 +92,6 @@ export async function dropTables(client: PGliteClient) {
       DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
     `);
 
-    console.log("All tables dropped successfully");
     return { success: true };
   } catch (error) {
     console.error("Failed to drop tables:", error);
@@ -108,5 +105,4 @@ export async function dropTables(client: PGliteClient) {
 export async function resetDatabase(client: PGliteClient) {
   await dropTables(client);
   await runMigrations(client);
-  console.log("Database reset completed");
 }

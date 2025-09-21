@@ -8,7 +8,6 @@ type PGliteClient = PGlite | any;
 // Database configuration options
 export interface DatabaseConfig {
   dataDir?: string;
-  debug?: boolean;
 }
 
 // Create database instance with existing PGlite client

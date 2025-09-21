@@ -4,15 +4,8 @@ import { useDatabase, type Task } from "../hooks/useDatabase";
 import { LoadingFallback } from "./LoadingFallback";
 
 export function TaskManager() {
-  const {
-    db,
-    isInitialized,
-    isLoading,
-    error,
-    tasks,
-    clearDatabase,
-    resetDatabase,
-  } = useDatabase();
+  const { db, isInitialized, isLoading, error, tasks, clearDatabase, resetDatabase } =
+    useDatabase();
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
@@ -106,7 +99,7 @@ export function TaskManager() {
         .returning();
 
       if (newTask[0]) {
-        setAllTasks((prev) => [...prev, newTask[0]!]);
+        setAllTasks((prev) => [...prev, newTask[0]]);
         setNewTaskTitle("");
         setNewTaskDescription("");
       }
@@ -128,9 +121,7 @@ export function TaskManager() {
         .returning();
 
       if (updatedTask[0]) {
-        setAllTasks((prev) =>
-          prev.map((task) => (task.id === taskId ? updatedTask[0]! : task)),
-        );
+        setAllTasks((prev) => prev.map((task) => (task.id === taskId ? updatedTask[0] : task)));
       }
     } catch (err) {
       console.error("Failed to toggle task:", err);
@@ -153,11 +144,7 @@ export function TaskManager() {
 
   // Reset database for development
   async function handleResetDatabase() {
-    if (
-      !confirm(
-        "Are you sure you want to reset the database? This will delete all data!",
-      )
-    ) {
+    if (!confirm("Are you sure you want to reset the database? This will delete all data!")) {
       return;
     }
 
@@ -384,9 +371,7 @@ export function TaskManager() {
                     <h3
                       style={{
                         margin: "0 0 8px 0",
-                        textDecoration: task.completed
-                          ? "line-through"
-                          : "none",
+                        textDecoration: task.completed ? "line-through" : "none",
                         color: task.completed ? "#666" : "#333",
                       }}
                     >
@@ -398,9 +383,7 @@ export function TaskManager() {
                           margin: "0 0 8px 0",
                           color: "#666",
                           fontSize: "14px",
-                          textDecoration: task.completed
-                            ? "line-through"
-                            : "none",
+                          textDecoration: task.completed ? "line-through" : "none",
                         }}
                       >
                         {task.description}
@@ -408,9 +391,7 @@ export function TaskManager() {
                     )}
                     <div style={{ fontSize: "12px", color: "#999" }}>
                       Created: {task.createdAt.toLocaleDateString()}
-                      {task.dueDate && (
-                        <> • Due: {task.dueDate.toLocaleDateString()}</>
-                      )}
+                      {task.dueDate && <> • Due: {task.dueDate.toLocaleDateString()}</>}
                     </div>
                   </div>
                   <button
@@ -492,19 +473,16 @@ export function TaskManager() {
           </button>
         </div>
         <div style={{ fontSize: "12px", color: "#666" }}>
-          <strong>Clear All Data:</strong> Removes all users and tasks but keeps
-          the schema.
+          <strong>Clear All Data:</strong> Removes all users and tasks but keeps the schema.
           <br />
-          <strong>Reset Database:</strong> Drops and recreates the entire
-          database, then reloads the page.
+          <strong>Reset Database:</strong> Drops and recreates the entire database, then reloads the
+          page.
         </div>
       </details>
 
       {/* Debug Info */}
       <details style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
-        <summary style={{ cursor: "pointer", marginBottom: "10px" }}>
-          Debug Info
-        </summary>
+        <summary style={{ cursor: "pointer", marginBottom: "10px" }}>Debug Info</summary>
         <pre
           style={{
             backgroundColor: "#f5f5f5",

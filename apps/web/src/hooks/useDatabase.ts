@@ -34,27 +34,22 @@ export function useDatabase() {
 
     async function initializeDatabase() {
       try {
-        console.log("Starting database initialization...");
         setIsLoading(true);
 
         // Run migrations to set up schema
-        console.log("Running migrations...");
         await runMigrations(pgliteClient);
 
         // Check database health
-        console.log("Checking database health...");
         const health = await healthCheck(db);
         if (health.status !== "healthy") {
           throw new Error(`Database unhealthy: ${health.error}`);
         }
 
-        console.log("Database initialized successfully");
         setIsInitialized(true);
         setError(null);
       } catch (err) {
         console.error("Failed to initialize database:", err);
-        const errorMessage =
-          err instanceof Error ? err.message : "Unknown error";
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
         setError(`Database initialization failed: ${errorMessage}`);
         initRef.current = false; // Allow retry on error
       } finally {
