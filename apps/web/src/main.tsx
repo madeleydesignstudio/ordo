@@ -6,13 +6,46 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 
-// Register service worker for PWA
+// Register service worker for PWA with better offline handling
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("/sw.js")
-      .then(() => console.log("PWA: Service worker registered"))
-      .catch(() => console.log("PWA: Service worker registration failed"));
+      .then((registration) => {
+        console.log("PWA: Service worker registered", registration);
+
+        // Listen for updates
+        registration.addEventListener("updatefound", () => {
+          const newWorker = registration.installing;
+          if (newWorker) {
+            newWorker.addEventListener("statechange", () => {
+              if (
+                newWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+                // New content is available, prompt user to refresh
+                if (confirm("New version available! Refresh to update?")) {
+                  window.location.reload();
+                }
+              }
+            });
+          }
+        });
+      })
+      .catch((error) => {
+        console.log("PWA: Service worker registration failed", error);
+      });
+  });
+
+  // Listen for offline/online status
+  window.addEventListener("online", () => {
+    console.log("PWA: Back online");
+    document.body.classList.remove("offline");
+  });
+
+  window.addEventListener("offline", () => {
+    console.log("PWA: Gone offline - app will continue to work");
+    document.body.classList.add("offline");
   });
 }
 

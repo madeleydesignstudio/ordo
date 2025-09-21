@@ -69,3 +69,125 @@ button:focus-visible {
   min-height: 100vh;
   padding: 1rem;
 }
+
+/* PWA Offline Status Indicator */
+body.offline::before {
+  content: "⚡ Offline Mode - App continues to work";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #ff9800;
+  color: white;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 10000;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Adjust root padding when offline banner is shown */
+body.offline #root {
+  padding-top: calc(1rem + 40px);
+}
+
+/* PWA Install Button Styles */
+.pwa-install-prompt {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #007cba;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 124, 186, 0.3);
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+
+.pwa-install-prompt:hover {
+  background: #005a8b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 124, 186, 0.4);
+}
+
+.pwa-install-prompt:active {
+  transform: translateY(0);
+}
+
+/* Loading states for PWA */
+.pwa-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pwa-loading::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e0e0e0;
+  border-top: 2px solid #007cba;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Better mobile experience */
+@media (max-width: 768px) {
+  body.offline::before {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  body.offline #root {
+    padding-top: calc(1rem + 32px);
+  }
+
+  .pwa-install-prompt {
+    bottom: 16px;
+    right: 16px;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  body.offline::before {
+    border: 2px solid white;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  body.offline::before {
+    animation: none;
+  }
+
+  .pwa-install-prompt:hover {
+    transform: none;
+  }
+}
