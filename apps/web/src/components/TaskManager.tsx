@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { eq } from "drizzle-orm";
 import { useDatabase, type Task } from "../hooks/useDatabase";
+import { LoadingFallback } from "./LoadingFallback";
 
 export function TaskManager() {
   const {
@@ -22,8 +23,10 @@ export function TaskManager() {
 
     async function fetchData() {
       try {
-        const tasksData = await db.select().from(tasks);
-        setAllTasks(tasksData);
+        if (db) {
+          const tasksData = await db.select().from(tasks);
+          setAllTasks(tasksData);
+        }
       } catch (err) {
         console.error("Failed to fetch data:", err);
       }
@@ -32,10 +35,66 @@ export function TaskManager() {
     fetchData();
   }, [isInitialized, db]);
 
+  // Show error message if database failed to initialize
+  if (error) {
+    return (
+      <div style={{ textAlign: "center", padding: "40px", color: "red" }}>
+        <h1>❌ Database Error</h1>
+        <p>{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#007cba",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            marginRight: "10px",
+          }}
+        >
+          Reload Page
+        </button>
+        <button
+          onClick={() => {
+            if ("indexedDB" in window) {
+              indexedDB.deleteDatabase("ordo-db");
+            }
+            window.location.reload();
+          }}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#dc3545",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Reset Database & Reload
+        </button>
+      </div>
+    );
+  }
+
+  // Show loading state
+  if (isLoading) {
+    return <LoadingFallback message="🔄 Initializing database..." />;
+  }
+
+  // Show warning if database is not initialized
+  if (!isInitialized || !db) {
+    return (
+      <div style={{ textAlign: "center", padding: "40px", color: "orange" }}>
+        <div>⚠️ Database not ready. Please refresh the page.</div>
+      </div>
+    );
+  }
+
   // Add new task
   async function addTask(e: React.FormEvent) {
     e.preventDefault();
-    if (!newTaskTitle.trim()) return;
+    if (!newTaskTitle.trim() || !db) return;
 
     try {
       const newTask = await db
@@ -46,16 +105,21 @@ export function TaskManager() {
         })
         .returning();
 
-      setAllTasks((prev) => [...prev, newTask[0]!]);
-      setNewTaskTitle("");
-      setNewTaskDescription("");
+      if (newTask[0]) {
+        setAllTasks((prev) => [...prev, newTask[0]!]);
+        setNewTaskTitle("");
+        setNewTaskDescription("");
+      }
     } catch (err) {
       console.error("Failed to add task:", err);
+      alert("Failed to add task. Please try again.");
     }
   }
 
   // Toggle task completion
   async function toggleTask(taskId: string, completed: boolean) {
+    if (!db) return;
+
     try {
       const updatedTask = await db
         .update(tasks)
@@ -63,21 +127,27 @@ export function TaskManager() {
         .where(eq(tasks.id, taskId))
         .returning();
 
-      setAllTasks((prev) =>
-        prev.map((task) => (task.id === taskId ? updatedTask[0]! : task)),
-      );
+      if (updatedTask[0]) {
+        setAllTasks((prev) =>
+          prev.map((task) => (task.id === taskId ? updatedTask[0]! : task)),
+        );
+      }
     } catch (err) {
       console.error("Failed to toggle task:", err);
+      alert("Failed to update task. Please try again.");
     }
   }
 
   // Delete task
   async function deleteTask(taskId: string) {
+    if (!db) return;
+
     try {
       await db.delete(tasks).where(eq(tasks.id, taskId));
       setAllTasks((prev) => prev.filter((task) => task.id !== taskId));
     } catch (err) {
       console.error("Failed to delete task:", err);
+      alert("Failed to delete task. Please try again.");
     }
   }
 
@@ -114,22 +184,6 @@ export function TaskManager() {
       console.error("Failed to clear data:", err);
       alert("Failed to clear data. Check console for details.");
     }
-  }
-
-  if (isLoading) {
-    return (
-      <div style={{ textAlign: "center", padding: "40px" }}>
-        <div>🔄 Initializing database...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div style={{ textAlign: "center", padding: "40px", color: "red" }}>
-        <div>❌ Error: {error}</div>
-      </div>
-    );
   }
 
   return (
