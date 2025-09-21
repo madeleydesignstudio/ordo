@@ -11,37 +11,17 @@ export interface DatabaseConfig {
   debug?: boolean;
 }
 
-// Create PGlite instance with persistent storage
-// Use IndexedDB for browser persistence or file system for Node.js
-let client: PGlite;
-
-// Initialize database with configuration
-export function initializeClient(config: DatabaseConfig = {}) {
-  if (client) {
-    return client;
-  }
-
-  // Default to persistent storage in browser using IndexedDB
-  const dataDir = config.dataDir || "idb://ordo-db";
-
-  client = new PGlite(dataDir);
-
-  return client;
-}
-
 // Create database instance with existing PGlite client
 export function createDatabaseWithClient(pgliteClient: PGliteClient) {
   return drizzle(pgliteClient as any, { schema });
 }
 
-// Initialize with default config
-client = initializeClient();
-
-// Create Drizzle database instance with schema
-export const db = drizzle(client, { schema });
-
-// Export the client for direct access if needed
-export { client };
+// Initialize database with configuration (for non-React environments)
+export function initializeClient(config: DatabaseConfig = {}) {
+  // Default to persistent storage in browser using IndexedDB
+  const dataDir = config.dataDir || "idb://ordo-db";
+  return new PGlite(dataDir);
+}
 
 // Export all schema items for convenience
 export * from "./schema/index.js";

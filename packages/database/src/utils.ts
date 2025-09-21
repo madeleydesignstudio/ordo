@@ -4,11 +4,9 @@ import { tasks } from "./schema/index.js";
  * Clear all data from the database
  * Useful for testing or development
  */
-export async function clearDatabase(db?: any) {
-  // Use provided db or import the default one
+export async function clearDatabase(db: any) {
   if (!db) {
-    const { db: defaultDb } = await import("./index.js");
-    db = defaultDb;
+    throw new Error("Database instance is required to clear database");
   }
   try {
     await db.delete(tasks);
@@ -22,11 +20,9 @@ export async function clearDatabase(db?: any) {
 /**
  * Health check for the database connection
  */
-export async function healthCheck(db?: any) {
-  // Use provided db or import the default one
+export async function healthCheck(db: any) {
   if (!db) {
-    const { db: defaultDb } = await import("./index.js");
-    db = defaultDb;
+    throw new Error("Database instance is required for health check");
   }
   try {
     await db.select().from(tasks).limit(1);

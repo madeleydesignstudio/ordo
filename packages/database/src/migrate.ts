@@ -26,11 +26,9 @@ async function needsMigration(client: PGliteClient): Promise<boolean> {
  * Since PGlite doesn't support traditional migrations out of the box,
  * we'll use raw SQL to create our tables
  */
-export async function runMigrations(client?: PGliteClient) {
-  // Use provided client or import the default one
+export async function runMigrations(client: PGliteClient) {
   if (!client) {
-    const { client: defaultClient } = await import("./index.js");
-    client = defaultClient;
+    throw new Error("PGlite client is required for migrations");
   }
   try {
     // Check if we need to migrate from old schema
@@ -86,11 +84,9 @@ export async function runMigrations(client?: PGliteClient) {
 /**
  * Drop all tables (useful for testing)
  */
-export async function dropTables(client?: PGliteClient) {
-  // Use provided client or import the default one
+export async function dropTables(client: PGliteClient) {
   if (!client) {
-    const { client: defaultClient } = await import("./index.js");
-    client = defaultClient;
+    throw new Error("PGlite client is required to drop tables");
   }
   try {
     await client.exec(`
@@ -109,7 +105,7 @@ export async function dropTables(client?: PGliteClient) {
 /**
  * Reset database (drop and recreate)
  */
-export async function resetDatabase(client?: PGliteClient) {
+export async function resetDatabase(client: PGliteClient) {
   await dropTables(client);
   await runMigrations(client);
   console.log("Database reset completed");
