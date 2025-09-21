@@ -1,23 +1,24 @@
 # @ordo/database
 
-A TypeScript database package built with Drizzle ORM and PGlite for the Ordo project.
+A simplified TypeScript database package built with Drizzle ORM and PGlite for task management.
 
 ## Overview
 
 This package provides a type-safe database layer using:
 - **Drizzle ORM** - Modern TypeScript ORM with excellent type safety
-- **PGlite** - Lightweight WASM PostgreSQL that runs in-memory or with persistence
+- **PGlite** - Lightweight WASM PostgreSQL with IndexedDB persistence
 - **TypeScript** - Full type safety for database operations
 
 ## Features
 
 - 🚀 **Fast Setup** - Persistent PostgreSQL database with IndexedDB storage
 - 🔒 **Type Safe** - Full TypeScript support with inferred types
-- 🗃️ **Schema Management** - Declarative schema definition with Drizzle
-- 🔄 **Migrations** - Database schema migrations and seeding utilities
+- 📝 **Simple Schema** - Single tasks table with clean structure
+- 🔄 **Migrations** - Database schema migrations
 - 🛠️ **Utilities** - Common database operations and helpers
 - 📊 **Health Checks** - Database connection monitoring
 - 💾 **Persistence** - Data survives browser refresh and restart
+- 🧹 **No Seeding** - Start with an empty database
 
 ## Installation
 
@@ -30,7 +31,7 @@ bun install @ordo/database
 ### 1. Initialize the Database
 
 ```typescript
-import { runMigrations, seedDatabase, createDatabaseWithClient } from '@ordo/database';
+import { runMigrations, createDatabaseWithClient } from '@ordo/database';
 import { usePGlite } from '@electric-sql/pglite-react';
 
 // In a React component with PGlite context
@@ -39,15 +40,12 @@ const db = createDatabaseWithClient(pgliteClient);
 
 // Run migrations to create tables
 await runMigrations(pgliteClient);
-
-// Seed with initial data (optional)
-await seedDatabase(db);
 ```
 
 ### 2. Basic Usage
 
 ```typescript
-import { createDatabaseWithClient, users, tasks } from '@ordo/database';
+import { createDatabaseWithClient, tasks } from '@ordo/database';
 import { usePGlite } from '@electric-sql/pglite-react';
 import { eq } from 'drizzle-orm';
 
@@ -55,62 +53,43 @@ import { eq } from 'drizzle-orm';
 const pgliteClient = usePGlite();
 const db = createDatabaseWithClient(pgliteClient);
 
-// Create a user
-const newUser = await db.insert(users).values({
-  email: 'user@ordo.dev',
-  name: 'John Doe',
-}).returning();
-
 // Create a task
-await db.insert(tasks).values({
+const newTask = await db.insert(tasks).values({
   title: 'Complete project setup',
   description: 'Set up the database and initial schema',
-  userId: newUser[0].id,
-});
+}).returning();
 
-// Query with relations
-const allUsers = await db.select().from(users);
-const userTasks = await db.select().from(tasks).where(eq(tasks.userId, newUser[0].id));
+// Query tasks
+const allTasks = await db.select().from(tasks);
+const completedTasks = await db.select().from(tasks).where(eq(tasks.completed, true));
 ```
 
 ### 3. Using Utilities
 
 ```typescript
-import { getUserWithTasks, getUserByEmail, healthCheck, createDatabaseWithClient } from '@ordo/database';
+import { healthCheck, clearDatabase, createDatabaseWithClient } from '@ordo/database';
 import { usePGlite } from '@electric-sql/pglite-react';
 
 // In a React component
 const pgliteClient = usePGlite();
 const db = createDatabaseWithClient(pgliteClient);
 
-// Get user with their tasks
-const userWithTasks = await getUserWithTasks(userId, db);
-
-// Find user by email
-const user = await getUserByEmail('user@ordo.dev', db);
-
 // Check database health
 const health = await healthCheck(db);
+
+// Clear all tasks (for development)
+await clearDatabase(db);
 ```
 
 ## Schema
 
-The database includes the following tables:
-
-### Users Table
-- `id` - UUID primary key
-- `email` - Unique email address
-- `name` - User's display name
-- `created_at` - Creation timestamp
-- `updated_at` - Last update timestamp
-- `is_active` - Account status
+The database includes a single table:
 
 ### Tasks Table
 - `id` - UUID primary key
-- `title` - Task title
-- `description` - Task description
-- `completed` - Completion status
-- `user_id` - Foreign key to users table
+- `title` - Task title (required)
+- `description` - Task description (optional)
+- `completed` - Completion status (defaults to false)
 - `created_at` - Creation timestamp
 - `updated_at` - Last update timestamp
 - `due_date` - Optional due date
@@ -157,11 +136,11 @@ await pgliteClient.exec('CREATE INDEX ...');
 ### Schema Types
 
 ```typescript
-import type { User, NewUser, Task, NewTask } from '@ordo/database';
+import type { Task, NewTask } from '@ordo/database';
 
 // Inferred types from schema
-const user: User = { id: '...', email: '...', ... };
-const newUser: NewUser = { email: '...', name: '...' };
+const task: Task = { id: '...', title: '...', completed: false, ... };
+const newTask: NewTask = { title: '...', description: '...' };
 ```
 
 ### Utility Functions
@@ -169,11 +148,8 @@ const newUser: NewUser = { email: '...', name: '...' };
 ```typescript
 import { 
   runMigrations, 
-  seedDatabase, 
   clearDatabase,
   resetDatabase,
-  getUserByEmail,
-  getUserWithTasks,
   healthCheck 
 } from '@ordo/database';
 ```
@@ -185,30 +161,30 @@ import {
 1. Create a new schema file in `src/schema/`:
 
 ```typescript
-// src/schema/projects.ts
+// src/schema/categories.ts
 import { pgTable, uuid, varchar, timestamp } from 'drizzle-orm/pg-core';
 
-export const projects = pgTable('projects', {
+export const categories = pgTable('categories', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-export type Project = typeof projects.$inferSelect;
-export type NewProject = typeof projects.$inferInsert;
+export type Category = typeof categories.$inferSelect;
+export type NewCategory = typeof categories.$inferInsert;
 ```
 
 2. Export from `src/schema/index.ts`:
 
 ```typescript
-export * from './projects.js';
+export * from './categories.js';
 ```
 
 3. Update migrations in `src/migrate.ts`:
 
 ```typescript
 await client.exec(`
-  CREATE TABLE IF NOT EXISTS projects (
+  CREATE TABLE IF NOT EXISTS categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW() NOT NULL
@@ -216,12 +192,12 @@ await client.exec(`
 `);
 ```
 
-### Running Examples
+### Testing the Database
 
-```bash
-# Run the example usage
-bun run src/example.ts
-```
+The database starts empty by design. You can test it by:
+1. Adding tasks through the web interface
+2. Refreshing the page to confirm persistence
+3. Using the developer tools to reset or clear data
 
 ## Configuration
 

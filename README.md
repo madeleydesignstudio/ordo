@@ -1,15 +1,15 @@
-# Ordo - Task Management System
+# Ordo - Simple Task Manager
 
-A modern task management system built with React, Drizzle ORM, and PGlite in a monorepo structure.
+A clean and simple task management application built with React, Drizzle ORM, and PGlite in a monorepo structure.
 
 ## Features
 
-- 📋 **Task Management** - Create, update, and manage tasks
-- 👥 **User Management** - Multi-user support with user profiles
-- 🗄️ **Database** - Centralized database package with Drizzle ORM + PGlite
-- 🎨 **UI Components** - Shared component library with shadcn/ui
-- ⚡ **Fast Development** - Turbo-powered monorepo with hot reloading
+- 📋 **Simple Task Management** - Create, update, delete, and complete tasks
 - 💾 **Persistent Storage** - Browser-based PostgreSQL with IndexedDB persistence
+- 🗄️ **Type-Safe Database** - Centralized database package with Drizzle ORM + PGlite
+- 🎨 **Clean UI** - Simple, focused interface without unnecessary complexity
+- ⚡ **Fast Development** - Turbo-powered monorepo with hot reloading
+- 🧹 **No Setup Required** - Starts with an empty database, no seeding needed
 
 ## Project Structure
 
@@ -44,23 +44,29 @@ bun run build
 
 ## Database Package (@ordo/database)
 
-The database package provides a type-safe database layer using:
+The database package provides a simple, type-safe database layer using:
 - **Drizzle ORM** - Modern TypeScript ORM
-- **PGlite** - Lightweight WASM PostgreSQL
+- **PGlite** - Lightweight WASM PostgreSQL with IndexedDB persistence
+- **Single Table** - Just tasks, keeping it simple
 - **Type Safety** - Full TypeScript support with inferred types
 
 ### Usage
 
 ```typescript
-import { db, users, tasks, runMigrations } from '@ordo/database';
+import { createDatabaseWithClient, tasks, runMigrations } from '@ordo/database';
+import { usePGlite } from '@electric-sql/pglite-react';
 
-// Initialize database
-await runMigrations();
+// In a React component
+const pgliteClient = usePGlite();
+const db = createDatabaseWithClient(pgliteClient);
 
-// Create a user
-const newUser = await db.insert(users).values({
-  email: 'user@example.com',
-  name: 'John Doe'
+// Initialize database (creates empty tasks table)
+await runMigrations(pgliteClient);
+
+// Create a task
+const newTask = await db.insert(tasks).values({
+  title: 'Complete setup',
+  description: 'Finish setting up the task manager'
 }).returning();
 ```
 
@@ -69,9 +75,6 @@ const newUser = await db.insert(users).values({
 ```bash
 # Build database package
 cd packages/database && bun run build
-
-# Run example/demo
-cd packages/database && bun run src/example.ts
 
 # Generate migrations (if needed)
 cd packages/database && bun run generate

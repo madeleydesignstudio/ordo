@@ -3,15 +3,11 @@ import { usePGlite } from "@electric-sql/pglite-react";
 import {
   createDatabaseWithClient,
   runMigrations,
-  seedDatabase,
   healthCheck,
   clearDatabase,
   resetDatabase,
-  users,
   tasks,
-  type User,
   type Task,
-  type NewUser,
   type NewTask,
 } from "@ordo/database";
 
@@ -41,9 +37,6 @@ export function useDatabase() {
           throw new Error(`Database unhealthy: ${health.error}`);
         }
 
-        // Seed database with initial data (only if empty)
-        await seedDatabase(db);
-
         setIsInitialized(true);
         setError(null);
       } catch (err) {
@@ -64,7 +57,6 @@ export function useDatabase() {
     isLoading,
     error,
     // Re-export schema and types for convenience
-    users,
     tasks,
     // Utility functions for development - bound to current db instance
     clearDatabase: () => clearDatabase(db),
@@ -73,4 +65,4 @@ export function useDatabase() {
 }
 
 // Export types for use in components
-export type { User, Task, NewUser, NewTask };
+export type { Task, NewTask };
