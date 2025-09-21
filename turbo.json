@@ -5,40 +5,23 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", ".vercel/**"],
-      "env": [
-        "RESEND_API_KEY",
-        "VITE_PUBLIC_SUPABASE_URL",
-        "VITE_PUBLIC_SUPABASE_ANON_KEY",
-        "DATABASE_URL"
-      ]
-    },
-    "@ordo/supabase#build": {
-      "dependsOn": [],
-      "outputs": []
-    },
-    "@ordo/marketing#build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"],
-      "cache": false
-    },
-    "@ordo/web#build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".vercel/**", ".tanstack/**"],
-      "env": ["VITE_PUBLIC_SUPABASE_URL", "VITE_PUBLIC_SUPABASE_ANON_KEY"]
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
+    },
+    "format": {
+      "dependsOn": ["^format"]
+    },
+    "check": {
+      "dependsOn": ["^check"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
     },
     "dev": {
       "cache": false,
-      "persistent": true,
-      "env": ["VITE_PUBLIC_SUPABASE_URL", "VITE_PUBLIC_SUPABASE_ANON_KEY"]
+      "persistent": true
     }
   }
 }

@@ -9,13 +9,12 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "lint": "biome lint .",
+    "format": "biome format --write ."
   },
   "devDependencies": {
-    "@ordo/eslint-config": "workspace:*",
+    "@biomejs/biome": "2.2.4",
     "@ordo/typescript-config": "workspace:*",
-    "prettier": "^3.6.2",
     "turbo": "^2.5.5",
     "typescript": "5.7.3"
   },

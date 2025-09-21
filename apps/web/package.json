@@ -1,38 +1,28 @@
 {
   "name": "@ordo/web",
-  "version": "0.1.0",
   "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "build:static": "vite build --mode production",
-    "preview": "vite preview --port 3000",
-    "serve": "bun run build:static && bun run preview",
-    "serve:offline": "bun run build:static && python3 -m http.server 3000 -d dist",
-    "build:offline": "./scripts/build-offline.sh"
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.3.8",
-    "@electric-sql/pglite-react": "^0.2.26",
-    "@ordo/supabase": "workspace:*",
-    "@ordo/ui": "workspace:*",
-    "@tailwindcss/vite": "^4.1.13",
-    "@tanstack/react-query": "^5.89.0",
-    "drizzle-orm": "^0.36.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "tailwindcss": "^4.1.13",
-    "vite": "^7.1.6"
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@ordo/typescript-config": "workspace:*",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
-    "@vitejs/plugin-react": "^5.0.3",
-    "typescript": "^5.9.2",
+    "@vitejs/plugin-react-swc": "^4.0.1",
+    "typescript": "~5.8.3",
+    "vite": "^7.1.6",
     "vite-plugin-pwa": "^1.0.3",
-    "vite-tsconfig-paths": "^5.1.4",
     "workbox-window": "^7.3.0"
   }
 }

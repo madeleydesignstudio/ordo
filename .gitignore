@@ -31,35 +31,6 @@ dist
 # Debug
 npm-debug.log*
 
-# TypeScript compilation artifacts (but keep config files)
-apps/**/*.js
-packages/**/*.js
-apps/**/*.d.ts
-packages/**/*.d.ts
-apps/**/*.js.map
-packages/**/*.js.map
-apps/**/*.d.ts.map
-packages/**/*.d.ts.map
-
-# Keep essential config files
-!**/*.config.js
-!**/*.config.mjs
-!**/next.config.js
-!**/tailwind.config.js
-!**/postcss.config.js
-!**/eslint.config.js
-!**/vite.config.js
-
-# Keep environment definition files
-!**/vite-env.d.ts
-!**/next-env.d.ts
-
-# TanStack Router generated files
-**/routeTree.gen.*
-
-# TypeScript build info
-*.tsbuildinfo
-
 # Misc
 .DS_Store
 *.pem
