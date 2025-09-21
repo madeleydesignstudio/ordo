@@ -1,14 +1,26 @@
 import { useState, useEffect } from "react";
-import { eq } from "drizzle-orm";
 import { useDatabase, type Task } from "../hooks/useDatabase";
+import { useSync } from "../hooks/useSync";
 import { LoadingFallback } from "./LoadingFallback";
+import { eq } from "@ordo/local-db";
 
 export function TaskManager() {
   const { db, isInitialized, isLoading, error, tasks, clearDatabase, resetDatabase } =
     useDatabase();
+  const {
+    isLoading: isSyncing,
+    status: syncStatus,
+    message: syncMessage,
+    error: syncError,
+    lastSyncTime,
+    syncToCloud,
+    checkBackendStatus,
+    clearSyncStatus,
+  } = useSync();
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
+  const [backendAvailable, setBackendAvailable] = useState<boolean | null>(null);
 
   // Fetch tasks
   useEffect(() => {
@@ -28,6 +40,11 @@ export function TaskManager() {
     fetchData();
   }, [isInitialized, db]);
 
+  // Check backend availability on mount
+  useEffect(() => {
+    checkBackendStatus().then(setBackendAvailable);
+  }, [checkBackendStatus]);
+
   const buttonStyle = {
     padding: "10px 20px",
     color: "white",
@@ -36,6 +53,24 @@ export function TaskManager() {
     cursor: "pointer",
     marginRight: "10px",
   };
+
+  // Handle sync to cloud
+  const handleSyncToCloud = async () => {
+    try {
+      const result = await syncToCloud(allTasks);
+      if (result.success) {
+        // Success feedback is handled by the hook
+      } else {
+        console.error("Sync failed:", result.message);
+      }
+    } catch (error) {
+      console.error("Sync error:", error);
+    }
+  };
+
+  // Check if we should show sync button
+  const showSyncButton =
+    navigator.onLine && (backendAvailable === true || backendAvailable === null);
 
   if (error) {
     return (
@@ -229,6 +264,128 @@ export function TaskManager() {
           </button>
         </form>
       </section>
+
+      {/* Sync Section */}
+      {showSyncButton && (
+        <section
+          style={{
+            marginBottom: "20px",
+            padding: "20px",
+            border: "1px solid #2196F3",
+            borderRadius: "8px",
+            backgroundColor: "#e3f2fd",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "10px",
+            }}
+          >
+            <div>
+              <h3 style={{ margin: "0 0 5px 0", color: "#1976d2" }}>☁️ Cloud Sync</h3>
+              <p style={{ margin: "0", fontSize: "14px", color: "#666" }}>
+                Sync your tasks to the cloud database
+                {lastSyncTime && <span> • Last sync: {lastSyncTime.toLocaleString()}</span>}
+              </p>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              {syncStatus === "success" && syncMessage && (
+                <div
+                  style={{
+                    fontSize: "12px",
+                    color: "#4caf50",
+                    backgroundColor: "#e8f5e8",
+                    padding: "6px 12px",
+                    borderRadius: "4px",
+                    border: "1px solid #4caf50",
+                  }}
+                >
+                  ✅ {syncMessage}
+                </div>
+              )}
+              {syncError && (
+                <div
+                  style={{
+                    fontSize: "12px",
+                    color: "#f44336",
+                    backgroundColor: "#ffebee",
+                    padding: "6px 12px",
+                    borderRadius: "4px",
+                    border: "1px solid #f44336",
+                  }}
+                >
+                  ❌ {syncError}
+                </div>
+              )}
+              <button
+                onClick={handleSyncToCloud}
+                disabled={isSyncing || allTasks.length === 0}
+                style={{
+                  ...buttonStyle,
+                  backgroundColor: isSyncing ? "#ccc" : "#2196F3",
+                  cursor: isSyncing || allTasks.length === 0 ? "not-allowed" : "pointer",
+                  padding: "8px 16px",
+                  fontSize: "14px",
+                  marginRight: "0",
+                }}
+              >
+                {isSyncing ? "🔄 Syncing..." : `📤 Sync ${allTasks.length} Tasks`}
+              </button>
+            </div>
+          </div>
+          {backendAvailable === false && (
+            <div
+              style={{
+                marginTop: "10px",
+                fontSize: "12px",
+                color: "#ff9800",
+                backgroundColor: "#fff8e1",
+                padding: "8px 12px",
+                borderRadius: "4px",
+                border: "1px solid #ff9800",
+              }}
+            >
+              ⚠️ Sync backend is not available. Make sure the sync server is running on port 3001.
+            </div>
+          )}
+          {!navigator.onLine && (
+            <div
+              style={{
+                marginTop: "10px",
+                fontSize: "12px",
+                color: "#f44336",
+                backgroundColor: "#ffebee",
+                padding: "8px 12px",
+                borderRadius: "4px",
+                border: "1px solid #f44336",
+              }}
+            >
+              🌐 You're offline. Sync will be available when you're back online.
+            </div>
+          )}
+          {(syncStatus === "success" || syncError) && (
+            <button
+              onClick={clearSyncStatus}
+              style={{
+                marginTop: "10px",
+                padding: "4px 8px",
+                fontSize: "11px",
+                backgroundColor: "transparent",
+                color: "#666",
+                border: "1px solid #ccc",
+                borderRadius: "3px",
+                cursor: "pointer",
+              }}
+            >
+              Clear Status
+            </button>
+          )}
+        </section>
+      )}
 
       {/* Task Statistics */}
       <section

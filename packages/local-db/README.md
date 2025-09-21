@@ -1,6 +1,6 @@
-# @ordo/database
+# @ordo/local-db
 
-A simplified TypeScript database package built with Drizzle ORM and PGlite for task management.
+A simplified TypeScript local database package built with Drizzle ORM and PGlite for offline-first task management.
 
 ## Overview
 
@@ -23,7 +23,7 @@ This package provides a type-safe database layer using:
 ## Installation
 
 ```bash
-bun install @ordo/database
+bun install @ordo/local-db
 ```
 
 ## Quick Start
@@ -31,7 +31,7 @@ bun install @ordo/database
 ### 1. Initialize the Database
 
 ```typescript
-import { runMigrations, createDatabaseWithClient } from '@ordo/database';
+import { runMigrations, createDatabaseWithClient } from '@ordo/local-db';
 import { usePGlite } from '@electric-sql/pglite-react';
 
 // In a React component with PGlite context
@@ -45,7 +45,7 @@ await runMigrations(pgliteClient);
 ### 2. Basic Usage
 
 ```typescript
-import { createDatabaseWithClient, tasks } from '@ordo/database';
+import { createDatabaseWithClient, tasks } from '@ordo/local-db';
 import { usePGlite } from '@electric-sql/pglite-react';
 import { eq } from 'drizzle-orm';
 
@@ -67,7 +67,7 @@ const completedTasks = await db.select().from(tasks).where(eq(tasks.completed, t
 ### 3. Using Utilities
 
 ```typescript
-import { healthCheck, clearDatabase, createDatabaseWithClient } from '@ordo/database';
+import { healthCheck, clearDatabase, createDatabaseWithClient } from '@ordo/local-db';
 import { usePGlite } from '@electric-sql/pglite-react';
 
 // In a React component
@@ -118,7 +118,7 @@ bun run studio
 ### Database Connection
 
 ```typescript
-import { createDatabaseWithClient, initializeClient } from '@ordo/database';
+import { createDatabaseWithClient, initializeClient } from '@ordo/local-db';
 import { usePGlite } from '@electric-sql/pglite-react';
 
 // In React components - use PGlite from context
@@ -136,7 +136,7 @@ await pgliteClient.exec('CREATE INDEX ...');
 ### Schema Types
 
 ```typescript
-import type { Task, NewTask } from '@ordo/database';
+import type { Task, NewTask } from '@ordo/local-db';
 
 // Inferred types from schema
 const task: Task = { id: '...', title: '...', completed: false, ... };
@@ -151,7 +151,7 @@ import {
   clearDatabase,
   resetDatabase,
   healthCheck 
-} from '@ordo/database';
+} from '@ordo/local-db';
 ```
 
 ## Development
@@ -204,7 +204,7 @@ The database starts empty by design. You can test it by:
 The database can be configured for different environments:
 
 ```typescript
-import { initializeClient, createDatabaseWithClient } from '@ordo/database';
+import { initializeClient, createDatabaseWithClient } from '@ordo/local-db';
 
 // Default persistent storage (IndexedDB in browser)
 const client = initializeClient();
@@ -263,7 +263,7 @@ await runMigrations();
 **Type errors:**
 ```typescript
 // Ensure you're importing the correct types
-import type { User } from '@ordo/database';
+import type { Task } from '@ordo/local-db';
 ```
 
 **Connection issues:**

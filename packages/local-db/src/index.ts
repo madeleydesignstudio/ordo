@@ -2,6 +2,9 @@ import { drizzle } from "drizzle-orm/pglite";
 import { PGlite } from "@electric-sql/pglite";
 import * as schema from "./schema/index.js";
 
+// Re-export commonly used Drizzle functions
+export { eq, and, or, not, sql } from "drizzle-orm";
+
 // Type to accept both PGlite and PGliteWithLive
 type PGliteClient = PGlite | any;
 

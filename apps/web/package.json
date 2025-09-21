@@ -12,7 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ordo/database": "workspace:*",
+    "@ordo/local-db": "workspace:*",
     "@electric-sql/pglite": "^0.3.8",
     "@electric-sql/pglite-react": "^0.2.14",
     "drizzle-orm": "^0.44.5",

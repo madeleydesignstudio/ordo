@@ -9,7 +9,7 @@ import {
   tasks,
   type Task,
   type NewTask,
-} from "@ordo/database";
+} from "@ordo/local-db";
 
 export function useDatabase() {
   const [isInitialized, setIsInitialized] = useState(false);

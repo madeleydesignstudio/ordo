@@ -1,0 +1,23 @@
+{
+  "name": "@ordo/sync-backend",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ordo/cloud-db": "workspace:*",
+    "@ordo/local-db": "workspace:*",
+    "hono": "^4.6.3",
+    "drizzle-orm": "^0.44.5"
+  },
+  "devDependencies": {
+    "@ordo/typescript-config": "workspace:*",
+    "@types/bun": "latest",
+    "typescript": "5.7.3"
+  }
+}
