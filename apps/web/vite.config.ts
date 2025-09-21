@@ -15,6 +15,8 @@ export default defineConfig({
         ],
         // Increase the maximum file size limit for WASM files
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB
+        // Prevent cleanup of IndexedDB and other storage
+        cleanupOutdatedCaches: false,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -39,8 +41,8 @@ export default defineConfig({
             },
           },
         ],
-        // Skip waiting to activate new service worker immediately
-        skipWaiting: true,
+        // More conservative service worker activation
+        skipWaiting: false,
         clientsClaim: true,
       },
       includeAssets: [
@@ -53,7 +55,8 @@ export default defineConfig({
       manifest: {
         name: "Ordo Task Manager",
         short_name: "Ordo",
-        description: "Offline-first task manager powered by Drizzle ORM and PGlite",
+        description:
+          "Offline-first task manager powered by Drizzle ORM and PGlite",
         theme_color: "#ffffff",
         background_color: "#ffffff",
         display: "standalone",

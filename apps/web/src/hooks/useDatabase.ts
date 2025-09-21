@@ -36,20 +36,47 @@ export function useDatabase() {
       try {
         setIsLoading(true);
 
+        // Debug storage availability
+        console.log("Checking IndexedDB availability...");
+        if (!("indexedDB" in window)) {
+          throw new Error("IndexedDB not available in this environment");
+        }
+
+        // Check if we can access the existing database
+        try {
+          const dbList = await indexedDB.databases();
+          const existingDb = dbList.find((db) => db.name?.includes("ordo-db"));
+          console.log(
+            "Existing databases:",
+            dbList.map((db) => db.name),
+          );
+          console.log("Found ordo-db:", !!existingDb);
+        } catch (e) {
+          console.log("Could not list databases:", e);
+        }
+
         // Run migrations to set up schema
+        console.log("Running migrations...");
         await runMigrations(pgliteClient);
 
-        // Check database health
+        // Check database health and verify data persistence
+        console.log("Checking database health...");
         const health = await healthCheck(db);
         if (health.status !== "healthy") {
           throw new Error(`Database unhealthy: ${health.error}`);
         }
 
+        // Test data persistence by checking existing data
+        console.log("Verifying data persistence...");
+        const existingTasks = await db.select().from(tasks).limit(5);
+        console.log(`Found ${existingTasks.length} existing tasks`);
+
         setIsInitialized(true);
         setError(null);
       } catch (err) {
         console.error("Failed to initialize database:", err);
-        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
         setError(`Database initialization failed: ${errorMessage}`);
         initRef.current = false; // Allow retry on error
       } finally {

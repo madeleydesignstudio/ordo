@@ -26,7 +26,10 @@ if ("serviceWorker" in navigator) {
           const newWorker = registration.installing;
           if (newWorker) {
             newWorker.addEventListener("statechange", () => {
-              if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+              if (
+                newWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
                 // New content is available, prompt user to refresh
                 if (confirm("New version available! Refresh to update?")) {
                   window.location.reload();
@@ -105,19 +108,34 @@ async function installPWA() {
 // Initialize app with PGlite database
 async function initApp() {
   try {
+    // Check IndexedDB availability and persistence
+    if (!("indexedDB" in window)) {
+      throw new Error("IndexedDB not available");
+    }
+
+    // Request persistent storage if available
+    if ("storage" in navigator && "persist" in navigator.storage) {
+      const isPersistent = await navigator.storage.persist();
+      console.log("Storage persistence granted:", isPersistent);
+    }
+
     // Create PGlite instance with live queries support and persistent storage
     const db = await PGlite.create("idb://ordo-db", {
       extensions: { live },
     });
+
+    // Verify database connection and persistence
+    console.log("Database initialized with IndexedDB storage");
 
     createRoot(document.getElementById("root") as HTMLElement).render(
       <StrictMode>
         <PGliteProvider db={db}>
           <App />
         </PGliteProvider>
-      </StrictMode>
+      </StrictMode>,
     );
   } catch (error) {
+    console.error("Database initialization error:", error);
     console.error("Failed to initialize app:", error);
 
     // Show error message directly in DOM
