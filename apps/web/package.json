@@ -12,6 +12,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ordo/database": "workspace:*",
+    "@electric-sql/pglite": "^0.3.8",
+    "@electric-sql/pglite-react": "^0.2.14",
+    "drizzle-orm": "^0.44.5",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
@@ -20,6 +24,7 @@
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react-swc": "^4.0.1",
+    "drizzle-kit": "^0.31.4",
     "typescript": "~5.8.3",
     "vite": "^7.1.6",
     "vite-plugin-pwa": "^1.0.3",
