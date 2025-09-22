@@ -117,6 +117,10 @@ export default defineConfig(({ mode }) => {
   // Define environment variables
   define: {
     'import.meta.env.VITE_SYNC_BACKEND_URL': JSON.stringify(env.VITE_SYNC_BACKEND_URL || 'http://localhost:3001'),
+    'import.meta.env.VITE_ELECTRIC_URL': JSON.stringify(env.VITE_ELECTRIC_URL || 'https://api.electric-sql.cloud'),
+    'import.meta.env.VITE_ELECTRIC_SOURCE_ID': JSON.stringify(env.VITE_ELECTRIC_SOURCE_ID || ''),
+    'import.meta.env.VITE_ELECTRIC_SECRET': JSON.stringify(env.VITE_ELECTRIC_SECRET || ''),
+    'import.meta.env.VITE_ELECTRIC_SYNC_ENABLED': JSON.stringify(env.VITE_ELECTRIC_SYNC_ENABLED || 'false'),
   },
   };
 });

@@ -2,7 +2,10 @@ import { useState, useEffect } from "react";
 import { useDatabase, type Task } from "../hooks/useDatabase";
 import { useSync } from "../hooks/useSync";
 import { LoadingFallback } from "./LoadingFallback";
+import { ElectricSyncStatus } from "./ElectricSyncStatus";
+import { useBidirectionalSync } from "../hooks/useBidirectionalSync";
 import { eq } from "@ordo/local-db";
+import { usePGlite } from "@electric-sql/pglite-react";
 
 export function TaskManager() {
   const {
@@ -28,6 +31,38 @@ export function TaskManager() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [backendAvailable, setBackendAvailable] = useState<boolean>(false);
+  const [useBidirectional, setUseBidirectional] = useState<boolean>(true);
+  const pgliteClient = usePGlite();
+
+  // Get ElectricSQL configuration
+  const electricConfig = {
+    electricUrl: import.meta.env.VITE_ELECTRIC_URL || "https://api.electric-sql.cloud",
+    sourceId: import.meta.env.VITE_ELECTRIC_SOURCE_ID || "",
+    secret: import.meta.env.VITE_ELECTRIC_SECRET || "",
+    debug: import.meta.env.DEV === true,
+    conflictResolution: 'latest-wins' as const,
+    syncInterval: 5000,
+    enableRealTimeSync: true,
+  };
+
+  const syncEnabled = import.meta.env.VITE_ELECTRIC_SYNC_ENABLED === "true";
+  const isElectricConfigured = electricConfig.sourceId && electricConfig.secret;
+
+  // Use bidirectional sync if configured and enabled
+  const {
+    isInitialized: isBidirectionalSyncReady,
+    isLoading: isBidirectionalSyncing,
+    conflictCount,
+    syncedRecords,
+    failedRecords,
+    error: bidirectionalSyncError,
+    canSync: canUseBidirectional,
+    forceSyncFromRemote,
+    clearError: clearBidirectionalError,
+  } = useBidirectionalSync({
+    config: isElectricConfigured && useBidirectional ? electricConfig : undefined,
+    autoStart: Boolean(syncEnabled && isElectricConfigured && useBidirectional),
+  });
 
   // Fetch tasks
   useEffect(() => {
@@ -201,6 +236,89 @@ export function TaskManager() {
       alert("Failed to clear data. Check console for details.");
     }
   }
+
+  // Debug function to check database state
+  const debugDatabaseState = async () => {
+    if (!db || !pgliteClient) {
+      console.log("[Debug] Database not ready");
+      return;
+    }
+
+    try {
+      console.log("[Debug] === Database State Debug ===");
+
+      // Check PGlite electric extension
+      console.log("[Debug] PGlite has electric extension:", !!pgliteClient.electric);
+
+      // Count total tasks
+      const countResult = await db.select().from(tasks);
+      console.log(`[Debug] Total tasks in local database: ${countResult.length}`);
+
+      // Show all tasks with details
+      countResult.forEach((task: Task, index: number) => {
+        console.log(`[Debug] Task ${index + 1}:`, {
+          id: task.id,
+          title: task.title,
+          completed: task.completed,
+          createdAt: task.createdAt,
+          updatedAt: task.updatedAt
+        });
+      });
+
+      // Check electric metadata if available
+      if (pgliteClient.electric) {
+        try {
+          const metadataResult = await pgliteClient.query(`
+            SELECT schemaname, tablename
+            FROM pg_tables
+            WHERE schemaname = 'electric' OR tablename LIKE '%electric%'
+          `);
+          console.log("[Debug] Electric metadata tables:", metadataResult.rows);
+        } catch (err) {
+          console.log("[Debug] Could not query electric metadata:", err instanceof Error ? err.message : String(err));
+        }
+      }
+
+      // Check if there are any shape subscriptions
+      console.log("[Debug] Database debugging complete");
+    } catch (error) {
+      console.error("[Debug] Error during database debug:", error);
+    }
+  };
+
+  // Reset database to fix primary key conflicts
+  const resetDatabaseForSync = async () => {
+    if (!confirm("⚠️ This will clear your local database and re-sync from cloud. Continue?")) {
+      return;
+    }
+
+    try {
+      console.log("[Reset] Clearing local database for clean ElectricSQL sync...");
+
+      // Clear all local tasks
+      await clearDatabase();
+
+      // Clear browser storage to reset ElectricSQL sync state
+      localStorage.removeItem('electric-sync-state');
+
+      // Also clear any ElectricSQL metadata
+      if (pgliteClient.electric) {
+        try {
+          await pgliteClient.query('DROP SCHEMA IF EXISTS electric CASCADE');
+        } catch (err) {
+          console.log("[Reset] No electric schema to drop");
+        }
+      }
+
+      console.log("[Reset] ✅ Local database cleared. Refreshing page for clean sync...");
+
+      // Refresh page to restart ElectricSQL sync
+      window.location.reload();
+    } catch (error) {
+      console.error("[Reset] ❌ Failed to reset database:", error);
+      alert("Failed to reset database. Check console for details.");
+    }
+  };
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
@@ -410,6 +528,173 @@ export function TaskManager() {
           )}
         </section>
       )}
+
+      {/* ElectricSQL Sync Status */}
+      <section
+        style={{
+          marginBottom: "20px",
+          padding: "20px",
+          border: "1px solid #e0e0e0",
+          borderRadius: "8px",
+        }}
+      >
+        <div style={{ marginBottom: "20px" }}>
+          {/* Sync Mode Toggle */}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "15px" }}>
+            <span style={{ fontSize: "14px", fontWeight: "500" }}>Sync Mode:</span>
+            <label style={{ display: "flex", alignItems: "center", gap: "5px", cursor: "pointer" }}>
+              <input
+                type="radio"
+                name="syncMode"
+                checked={!useBidirectional}
+                onChange={() => setUseBidirectional(false)}
+              />
+              <span style={{ fontSize: "13px" }}>Basic ElectricSQL</span>
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "5px", cursor: "pointer" }}>
+              <input
+                type="radio"
+                name="syncMode"
+                checked={useBidirectional}
+                onChange={() => setUseBidirectional(true)}
+              />
+              <span style={{ fontSize: "13px", color: "#28a745", fontWeight: "500" }}>
+                🚀 Smart Bidirectional Sync
+              </span>
+            </label>
+          </div>
+
+          {/* Sync Status and Controls */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            {useBidirectional ? (
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+                  <span style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    background: isBidirectionalSyncReady ? "#28a745" : isBidirectionalSyncing ? "#007bff" : bidirectionalSyncError ? "#dc3545" : "#6c757d",
+                    display: "inline-block",
+                  }}></span>
+                  <span style={{ fontSize: "14px", fontWeight: "500" }}>
+                    {isBidirectionalSyncReady ? "Smart Sync Active" :
+                     isBidirectionalSyncing ? "Initializing Smart Sync..." :
+                     bidirectionalSyncError ? "Smart Sync Error" :
+                     !canUseBidirectional ? "Smart Sync Unavailable" :
+                     "Smart Sync Stopped"}
+                  </span>
+                </div>
+
+                {isBidirectionalSyncReady && (
+                  <div style={{ fontSize: "12px", color: "#666", marginBottom: "8px" }}>
+                    Synced: {syncedRecords} | Conflicts: {conflictCount} | Failed: {failedRecords}
+                  </div>
+                )}
+
+                {bidirectionalSyncError && (
+                  <div style={{ fontSize: "12px", color: "#dc3545", marginBottom: "8px" }}>
+                    Error: {bidirectionalSyncError}
+                  </div>
+                )}
+
+                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  {isBidirectionalSyncReady && (
+                    <button
+                      onClick={forceSyncFromRemote}
+                      style={{
+                        padding: "4px 12px",
+                        fontSize: "11px",
+                        backgroundColor: "#007bff",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "3px",
+                        cursor: "pointer",
+                      }}
+                      title="Force sync from cloud (preserves local data)"
+                    >
+                      🔄 Force Sync
+                    </button>
+                  )}
+
+                  {bidirectionalSyncError && (
+                    <button
+                      onClick={clearBidirectionalError}
+                      style={{
+                        padding: "4px 8px",
+                        fontSize: "11px",
+                        backgroundColor: "#6c757d",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "3px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Clear Error
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <ElectricSyncStatus />
+            )}
+
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button
+                onClick={debugDatabaseState}
+                style={{
+                  padding: "4px 8px",
+                  fontSize: "11px",
+                  backgroundColor: "#6c757d",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "3px",
+                  cursor: "pointer",
+                }}
+                title="Debug database state (check browser console)"
+              >
+                🐛 Debug DB
+              </button>
+              {!useBidirectional && (
+                <button
+                  onClick={resetDatabaseForSync}
+                  style={{
+                    padding: "4px 8px",
+                    fontSize: "11px",
+                    backgroundColor: "#dc3545",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "3px",
+                    cursor: "pointer",
+                  }}
+                  title="Clear local database and restart ElectricSQL sync"
+                >
+                  🔄 Reset & Sync
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Bidirectional Sync Info */}
+          {useBidirectional && (
+            <div style={{
+              marginTop: "10px",
+              padding: "10px",
+              backgroundColor: "#e8f5e8",
+              border: "1px solid #28a745",
+              borderRadius: "4px",
+              fontSize: "12px",
+            }}>
+              <strong>🚀 Smart Bidirectional Sync Enabled:</strong>
+              <ul style={{ margin: "5px 0 0 20px", padding: 0 }}>
+                <li>✅ Multi-device sync without conflicts</li>
+                <li>✅ Preserves local data during sync</li>
+                <li>✅ Auto-resolves conflicts with "latest wins"</li>
+                <li>✅ Real-time updates from cloud</li>
+              </ul>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Task Statistics */}
       <section

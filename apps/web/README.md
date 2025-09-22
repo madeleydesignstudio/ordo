@@ -29,6 +29,11 @@ This app uses environment variables to configure the sync backend URL:
   - Development: `http://localhost:3001`
   - Production: `https://ordo-sync-backend.vercel.app`
 
+- `VITE_ELECTRIC_URL` - ElectricSQL API URL (default: `https://api.electric-sql.cloud`)
+- `VITE_ELECTRIC_SOURCE_ID` - Your ElectricSQL source ID from Electric Cloud
+- `VITE_ELECTRIC_SECRET` - Your ElectricSQL source secret from Electric Cloud
+- `VITE_ELECTRIC_SYNC_ENABLED` - Enable/disable ElectricSQL sync (`true`/`false`)
+
 ### Setup
 
 1. Copy the example environment file:
@@ -65,10 +70,52 @@ bun run check
 
 ## Sync Integration
 
-This app integrates with the Ordo sync backend for cloud synchronization:
+This app features dual-layer synchronization architecture:
+
+### 1. Custom Sync Backend (Local → Cloud)
+- **Push Sync**: Local changes are pushed to Supabase via custom sync backend
 - **Environment-based Configuration**: Automatically uses the correct backend URL based on build environment
 - **Smart Sync**: Network-aware synchronization that gracefully handles offline scenarios
 - **Background Sync**: Automatic synchronization when network connectivity is restored
+
+### 2. ElectricSQL Sync (Cloud → Local)
+- **Real-time Sync**: Changes from Supabase are synced back to PGlite via ElectricSQL
+- **Shape-based Sync**: Efficient partial replication using Electric's "shapes" concept
+- **Transactional Consistency**: Maintains ACID properties during sync operations
+- **Automatic Resumption**: Resumes sync after network interruptions
+
+### ElectricSQL Cloud Setup
+
+1. **Sign up for Electric Cloud**:
+   - Go to https://console.electric-sql.com
+   - Create an account and log in
+
+2. **Add your Supabase database**:
+   - Click "New Source"
+   - Select your region and team
+   - Enter your Supabase PostgreSQL connection string
+   - Click "Connect Source"
+
+3. **Get your credentials**:
+   - Copy your `SOURCE_ID` and `SECRET` from the dashboard
+   - Add them to your environment variables:
+     ```bash
+     VITE_ELECTRIC_SOURCE_ID=your-source-id-here
+     VITE_ELECTRIC_SECRET=your-secret-here
+     VITE_ELECTRIC_SYNC_ENABLED=true
+     ```
+
+4. **Security Note**:
+   - Never expose your Electric credentials in client code
+   - Use a proxy/API to add credentials server-side for production
+   - The current setup is for development only
+
+### Bidirectional Sync Flow
+```
+Local PGlite ──[Custom Backend]──→ Supabase PostgreSQL
+      ↑                                    │
+      └──────[ElectricSQL]─────────────────┘
+```
 
 ## Progressive Web App
 

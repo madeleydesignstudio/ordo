@@ -1,5 +1,6 @@
 import { PGlite } from "@electric-sql/pglite";
 import { live } from "@electric-sql/pglite/live";
+import { electricSync } from "@electric-sql/pglite-sync";
 import { PGliteProvider } from "@electric-sql/pglite-react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -110,9 +111,15 @@ async function initApp() {
       await navigator.storage.persist();
     }
 
-    // Create PGlite instance with live queries support and persistent storage
+    // Create PGlite instance with live queries support, ElectricSQL sync, and persistent storage
     const db = await PGlite.create("idb://ordo-db", {
-      extensions: { live },
+      extensions: {
+        live,
+        electric: electricSync({
+          metadataSchema: "electric",
+          debug: import.meta.env.DEV || false,
+        }),
+      },
     });
 
     createRoot(document.getElementById("root") as HTMLElement).render(

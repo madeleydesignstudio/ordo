@@ -24,3 +24,5 @@ export * from "./schema/index.js";
 // Export utilities and migration functions
 export * from "./utils.js";
 export * from "./migrate.js";
+export * from "./sync.js";
+export * from "./bidirectional-sync.js";
