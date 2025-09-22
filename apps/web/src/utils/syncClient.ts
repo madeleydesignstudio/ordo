@@ -31,8 +31,10 @@ export interface SyncResponse {
 export class SyncClient {
   private baseUrl: string;
 
-  constructor(baseUrl: string = "http://localhost:3001") {
-    this.baseUrl = baseUrl;
+  constructor(baseUrl?: string) {
+    this.baseUrl = baseUrl ||
+      import.meta.env.VITE_SYNC_BACKEND_URL ||
+      "http://localhost:3001";
   }
 
   // Check if the sync backend is available

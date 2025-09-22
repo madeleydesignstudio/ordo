@@ -12,6 +12,32 @@ This is a React application built with Vite, TypeScript, and integrated with the
 - **Biome** for linting, formatting, and import organization
 - **Shared TypeScript configuration** from `@ordo/typescript-config`
 
+## Environment Configuration
+
+This app uses environment variables to configure the sync backend URL:
+
+### Environment Files
+
+- `.env` - Default development configuration
+- `.env.local` - Local overrides (ignored by git)
+- `.env.production` - Production configuration
+- `.env.example` - Example configuration file
+
+### Environment Variables
+
+- `VITE_SYNC_BACKEND_URL` - URL of the sync backend server
+  - Development: `http://localhost:3001`
+  - Production: `https://ordo-sync-backend.vercel.app`
+
+### Setup
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Update `.env.local` with your local settings if needed.
+
 ## Development
 
 ```bash
@@ -20,6 +46,9 @@ bun run dev
 
 # Build for production
 bun run build
+
+# Build for production with production env
+bun run build:prod
 
 # Preview production build
 bun run preview
@@ -33,6 +62,13 @@ bun run format
 # Lint, format, and organize imports
 bun run check
 ```
+
+## Sync Integration
+
+This app integrates with the Ordo sync backend for cloud synchronization:
+- **Environment-based Configuration**: Automatically uses the correct backend URL based on build environment
+- **Smart Sync**: Network-aware synchronization that gracefully handles offline scenarios
+- **Background Sync**: Automatic synchronization when network connectivity is restored
 
 ## Progressive Web App
 
