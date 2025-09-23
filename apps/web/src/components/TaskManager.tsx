@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDatabase, type Task } from "../hooks/useDatabase";
 import { useAutoSync } from "../hooks/useAutoSync";
@@ -25,7 +25,7 @@ export function TaskManager() {
   const queryClient = useQueryClient();
   
   // Auto-sync hook for automatic cloud synchronization
-  const { autoSyncTask, autoDeleteTask, checkSyncAvailable } = useAutoSync({
+  const { autoSyncTask, autoDeleteTask } = useAutoSync({
     enabled: navigator.onLine, // Only enable when online
   });
 
@@ -118,53 +118,6 @@ export function TaskManager() {
     marginRight: "10px",
   };
 
-  // Check sync status for display
-  const [autoSyncStatus, setAutoSyncStatus] = useState<"online" | "offline" | "checking">("checking");
-
-  // Check sync availability on mount and when online status changes
-  useEffect(() => {
-    let isMounted = true;
-    
-    const checkSync = async () => {
-      if (!isMounted) return;
-      setAutoSyncStatus("checking");
-      try {
-        const isAvailable = await checkSyncAvailable();
-        if (isMounted) {
-          setAutoSyncStatus(isAvailable ? "online" : "offline");
-        }
-      } catch (error) {
-        console.error("Failed to check sync availability:", error);
-        if (isMounted) {
-          setAutoSyncStatus("offline");
-        }
-      }
-    };
-    
-    // Check once on mount
-    checkSync();
-    
-    // Listen for online/offline events
-    const handleOnline = () => {
-      if (isMounted) {
-        checkSync();
-      }
-    };
-    const handleOffline = () => {
-      if (isMounted) {
-        setAutoSyncStatus("offline");
-      }
-    };
-    
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-    
-    return () => {
-      isMounted = false;
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, []); // Remove checkSyncAvailable from dependencies to prevent re-running
 
   if (error) {
     return (
@@ -222,12 +175,8 @@ export function TaskManager() {
         setNewTaskTitle("");
         setNewTaskDescription("");
         
-        // Auto-sync to cloud
-        autoSyncTask(newTask[0]).catch(error => {
-          console.error("Failed to auto-sync new task:", error);
-          // Note: We don't show an error to the user since the task was created locally
-          // ElectricSQL will eventually sync it when connection is restored
-        });
+        // Auto-sync to cloud (silent)
+        autoSyncTask(newTask[0]);
       }
     } catch (err) {
       console.error("Failed to add task:", err);
@@ -249,10 +198,8 @@ export function TaskManager() {
       if (updatedTask[0]) {
         queryClient.invalidateQueries({ queryKey: ['tasks'] });
         
-        // Auto-sync update to cloud
-        autoSyncTask(updatedTask[0]).catch(error => {
-          console.error("Failed to auto-sync updated task:", error);
-        });
+        // Auto-sync update to cloud (silent)
+        autoSyncTask(updatedTask[0]);
       }
     } catch (err) {
       console.error("Failed to toggle task:", err);
@@ -268,10 +215,8 @@ export function TaskManager() {
       await db.delete(tasks).where(eq(tasks.id, taskId));
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       
-      // Auto-sync deletion to cloud
-      autoDeleteTask(taskId).catch(error => {
-        console.error("Failed to auto-sync task deletion:", error);
-      });
+      // Auto-sync deletion to cloud (silent)
+      autoDeleteTask(taskId);
     } catch (err) {
       console.error("Failed to delete task:", err);
       alert("Failed to delete task. Please try again.");
@@ -490,49 +435,6 @@ export function TaskManager() {
         </form>
       </section>
 
-      {/* Automatic Sync Status */}
-      <section
-        style={{
-          marginBottom: "20px",
-          padding: "20px",
-          border: `1px solid ${autoSyncStatus === "online" ? "#4caf50" : autoSyncStatus === "offline" ? "#f44336" : "#ff9800"}`,
-          borderRadius: "8px",
-          backgroundColor: autoSyncStatus === "online" ? "#e8f5e8" : autoSyncStatus === "offline" ? "#ffebee" : "#fff8e1",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{
-            width: "8px",
-            height: "8px",
-            borderRadius: "50%",
-            backgroundColor: autoSyncStatus === "online" ? "#4caf50" : autoSyncStatus === "offline" ? "#f44336" : "#ff9800",
-            display: "inline-block",
-          }}></span>
-          <h3 style={{ margin: "0", color: autoSyncStatus === "online" ? "#2e7d32" : autoSyncStatus === "offline" ? "#c62828" : "#f57c00" }}>
-            🔄 Automatic Cloud Sync
-          </h3>
-        </div>
-        <p style={{ margin: "8px 0 0 18px", fontSize: "14px", color: "#666" }}>
-          {autoSyncStatus === "online" && "✅ All changes automatically sync to cloud"}
-          {autoSyncStatus === "offline" && "❌ Offline - Changes will sync when connection is restored"}
-          {autoSyncStatus === "checking" && "⏳ Checking connection..."}
-        </p>
-        <div style={{
-          marginTop: "10px",
-          padding: "10px",
-          backgroundColor: "rgba(255, 255, 255, 0.7)",
-          borderRadius: "4px",
-          fontSize: "12px",
-        }}>
-          <strong>🚀 How it works:</strong>
-          <ul style={{ margin: "5px 0 0 20px", padding: 0 }}>
-            <li>✨ Create, update, and delete tasks locally</li>
-            <li>☁️ Changes automatically sync to cloud in background</li>
-            <li>📥 ElectricSQL pulls updates from other devices</li>
-            <li>🔄 Works offline - syncs when connection returns</li>
-          </ul>
-        </div>
-      </section>
 
       {/* ElectricSQL Sync Status */}
       <section

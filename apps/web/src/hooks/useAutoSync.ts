@@ -23,19 +23,16 @@ export function useAutoSync(options: UseAutoSyncOptions = {}) {
     if (!enabled) return true;
 
     try {
-      console.log(`[AutoSync] Syncing task to cloud: ${task.title}`);
       const syncTask = convertTaskToSyncFormat(task);
       const result = await syncClient.pushTasks([syncTask]);
       
-      if (result.success) {
-        console.log(`[AutoSync] ✅ Successfully synced task: ${task.title}`);
-        return true;
-      } else {
-        console.error(`[AutoSync] ❌ Failed to sync task: ${result.error}`);
+      if (!result.success) {
+        console.error(`[AutoSync] Failed to sync task "${task.title}":`, result.error);
         return false;
       }
+      return true;
     } catch (error) {
-      console.error(`[AutoSync] ❌ Error syncing task:`, error);
+      console.error(`[AutoSync] Error syncing task:`, error);
       return false;
     }
   }, [enabled, syncClient]);
@@ -45,32 +42,22 @@ export function useAutoSync(options: UseAutoSyncOptions = {}) {
     if (!enabled) return true;
 
     try {
-      console.log(`[AutoSync] Deleting task from cloud: ${taskId}`);
       const result = await syncClient.deleteTask(taskId);
       
-      if (result.success) {
-        console.log(`[AutoSync] ✅ Successfully deleted task from cloud: ${taskId}`);
-        return true;
-      } else {
-        console.error(`[AutoSync] ❌ Failed to delete task from cloud: ${result.error}`);
+      if (!result.success) {
+        console.error(`[AutoSync] Failed to delete task ${taskId}:`, result.error);
         return false;
       }
+      return true;
     } catch (error) {
-      console.error(`[AutoSync] ❌ Error deleting task:`, error);
+      console.error(`[AutoSync] Error deleting task:`, error);
       return false;
     }
-  }, [enabled, syncClient]);
-
-  // Check if sync is available
-  const checkSyncAvailable = useCallback(async (): Promise<boolean> => {
-    if (!enabled) return false;
-    return await syncClient.isOnline();
   }, [enabled, syncClient]);
 
   return {
     autoSyncTask,
     autoDeleteTask,
-    checkSyncAvailable,
     enabled,
   };
 }
