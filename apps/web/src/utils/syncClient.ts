@@ -117,6 +117,25 @@ export class SyncClient {
     }
   }
 
+  // Delete a task from cloud
+  async deleteTask(taskId: string): Promise<{ success: boolean; error?: string; details?: string }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/sync/tasks/${taskId}`, {
+        method: "DELETE",
+        signal: AbortSignal.timeout(30000), // 30 second timeout
+      });
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        error: "Failed to delete task from cloud",
+        details: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
   // Full bidirectional sync
   async syncBidirectional(
     localTasks: SyncTask[],

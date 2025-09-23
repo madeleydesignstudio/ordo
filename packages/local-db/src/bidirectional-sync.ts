@@ -1,5 +1,3 @@
-import type { PGlite } from "@electric-sql/pglite";
-import { electricSync } from "@electric-sql/pglite-sync";
 import type { ElectricSyncConfig, SyncSubscription } from "./sync.js";
 
 export interface BidirectionalSyncConfig extends ElectricSyncConfig {

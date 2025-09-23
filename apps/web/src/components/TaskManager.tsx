@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDatabase, type Task } from "../hooks/useDatabase";
-import { useSync } from "../hooks/useSync";
+import { useAutoSync } from "../hooks/useAutoSync";
 import { LoadingFallback } from "./LoadingFallback";
 import { ElectricSyncStatus } from "./ElectricSyncStatus";
-import { useBidirectionalSync } from "../hooks/useBidirectionalSync";
-import { eq } from "@ordo/local-db";
+import { useElectricSync } from "../hooks/useElectricSync";
+import { eq, testElectricSync, testSyncConnectivity } from "@ordo/local-db";
 import { usePGlite } from "@electric-sql/pglite-react";
 
 export function TaskManager() {
@@ -17,22 +18,16 @@ export function TaskManager() {
     clearDatabase,
     resetDatabase,
   } = useDatabase();
-  const {
-    isLoading: isSyncing,
-    status: syncStatus,
-    message: syncMessage,
-    error: syncError,
-    lastSyncTime,
-    syncToCloud,
-    checkBackendStatus,
-    clearSyncStatus,
-  } = useSync();
-  const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
-  const [backendAvailable, setBackendAvailable] = useState<boolean>(false);
-  const [useBidirectional, setUseBidirectional] = useState<boolean>(true);
+  const [syncTestResult, setSyncTestResult] = useState<any>(null);
   const pgliteClient = usePGlite();
+  const queryClient = useQueryClient();
+  
+  // Auto-sync hook for automatic cloud synchronization
+  const { autoSyncTask, autoDeleteTask, checkSyncAvailable } = useAutoSync({
+    enabled: navigator.onLine, // Only enable when online
+  });
 
   // Get ElectricSQL configuration
   const electricConfig = {
@@ -48,44 +43,71 @@ export function TaskManager() {
   const syncEnabled = import.meta.env.VITE_ELECTRIC_SYNC_ENABLED === "true";
   const isElectricConfigured = electricConfig.sourceId && electricConfig.secret;
 
-  // Use bidirectional sync if configured and enabled
+  // Use basic ElectricSQL sync for reading from cloud
   const {
-    isInitialized: isBidirectionalSyncReady,
-    isLoading: isBidirectionalSyncing,
-    conflictCount,
-    syncedRecords,
-    failedRecords,
-    error: bidirectionalSyncError,
-    canSync: canUseBidirectional,
-    forceSyncFromRemote,
-    clearError: clearBidirectionalError,
-  } = useBidirectionalSync({
-    config: isElectricConfigured && useBidirectional ? electricConfig : undefined,
-    autoStart: Boolean(syncEnabled && isElectricConfigured && useBidirectional),
+    isInitialized: isElectricSyncReady,
+    isLoading: isElectricSyncing,
+    isUpToDate,
+    error: electricSyncError,
+    canSync: canUseElectric,
+    restartSync,
+    clearError: clearElectricError,
+  } = useElectricSync({
+    config: isElectricConfigured ? electricConfig : undefined,
+    autoStart: Boolean(syncEnabled && isElectricConfigured),
   });
 
-  // Fetch tasks
-  useEffect(() => {
-    if (!isInitialized) return;
+  // Use TanStack Query to fetch tasks - simple and effective
+  const { data: allTasks = [], refetch: refetchTasks } = useQuery<Task[]>({
+    queryKey: ['tasks'],
+    queryFn: async (): Promise<Task[]> => {
+      if (!isInitialized || !db) return [];
+      const tasksData = await db.select().from(tasks);
+      console.log(`[TaskManager] TanStack Query fetched ${tasksData.length} tasks`);
+      return tasksData;
+    },
+    enabled: isInitialized && !!db,
+    staleTime: 5000, // Consider data fresh for 5 seconds
+    refetchInterval: isElectricSyncReady ? 30000 : false, // Refetch every 30s when sync is active
+  });
 
-    async function fetchData() {
-      try {
-        if (db) {
-          const tasksData = await db.select().from(tasks);
-          setAllTasks(tasksData);
-        }
-      } catch (err) {
-        console.error("Failed to fetch data:", err);
-      }
+
+  // Test Electric sync connectivity
+  const handleTestSync = async () => {
+    if (!isElectricConfigured) {
+      alert("Electric sync is not configured. Please set VITE_ELECTRIC_SOURCE_ID and VITE_ELECTRIC_SECRET environment variables.");
+      return;
     }
 
-    fetchData();
-  }, [isInitialized, db]);
+    try {
+      console.log("Testing Electric sync...");
+      const result = await testElectricSync(electricConfig);
+      setSyncTestResult(result);
+      console.log("Sync test result:", result);
+      alert(`Sync test completed! Found ${result.taskCount} tasks in cloud database.`);
+    } catch (error) {
+      console.error("Sync test failed:", error);
+      setSyncTestResult({ error: error instanceof Error ? error.message : String(error) });
+      alert(`Sync test failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
 
-  // Check backend availability on mount
-  useEffect(() => {
-    checkBackendStatus().then(setBackendAvailable);
-  }, [checkBackendStatus]);
+  // Test connectivity only
+  const handleTestConnectivity = async () => {
+    if (!isElectricConfigured) {
+      alert("Electric sync is not configured. Please set VITE_ELECTRIC_SOURCE_ID and VITE_ELECTRIC_SECRET environment variables.");
+      return;
+    }
+
+    try {
+      console.log("Testing connectivity...");
+      const isConnected = await testSyncConnectivity(electricConfig);
+      alert(`Connectivity test: ${isConnected ? 'SUCCESS' : 'FAILED'}`);
+    } catch (error) {
+      console.error("Connectivity test failed:", error);
+      alert(`Connectivity test failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
 
   const buttonStyle = {
     padding: "10px 20px",
@@ -96,22 +118,31 @@ export function TaskManager() {
     marginRight: "10px",
   };
 
-  // Handle sync to cloud
-  const handleSyncToCloud = async () => {
-    try {
-      const result = await syncToCloud(allTasks);
-      if (result.success) {
-        // Success feedback is handled by the hook
-      } else {
-        console.error("Sync failed:", result.message);
-      }
-    } catch (error) {
-      console.error("Sync error:", error);
-    }
-  };
+  // Check sync status for display
+  const [autoSyncStatus, setAutoSyncStatus] = useState<"online" | "offline" | "checking">("checking");
 
-  // Check if we should show sync button
-  const showSyncButton = navigator.onLine;
+  // Check sync availability on mount and when online status changes
+  useEffect(() => {
+    const checkSync = async () => {
+      setAutoSyncStatus("checking");
+      const isAvailable = await checkSyncAvailable();
+      setAutoSyncStatus(isAvailable ? "online" : "offline");
+    };
+    
+    checkSync();
+    
+    // Listen for online/offline events
+    const handleOnline = () => checkSync();
+    const handleOffline = () => setAutoSyncStatus("offline");
+    
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [checkSyncAvailable]);
 
   if (error) {
     return (
@@ -165,9 +196,16 @@ export function TaskManager() {
         .returning();
 
       if (newTask[0]) {
-        setAllTasks((prev) => [...prev, newTask[0]]);
+        queryClient.invalidateQueries({ queryKey: ['tasks'] });
         setNewTaskTitle("");
         setNewTaskDescription("");
+        
+        // Auto-sync to cloud
+        autoSyncTask(newTask[0]).catch(error => {
+          console.error("Failed to auto-sync new task:", error);
+          // Note: We don't show an error to the user since the task was created locally
+          // ElectricSQL will eventually sync it when connection is restored
+        });
       }
     } catch (err) {
       console.error("Failed to add task:", err);
@@ -187,9 +225,12 @@ export function TaskManager() {
         .returning();
 
       if (updatedTask[0]) {
-        setAllTasks((prev) =>
-          prev.map((task) => (task.id === taskId ? updatedTask[0] : task)),
-        );
+        queryClient.invalidateQueries({ queryKey: ['tasks'] });
+        
+        // Auto-sync update to cloud
+        autoSyncTask(updatedTask[0]).catch(error => {
+          console.error("Failed to auto-sync updated task:", error);
+        });
       }
     } catch (err) {
       console.error("Failed to toggle task:", err);
@@ -203,7 +244,12 @@ export function TaskManager() {
 
     try {
       await db.delete(tasks).where(eq(tasks.id, taskId));
-      setAllTasks((prev) => prev.filter((task) => task.id !== taskId));
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      
+      // Auto-sync deletion to cloud
+      autoDeleteTask(taskId).catch(error => {
+        console.error("Failed to auto-sync task deletion:", error);
+      });
     } catch (err) {
       console.error("Failed to delete task:", err);
       alert("Failed to delete task. Please try again.");
@@ -230,7 +276,7 @@ export function TaskManager() {
     if (!confirm("Are you sure you want to clear all data?")) return;
     try {
       await clearDatabase();
-      setAllTasks([]);
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
     } catch (err) {
       console.error("Failed to clear data:", err);
       alert("Failed to clear data. Check console for details.");
@@ -250,9 +296,17 @@ export function TaskManager() {
       // Check PGlite electric extension
       console.log("[Debug] PGlite has electric extension:", !!pgliteClient.electric);
 
-      // Count total tasks
+      // Raw SQL query to check tasks table
+      try {
+        const rawResult = await pgliteClient.query('SELECT * FROM tasks ORDER BY created_at DESC');
+        console.log(`[Debug] Raw SQL query found ${rawResult.rows.length} tasks:`, rawResult.rows);
+      } catch (err) {
+        console.log("[Debug] Raw SQL query failed:", err instanceof Error ? err.message : String(err));
+      }
+
+      // Drizzle ORM query
       const countResult = await db.select().from(tasks);
-      console.log(`[Debug] Total tasks in local database: ${countResult.length}`);
+      console.log(`[Debug] Drizzle ORM query found ${countResult.length} tasks`);
 
       // Show all tasks with details
       countResult.forEach((task: Task, index: number) => {
@@ -261,25 +315,42 @@ export function TaskManager() {
           title: task.title,
           completed: task.completed,
           createdAt: task.createdAt,
-          updatedAt: task.updatedAt
+          updatedAt: task.updatedAt,
+          description: task.description,
+          dueDate: task.dueDate
         });
       });
 
-      // Check electric metadata if available
+      // Check React state vs database
+      console.log(`[Debug] React state has ${allTasks.length} tasks`);
+      console.log(`[Debug] Database has ${countResult.length} tasks`);
+      console.log(`[Debug] State/DB mismatch: ${allTasks.length !== countResult.length ? 'YES' : 'NO'}`);
+
+      // Check electric metadata and sync status
       if (pgliteClient.electric) {
         try {
+          // Check electric tables
           const metadataResult = await pgliteClient.query(`
             SELECT schemaname, tablename
             FROM pg_tables
             WHERE schemaname = 'electric' OR tablename LIKE '%electric%'
           `);
           console.log("[Debug] Electric metadata tables:", metadataResult.rows);
+
+          // Check sync status
+          console.log("[Debug] ElectricSQL sync status:", {
+            isElectricSyncReady,
+            isElectricSyncing,
+            isUpToDate,
+            electricSyncError,
+            canUseElectric
+          });
+
         } catch (err) {
           console.log("[Debug] Could not query electric metadata:", err instanceof Error ? err.message : String(err));
         }
       }
 
-      // Check if there are any shape subscriptions
       console.log("[Debug] Database debugging complete");
     } catch (error) {
       console.error("[Debug] Error during database debug:", error);
@@ -397,137 +468,49 @@ export function TaskManager() {
         </form>
       </section>
 
-      {/* Sync Section */}
-      {showSyncButton && (
-        <section
-          style={{
-            marginBottom: "20px",
-            padding: "20px",
-            border: "1px solid #2196F3",
-            borderRadius: "8px",
-            backgroundColor: "#e3f2fd",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: "10px",
-            }}
-          >
-            <div>
-              <h3 style={{ margin: "0 0 5px 0", color: "#1976d2" }}>
-                ☁️ Cloud Sync
-              </h3>
-              <p style={{ margin: "0", fontSize: "14px", color: "#666" }}>
-                Sync your tasks to the cloud database
-                {lastSyncTime && (
-                  <span> • Last sync: {lastSyncTime.toLocaleString()}</span>
-                )}
-              </p>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              {syncStatus === "success" && syncMessage && (
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#4caf50",
-                    backgroundColor: "#e8f5e8",
-                    padding: "6px 12px",
-                    borderRadius: "4px",
-                    border: "1px solid #4caf50",
-                  }}
-                >
-                  ✅ {syncMessage}
-                </div>
-              )}
-              {syncError && (
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#f44336",
-                    backgroundColor: "#ffebee",
-                    padding: "6px 12px",
-                    borderRadius: "4px",
-                    border: "1px solid #f44336",
-                  }}
-                >
-                  ❌ {syncError}
-                </div>
-              )}
-              <button
-                onClick={handleSyncToCloud}
-                disabled={isSyncing || allTasks.length === 0}
-                style={{
-                  ...buttonStyle,
-                  backgroundColor: isSyncing ? "#ccc" : "#2196F3",
-                  cursor:
-                    isSyncing || allTasks.length === 0
-                      ? "not-allowed"
-                      : "pointer",
-                  padding: "8px 16px",
-                  fontSize: "14px",
-                  marginRight: "0",
-                }}
-              >
-                {isSyncing
-                  ? "🔄 Syncing..."
-                  : `📤 Sync ${allTasks.length} Tasks`}
-              </button>
-            </div>
-          </div>
-          {backendAvailable === false && (
-            <div
-              style={{
-                marginTop: "10px",
-                fontSize: "12px",
-                color: "#ff9800",
-                backgroundColor: "#fff8e1",
-                padding: "8px 12px",
-                borderRadius: "4px",
-                border: "1px solid #ff9800",
-              }}
-            >
-              ⚠️ Sync backend is not available. Make sure the sync server is
-              running on port 3001.
-            </div>
-          )}
-          {!navigator.onLine && (
-            <div
-              style={{
-                marginTop: "10px",
-                fontSize: "12px",
-                color: "#f44336",
-                backgroundColor: "#ffebee",
-                padding: "8px 12px",
-                borderRadius: "4px",
-                border: "1px solid #f44336",
-              }}
-            >
-              🌐 You're offline. Sync will be available when you're back online.
-            </div>
-          )}
-          {(syncStatus === "success" || syncError) && (
-            <button
-              onClick={clearSyncStatus}
-              style={{
-                marginTop: "10px",
-                padding: "4px 8px",
-                fontSize: "11px",
-                backgroundColor: "transparent",
-                color: "#666",
-                border: "1px solid #ccc",
-                borderRadius: "3px",
-                cursor: "pointer",
-              }}
-            >
-              Clear Status
-            </button>
-          )}
-        </section>
-      )}
+      {/* Automatic Sync Status */}
+      <section
+        style={{
+          marginBottom: "20px",
+          padding: "20px",
+          border: `1px solid ${autoSyncStatus === "online" ? "#4caf50" : autoSyncStatus === "offline" ? "#f44336" : "#ff9800"}`,
+          borderRadius: "8px",
+          backgroundColor: autoSyncStatus === "online" ? "#e8f5e8" : autoSyncStatus === "offline" ? "#ffebee" : "#fff8e1",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{
+            width: "8px",
+            height: "8px",
+            borderRadius: "50%",
+            backgroundColor: autoSyncStatus === "online" ? "#4caf50" : autoSyncStatus === "offline" ? "#f44336" : "#ff9800",
+            display: "inline-block",
+          }}></span>
+          <h3 style={{ margin: "0", color: autoSyncStatus === "online" ? "#2e7d32" : autoSyncStatus === "offline" ? "#c62828" : "#f57c00" }}>
+            🔄 Automatic Cloud Sync
+          </h3>
+        </div>
+        <p style={{ margin: "8px 0 0 18px", fontSize: "14px", color: "#666" }}>
+          {autoSyncStatus === "online" && "✅ All changes automatically sync to cloud"}
+          {autoSyncStatus === "offline" && "❌ Offline - Changes will sync when connection is restored"}
+          {autoSyncStatus === "checking" && "⏳ Checking connection..."}
+        </p>
+        <div style={{
+          marginTop: "10px",
+          padding: "10px",
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
+          borderRadius: "4px",
+          fontSize: "12px",
+        }}>
+          <strong>🚀 How it works:</strong>
+          <ul style={{ margin: "5px 0 0 20px", padding: 0 }}>
+            <li>✨ Create, update, and delete tasks locally</li>
+            <li>☁️ Changes automatically sync to cloud in background</li>
+            <li>📥 ElectricSQL pulls updates from other devices</li>
+            <li>🔄 Works offline - syncs when connection returns</li>
+          </ul>
+        </div>
+      </section>
 
       {/* ElectricSQL Sync Status */}
       <section
@@ -539,106 +522,144 @@ export function TaskManager() {
         }}
       >
         <div style={{ marginBottom: "20px" }}>
-          {/* Sync Mode Toggle */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "15px" }}>
-            <span style={{ fontSize: "14px", fontWeight: "500" }}>Sync Mode:</span>
-            <label style={{ display: "flex", alignItems: "center", gap: "5px", cursor: "pointer" }}>
-              <input
-                type="radio"
-                name="syncMode"
-                checked={!useBidirectional}
-                onChange={() => setUseBidirectional(false)}
-              />
-              <span style={{ fontSize: "13px" }}>Basic ElectricSQL</span>
-            </label>
-            <label style={{ display: "flex", alignItems: "center", gap: "5px", cursor: "pointer" }}>
-              <input
-                type="radio"
-                name="syncMode"
-                checked={useBidirectional}
-                onChange={() => setUseBidirectional(true)}
-              />
-              <span style={{ fontSize: "13px", color: "#28a745", fontWeight: "500" }}>
-                🚀 Smart Bidirectional Sync
-              </span>
-            </label>
-          </div>
+          <h3>🔄 ElectricSQL Sync (Read-Only from Cloud)</h3>
+
+          {syncEnabled && isElectricConfigured ? (
+            <div style={{ marginBottom: "15px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+                <span style={{
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  background: isElectricSyncReady ? "#28a745" : isElectricSyncing ? "#007bff" : electricSyncError ? "#dc3545" : "#6c757d",
+                  display: "inline-block",
+                }}></span>
+                <span style={{ fontSize: "14px", fontWeight: "500" }}>
+                  {isElectricSyncReady ? "ElectricSQL Sync Active" :
+                   isElectricSyncing ? "Initializing Sync..." :
+                   electricSyncError ? "Sync Error" :
+                   !canUseElectric ? "Sync Unavailable" :
+                   "Sync Stopped"}
+                </span>
+                <span style={{ fontSize: "12px", color: "#666" }}>
+                  (Up-to-date: {isUpToDate ? "Yes" : "No"})
+                </span>
+              </div>
+
+              {electricSyncError && (
+                <div style={{ fontSize: "12px", color: "#dc3545", marginBottom: "8px" }}>
+                  Error: {electricSyncError}
+                </div>
+              )}
+
+              <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "10px" }}>
+                {canUseElectric && (
+                  <button
+                    onClick={restartSync}
+                    disabled={isElectricSyncing}
+                    style={{
+                      padding: "4px 12px",
+                      fontSize: "11px",
+                      backgroundColor: "#007bff",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "3px",
+                      cursor: isElectricSyncing ? "not-allowed" : "pointer",
+                      opacity: isElectricSyncing ? 0.6 : 1,
+                    }}
+                    title="Restart sync from cloud"
+                  >
+                    🔄 Restart Sync
+                  </button>
+                )}
+
+                {electricSyncError && (
+                  <button
+                    onClick={clearElectricError}
+                    style={{
+                      padding: "4px 8px",
+                      fontSize: "11px",
+                      backgroundColor: "#6c757d",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "3px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Clear Error
+                  </button>
+                )}
+              </div>
+
+              <ElectricSyncStatus />
+              
+              <div style={{ marginTop: "10px" }}>
+                <button
+                  onClick={handleTestConnectivity}
+                  style={{ ...buttonStyle, background: "#17a2b8", marginRight: "10px" }}
+                >
+                  🔗 Test Connectivity
+                </button>
+                <button
+                  onClick={handleTestSync}
+                  style={{ ...buttonStyle, background: "#6f42c1" }}
+                >
+                  🧪 Test Full Sync
+                </button>
+              </div>
+              
+              {syncTestResult && (
+                <div style={{ 
+                  marginTop: "10px", 
+                  padding: "10px", 
+                  background: syncTestResult.error ? "#f8d7da" : "#d4edda", 
+                  border: `1px solid ${syncTestResult.error ? "#f5c6cb" : "#c3e6cb"}`, 
+                  borderRadius: "4px" 
+                }}>
+                  {syncTestResult.error ? (
+                    <p>❌ <strong>Sync Test Failed:</strong> {syncTestResult.error}</p>
+                  ) : (
+                    <div>
+                      <p>✅ <strong>Sync Test Passed!</strong></p>
+                      <ul>
+                        <li>Connected: {syncTestResult.connected ? '✅' : '❌'}</li>
+                        <li>Sync Setup: {syncTestResult.syncSetup ? '✅' : '❌'}</li>
+                        <li>Tasks Found: {syncTestResult.taskCount}</li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={{ padding: "10px", background: "#f8f9fa", border: "1px solid #dee2e6", borderRadius: "4px", marginBottom: "15px" }}>
+              <p>⚠️ ElectricSQL sync is not configured</p>
+              <small style={{ color: "#6c757d" }}>Set VITE_ELECTRIC_SOURCE_ID and VITE_ELECTRIC_SECRET environment variables</small>
+            </div>
+          )}
 
           {/* Sync Status and Controls */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-            {useBidirectional ? (
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                  <span style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    background: isBidirectionalSyncReady ? "#28a745" : isBidirectionalSyncing ? "#007bff" : bidirectionalSyncError ? "#dc3545" : "#6c757d",
-                    display: "inline-block",
-                  }}></span>
-                  <span style={{ fontSize: "14px", fontWeight: "500" }}>
-                    {isBidirectionalSyncReady ? "Smart Sync Active" :
-                     isBidirectionalSyncing ? "Initializing Smart Sync..." :
-                     bidirectionalSyncError ? "Smart Sync Error" :
-                     !canUseBidirectional ? "Smart Sync Unavailable" :
-                     "Smart Sync Stopped"}
-                  </span>
-                </div>
 
-                {isBidirectionalSyncReady && (
-                  <div style={{ fontSize: "12px", color: "#666", marginBottom: "8px" }}>
-                    Synced: {syncedRecords} | Conflicts: {conflictCount} | Failed: {failedRecords}
-                  </div>
-                )}
-
-                {bidirectionalSyncError && (
-                  <div style={{ fontSize: "12px", color: "#dc3545", marginBottom: "8px" }}>
-                    Error: {bidirectionalSyncError}
-                  </div>
-                )}
-
-                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                  {isBidirectionalSyncReady && (
-                    <button
-                      onClick={forceSyncFromRemote}
-                      style={{
-                        padding: "4px 12px",
-                        fontSize: "11px",
-                        backgroundColor: "#007bff",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "3px",
-                        cursor: "pointer",
-                      }}
-                      title="Force sync from cloud (preserves local data)"
-                    >
-                      🔄 Force Sync
-                    </button>
-                  )}
-
-                  {bidirectionalSyncError && (
-                    <button
-                      onClick={clearBidirectionalError}
-                      style={{
-                        padding: "4px 8px",
-                        fontSize: "11px",
-                        backgroundColor: "#6c757d",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "3px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Clear Error
-                    </button>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <ElectricSyncStatus />
-            )}
-
-            <div style={{ display: "flex", gap: "8px" }}>
+              <div style={{ display: "flex", gap: "8px" }}>
+              <button
+                onClick={() => {
+                  console.log("[TaskManager] Manual task refresh triggered");
+                  refetchTasks();
+                }}
+                style={{
+                  padding: "4px 8px",
+                  fontSize: "11px",
+                  backgroundColor: "#28a745",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "3px",
+                  cursor: "pointer",
+                }}
+                title="Refresh tasks from database"
+              >
+                🔄 Refresh Tasks
+              </button>
               <button
                 onClick={debugDatabaseState}
                 style={{
@@ -654,45 +675,41 @@ export function TaskManager() {
               >
                 🐛 Debug DB
               </button>
-              {!useBidirectional && (
-                <button
-                  onClick={resetDatabaseForSync}
-                  style={{
-                    padding: "4px 8px",
-                    fontSize: "11px",
-                    backgroundColor: "#dc3545",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "3px",
-                    cursor: "pointer",
-                  }}
-                  title="Clear local database and restart ElectricSQL sync"
-                >
-                  🔄 Reset & Sync
-                </button>
-              )}
+              <button
+                onClick={resetDatabaseForSync}
+                style={{
+                  padding: "4px 8px",
+                  fontSize: "11px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "3px",
+                  cursor: "pointer",
+                }}
+                title="Clear local database and restart ElectricSQL sync"
+              >
+                🔄 Reset & Sync
+              </button>
             </div>
           </div>
 
-          {/* Bidirectional Sync Info */}
-          {useBidirectional && (
-            <div style={{
-              marginTop: "10px",
-              padding: "10px",
-              backgroundColor: "#e8f5e8",
-              border: "1px solid #28a745",
-              borderRadius: "4px",
-              fontSize: "12px",
-            }}>
-              <strong>🚀 Smart Bidirectional Sync Enabled:</strong>
-              <ul style={{ margin: "5px 0 0 20px", padding: 0 }}>
-                <li>✅ Multi-device sync without conflicts</li>
-                <li>✅ Preserves local data during sync</li>
-                <li>✅ Auto-resolves conflicts with "latest wins"</li>
-                <li>✅ Real-time updates from cloud</li>
-              </ul>
-            </div>
-          )}
+          {/* ElectricSQL Sync Info */}
+          <div style={{
+            marginTop: "10px",
+            padding: "10px",
+            backgroundColor: "#e8f4ff",
+            border: "1px solid #007bff",
+            borderRadius: "4px",
+            fontSize: "12px",
+          }}>
+            <strong>⚡ ElectricSQL Read-Only Sync:</strong>
+            <ul style={{ margin: "5px 0 0 20px", padding: 0 }}>
+              <li>📥 Pulls latest data from cloud database</li>
+              <li>🔄 Real-time updates when cloud data changes</li>
+              <li>📝 Local writes handled by @ordo/engine service</li>
+              <li>🚀 Fast local reads with cloud sync</li>
+            </ul>
+          </div>
         </div>
       </section>
 

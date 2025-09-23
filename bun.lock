@@ -10,6 +10,21 @@
         "typescript": "5.7.3",
       },
     },
+    "apps/engine": {
+      "name": "@ordo/engine",
+      "version": "0.0.1",
+      "dependencies": {
+        "@ordo/cloud-db": "workspace:*",
+        "@ordo/local-db": "workspace:*",
+        "drizzle-orm": "^0.44.5",
+        "hono": "^4.6.3",
+      },
+      "devDependencies": {
+        "@ordo/typescript-config": "workspace:*",
+        "@types/bun": "latest",
+        "typescript": "5.7.3",
+      },
+    },
     "apps/marketing": {
       "name": "@ordo/marketing",
       "version": "0.0.1",
@@ -29,21 +44,6 @@
         "typescript": "^5.9.2",
       },
     },
-    "apps/sync-backend": {
-      "name": "@ordo/sync-backend",
-      "version": "0.0.1",
-      "dependencies": {
-        "@ordo/cloud-db": "workspace:*",
-        "@ordo/local-db": "workspace:*",
-        "drizzle-orm": "^0.44.5",
-        "hono": "^4.6.3",
-      },
-      "devDependencies": {
-        "@ordo/typescript-config": "workspace:*",
-        "@types/bun": "latest",
-        "typescript": "5.7.3",
-      },
-    },
     "apps/web": {
       "name": "@ordo/web",
       "version": "0.0.0",
@@ -52,6 +52,7 @@
         "@electric-sql/pglite": "^0.3.8",
         "@electric-sql/pglite-react": "^0.2.14",
         "@ordo/local-db": "workspace:*",
+        "@tanstack/react-query": "^5.90.2",
         "drizzle-orm": "^0.44.5",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
@@ -495,11 +496,11 @@
 
     "@ordo/cloud-db": ["@ordo/cloud-db@workspace:packages/cloud-db"],
 
+    "@ordo/engine": ["@ordo/engine@workspace:apps/engine"],
+
     "@ordo/local-db": ["@ordo/local-db@workspace:packages/local-db"],
 
     "@ordo/marketing": ["@ordo/marketing@workspace:apps/marketing"],
-
-    "@ordo/sync-backend": ["@ordo/sync-backend@workspace:apps/sync-backend"],
 
     "@ordo/typescript-config": ["@ordo/typescript-config@workspace:packages/typescript-config"],
 
@@ -640,6 +641,10 @@
     "@tailwindcss/oxide-win32-x64-msvc": ["@tailwindcss/oxide-win32-x64-msvc@4.1.13", "", { "os": "win32", "cpu": "x64" }, "sha512-3+LKesjXydTkHk5zXX01b5KMzLV1xl2mcktBJkje7rhFUpUlYJy7IMOLqjIRQncLTa1WZZiFY/foAeB5nmaiTw=="],
 
     "@tailwindcss/postcss": ["@tailwindcss/postcss@4.1.13", "", { "dependencies": { "@alloc/quick-lru": "^5.2.0", "@tailwindcss/node": "4.1.13", "@tailwindcss/oxide": "4.1.13", "postcss": "^8.4.41", "tailwindcss": "4.1.13" } }, "sha512-HLgx6YSFKJT7rJqh9oJs/TkBFhxuMOfUKSBEPYwV+t78POOBsdQ7crhZLzwcH3T0UyUuOzU/GK5pk5eKr3wCiQ=="],
+
+    "@tanstack/query-core": ["@tanstack/query-core@5.90.2", "", {}, "sha512-k/TcR3YalnzibscALLwxeiLUub6jN5EDLwKDiO7q5f4ICEoptJ+n9+7vcEFy5/x/i6Q+Lb/tXrsKCggf5uQJXQ=="],
+
+    "@tanstack/react-query": ["@tanstack/react-query@5.90.2", "", { "dependencies": { "@tanstack/query-core": "5.90.2" }, "peerDependencies": { "react": "^18 || ^19" } }, "sha512-CLABiR+h5PYfOWr/z+vWFt5VsOA2ekQeRQBFSKlcoW6Ndx/f8rfyVmq4LbgOM4GG2qtxAxjLYLOpCNTYm4uKzw=="],
 
     "@tootallnate/quickjs-emscripten": ["@tootallnate/quickjs-emscripten@0.23.0", "", {}, "sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA=="],
 

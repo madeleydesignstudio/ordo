@@ -10,10 +10,7 @@ const app = new Hono();
 app.use("*", cors());
 app.use("*", logger());
 
-// Initialize cloud database
-console.log("🔧 Initializing database connection...");
-console.log("DATABASE_URL exists:", !!process.env.DATABASE_URL);
-console.log("SUPABASE_DATABASE_URL exists:", !!process.env.SUPABASE_DATABASE_URL);
+
 
 const cloudDbResult = initializeCloudDatabase({
   connectionString: process.env.DATABASE_URL || process.env.SUPABASE_DATABASE_URL,
@@ -21,7 +18,6 @@ const cloudDbResult = initializeCloudDatabase({
 
 // Handle both possible return types
 const cloudDb = "db" in cloudDbResult ? cloudDbResult.db : cloudDbResult;
-console.log("✅ Database initialized successfully");
 
 // Health check endpoint
 app.get("/health", (c) => {
@@ -150,6 +146,41 @@ app.post("/sync/tasks", async (c) => {
     return c.json(
       {
         error: "Failed to sync tasks",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      500
+    );
+  }
+});
+
+// Delete a specific task from cloud
+app.delete("/sync/tasks/:id", async (c) => {
+  console.log("🗑️ Received delete request");
+  try {
+    const taskId = c.req.param("id");
+    console.log(`🗑️ Deleting task: ${taskId}`);
+
+    const deletedTask = await cloudDb
+      .delete(cloudTasks)
+      .where(eq(cloudTasks.id, taskId))
+      .returning();
+
+    if (deletedTask.length === 0) {
+      console.log(`❌ Task ${taskId} not found`);
+      return c.json({ error: "Task not found" }, 404);
+    }
+
+    console.log(`✅ Successfully deleted task: ${taskId}`);
+    return c.json({
+      success: true,
+      message: `Task ${taskId} deleted successfully`,
+      deletedTask: deletedTask[0],
+    });
+  } catch (error) {
+    console.error("💥 Delete error:", error);
+    return c.json(
+      {
+        error: "Failed to delete task",
         details: error instanceof Error ? error.message : "Unknown error",
       },
       500

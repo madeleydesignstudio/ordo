@@ -42,8 +42,14 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
 
   // Initialize sync
   const initializeSync = useCallback(async () => {
-    if (!canSync || !config || initRef.current) {
-      console.log("[useElectricSync] Skipping init:", { canSync, hasConfig: !!config, alreadyInit: initRef.current });
+    if (!canSync || !config || initRef.current || syncState.isLoading || syncState.isInitialized) {
+      console.log("[useElectricSync] Skipping init:", { 
+        canSync, 
+        hasConfig: !!config, 
+        alreadyInit: initRef.current,
+        isLoading: syncState.isLoading,
+        isInitialized: syncState.isInitialized
+      });
       return;
     }
 
@@ -70,7 +76,7 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
 
       console.log("[useElectricSync] PGlite electric extension found, setting up tasks sync...");
 
-      // Set up tasks sync
+      // Set up tasks sync - let ElectricSQL handle it
       const subscription = await setupTasksSync(pgliteClient, config);
 
       subscriptionRef.current = subscription;
@@ -91,27 +97,6 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
 
       console.log("[useElectricSync] ✅ ElectricSQL sync initialized successfully");
 
-      // Test the connection by making a direct API call
-      const testUrl = new URL(`${config.electricUrl}/v1/shape`);
-      testUrl.searchParams.set('table', 'tasks');
-      testUrl.searchParams.set('source_id', config.sourceId);
-      testUrl.searchParams.set('secret', config.secret);
-
-      fetch(testUrl.toString())
-        .then(response => {
-          console.log("[useElectricSync] Direct API test response status:", response.status);
-          return response.json();
-        })
-        .then(data => {
-          console.log("[useElectricSync] Direct API test data:", data);
-          if (Array.isArray(data)) {
-            console.log(`[useElectricSync] Found ${data.length} records in cloud database`);
-          }
-        })
-        .catch(err => {
-          console.error("[useElectricSync] Direct API test failed:", err);
-        });
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown sync error";
 
@@ -123,8 +108,18 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
 
       console.error("[useElectricSync] ❌ Failed to initialize ElectricSQL sync:", error);
       initRef.current = false;
+      
+      // Clean up any partial subscription
+      if (subscriptionRef.current) {
+        try {
+          subscriptionRef.current.unsubscribe();
+          subscriptionRef.current = null;
+        } catch (cleanupError) {
+          console.warn("[useElectricSync] Error during cleanup:", cleanupError);
+        }
+      }
     }
-  }, [canSync, config, pgliteClient]);
+  }, [canSync, config, pgliteClient, syncState.isLoading, syncState.isInitialized]);
 
   // Start sync manually
   const startSync = useCallback(async () => {
@@ -143,9 +138,16 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
 
   // Stop sync
   const stopSync = useCallback(() => {
+    console.log("[useElectricSync] Stopping sync...");
+    
     if (subscriptionRef.current) {
-      subscriptionRef.current.unsubscribe();
-      subscriptionRef.current = null;
+      try {
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
+        console.log("[useElectricSync] Subscription unsubscribed successfully");
+      } catch (error) {
+        console.warn("[useElectricSync] Error during unsubscribe:", error);
+      }
     }
 
     setSyncState(prev => ({
@@ -153,10 +155,12 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
       isInitialized: false,
       isSyncing: false,
       isUpToDate: false,
+      isLoading: false,
+      error: null,
     }));
 
     initRef.current = false;
-    console.log("ElectricSQL sync stopped");
+    console.log("[useElectricSync] ElectricSQL sync stopped");
   }, []);
 
   // Restart sync
@@ -176,10 +180,11 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
 
   // Auto-start sync if enabled
   useEffect(() => {
-    if (autoStart && canSync && config && !syncState.isInitialized && !initRef.current) {
+    if (autoStart && canSync && config && !syncState.isInitialized && !initRef.current && !syncState.isLoading) {
+      console.log("[useElectricSync] Auto-starting sync...");
       initializeSync();
     }
-  }, [autoStart, canSync, config, syncState.isInitialized, initializeSync]);
+  }, [autoStart, canSync, config, syncState.isInitialized, syncState.isLoading, initializeSync]);
 
   // Cleanup on unmount
   useEffect(() => {

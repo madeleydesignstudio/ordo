@@ -1,5 +1,5 @@
 {
-  "name": "@ordo/sync-backend",
+  "name": "@ordo/engine",
   "version": "0.0.1",
   "private": true,
   "type": "module",

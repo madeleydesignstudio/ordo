@@ -2,6 +2,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { live } from "@electric-sql/pglite/live";
 import { electricSync } from "@electric-sql/pglite-sync";
 import { PGliteProvider } from "@electric-sql/pglite-react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
@@ -122,11 +123,23 @@ async function initApp() {
       },
     });
 
+    // Create QueryClient for TanStack Query
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          staleTime: 5 * 60 * 1000, // 5 minutes
+          refetchOnWindowFocus: false,
+        },
+      },
+    });
+
     createRoot(document.getElementById("root") as HTMLElement).render(
       <StrictMode>
-        <PGliteProvider db={db}>
-          <App />
-        </PGliteProvider>
+        <QueryClientProvider client={queryClient}>
+          <PGliteProvider db={db}>
+            <App />
+          </PGliteProvider>
+        </QueryClientProvider>
       </StrictMode>
     );
   } catch (error) {
