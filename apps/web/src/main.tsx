@@ -124,12 +124,14 @@ async function initApp() {
     });
 
     // Create QueryClient for TanStack Query
+    // ElectricSQL handles real-time sync from cloud to PGlite automatically
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: {
-          staleTime: 30 * 1000, // 30 seconds default
-          refetchOnWindowFocus: true, // Enable focus refetching for real-time feel
-          refetchOnReconnect: true, // Refetch when reconnecting
+          staleTime: 5 * 60 * 1000, // 5 minutes - ElectricSQL handles real-time updates
+          refetchOnWindowFocus: true, // Refetch when switching back to tab
+          refetchOnReconnect: true, // Refetch when internet reconnects
+          // No refetchInterval needed - ElectricSQL automatically syncs changes to PGlite
         },
       },
     });

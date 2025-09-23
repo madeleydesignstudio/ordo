@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDatabase } from "../hooks/useDatabase";
-import { useAutoSync } from "../hooks/useAutoSync";
+
 import { LoadingFallback } from "./LoadingFallback";
 import { ElectricSyncStatus } from "./ElectricSyncStatus";
 import { useElectricSync } from "../hooks/useElectricSync";
@@ -20,10 +20,7 @@ export function TaskManager() {
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [syncTestResult, setSyncTestResult] = useState<any>(null);
 
-  // Auto-sync hook for automatic cloud synchronization
-  const { autoSyncTask, autoDeleteTask } = useAutoSync({
-    enabled: navigator.onLine, // Only enable when online
-  });
+
 
   // Get ElectricSQL configuration
   const electricConfig = {
@@ -53,20 +50,21 @@ export function TaskManager() {
     autoStart: Boolean(syncEnabled && isElectricConfigured),
   });
 
-  // Use TanStack Query to fetch tasks - simple and effective
+  // Use TanStack Query to fetch tasks from local PGlite database
+  // ElectricSQL handles real-time sync from cloud to PGlite automatically
   const { data: allTasks = [], refetch: refetchTasks } = useQuery<Task[]>({
     queryKey: ['tasks'],
     queryFn: async (): Promise<Task[]> => {
       if (!isInitialized || !db) return [];
       const tasksData = await db.select().from(tasks);
-      console.log(`[TaskManager] TanStack Query fetched ${tasksData.length} tasks`);
+      console.log(`[TaskManager] TanStack Query fetched ${tasksData.length} tasks from local PGlite`);
       return tasksData;
     },
     enabled: isInitialized && !!db,
-    staleTime: 1000, // Consider data fresh for 1 second
-    refetchInterval: isElectricSyncReady ? 3000 : false, // Refetch every 3s when sync is active for near real-time updates
+    staleTime: 5 * 60 * 1000, // 5 minutes - ElectricSQL handles real-time updates
     refetchOnWindowFocus: true, // Refetch when user switches back to tab
     refetchOnReconnect: true, // Refetch when internet reconnects
+    // No refetchInterval needed - ElectricSQL automatically syncs changes to PGlite
   });
 
   // Test Electric sync connectivity
@@ -162,13 +160,12 @@ export function TaskManager() {
       setNewTaskTitle("");
       setNewTaskDescription("");
 
-      // Force refetch
+      // Refetch to update UI with the new task
       refetchTasks();
 
-      // Auto-sync to cloud if enabled (use the returned task with all fields)
-      if (navigator.onLine && result.length > 0) {
-        await autoSyncTask(result[0]);
-      }
+      // Note: ElectricSQL will automatically sync this change to cloud
+      // The autoSyncTask is redundant when ElectricSQL is properly configured
+      console.log("[TaskManager] Task will be synced to cloud automatically by ElectricSQL");
 
       console.log("[TaskManager] Task added successfully");
     } catch (error) {
@@ -202,13 +199,11 @@ export function TaskManager() {
         .set(updatedTask)
         .where(eq(tasks.id, taskId));
 
-      // Force refetch
+      // Refetch to update UI with the toggled task
       refetchTasks();
 
-      // Auto-sync to cloud if enabled
-      if (navigator.onLine) {
-        await autoSyncTask(updatedTask);
-      }
+      // Note: ElectricSQL will automatically sync this change to cloud
+      console.log("[TaskManager] Task toggle will be synced to cloud automatically by ElectricSQL");
 
       console.log("[TaskManager] Task toggled successfully");
     } catch (error) {
@@ -228,13 +223,11 @@ export function TaskManager() {
       console.log(`[TaskManager] Deleting task ${taskId}`);
       await db.delete(tasks).where(eq(tasks.id, taskId));
 
-      // Force refetch
+      // Refetch to update UI after deletion
       refetchTasks();
 
-      // Auto-delete from cloud if enabled
-      if (navigator.onLine) {
-        await autoDeleteTask(taskId);
-      }
+      // Note: ElectricSQL will automatically sync this deletion to cloud
+      console.log("[TaskManager] Task deletion will be synced to cloud automatically by ElectricSQL");
 
       console.log("[TaskManager] Task deleted successfully");
     } catch (error) {
@@ -255,7 +248,7 @@ export function TaskManager() {
       console.log("[TaskManager] Clearing all tasks");
       await db.delete(tasks);
 
-      // Force refetch
+      // Refetch to update UI after clearing all tasks
       refetchTasks();
 
       console.log("[TaskManager] All tasks cleared successfully");
