@@ -127,8 +127,9 @@ async function initApp() {
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: {
-          staleTime: 5 * 60 * 1000, // 5 minutes
-          refetchOnWindowFocus: false,
+          staleTime: 30 * 1000, // 30 seconds default
+          refetchOnWindowFocus: true, // Enable focus refetching for real-time feel
+          refetchOnReconnect: true, // Refetch when reconnecting
         },
       },
     });

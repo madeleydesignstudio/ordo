@@ -67,8 +67,10 @@ export function TaskManager() {
       return tasksData;
     },
     enabled: isInitialized && !!db,
-    staleTime: 5000, // Consider data fresh for 5 seconds
-    refetchInterval: isElectricSyncReady ? 30000 : false, // Refetch every 30s when sync is active
+    staleTime: 1000, // Consider data fresh for 1 second
+    refetchInterval: isElectricSyncReady ? 3000 : false, // Refetch every 3s when sync is active for near real-time updates
+    refetchOnWindowFocus: true, // Refetch when user switches back to tab
+    refetchOnReconnect: true, // Refetch when internet reconnects
   });
 
 
