@@ -115,6 +115,88 @@ export async function syncShapeToTable(
   }
 }
 
+// Sync a single shape to a table with callbacks for data changes
+export async function syncShapeToTableWithCallbacks(
+  pglite: any,
+  config: ElectricSyncConfig,
+  shape: SyncShape,
+  callbacks?: {
+    onDataChange?: () => void;
+  }
+): Promise<SyncSubscription> {
+  const shapeKey = shape.shapeKey || shape.table;
+  
+  console.log(`[ElectricSync] Starting sync with callbacks for table: ${shape.table}`);
+  
+  // Check if we already have an active subscription for this shape
+  if (activeSubscriptions.has(shapeKey)) {
+    console.log(`[ElectricSync] ⚠️ Reusing existing subscription for shape: ${shapeKey}`);
+    const existingSubscription = activeSubscriptions.get(shapeKey);
+    return {
+      isUpToDate: existingSubscription.isUpToDate,
+      unsubscribe: () => {
+        console.log(`[ElectricSync] Unsubscribing from ${shape.table}`);
+        existingSubscription.unsubscribe();
+        activeSubscriptions.delete(shapeKey);
+      },
+      subscription: existingSubscription,
+    };
+  }
+
+  try {
+    const subscription = await pglite.electric.syncShapeToTable({
+      shape: {
+        url: `${config.electricUrl}/v1/shape`,
+        params: {
+          table: shape.table,
+          source_id: config.sourceId,
+          secret: config.secret,
+        },
+      },
+      table: shape.table,
+      schema: shape.schema || "public",
+      primaryKey: shape.primaryKey,
+      shapeKey: shapeKey,
+      initialInsertMethod: "json",
+      
+      // Callback when initial sync completes
+      onInitialSync: () => {
+        console.log(`[ElectricSync] ✅ Initial sync complete for ${shape.table}`);
+        if (callbacks?.onDataChange) {
+          console.log(`[ElectricSync] Triggering onDataChange callback for initial sync`);
+          callbacks.onDataChange();
+        }
+      },
+      
+      // Callback when data must be refetched (indicates changes)
+      onMustRefetch: () => {
+        console.log(`[ElectricSync] 🔄 Data changed for ${shape.table}, triggering refetch`);
+        if (callbacks?.onDataChange) {
+          console.log(`[ElectricSync] Triggering onDataChange callback for data change`);
+          callbacks.onDataChange();
+        }
+      },
+    });
+
+    console.log(`[ElectricSync] Subscription with callbacks created for ${shape.table}, isUpToDate:`, subscription.isUpToDate);
+
+    // Store the subscription to prevent duplicates
+    activeSubscriptions.set(shapeKey, subscription);
+
+    return {
+      isUpToDate: subscription.isUpToDate,
+      unsubscribe: () => {
+        console.log(`[ElectricSync] Unsubscribing from ${shape.table}`);
+        subscription.unsubscribe();
+        activeSubscriptions.delete(shapeKey);
+      },
+      subscription,
+    };
+  } catch (error) {
+    console.error(`[ElectricSync] ❌ Failed to set up sync with callbacks for table ${shape.table}:`, error);
+    throw error;
+  }
+}
 
 // Sync multiple shapes to multiple tables with transactional consistency
 export async function syncShapesToTables(
@@ -185,7 +267,10 @@ export async function syncShapesToTables(
 // Create a complete sync setup for the tasks table
 export async function setupTasksSync(
   pglite: any,
-  config: ElectricSyncConfig
+  config: ElectricSyncConfig,
+  callbacks?: {
+    onDataChange?: () => void;
+  }
 ): Promise<SyncSubscription> {
   console.log(`[ElectricSync] Setting up tasks table sync`);
   console.log(`[ElectricSync] Electric URL: ${config.electricUrl}`);
@@ -198,11 +283,11 @@ export async function setupTasksSync(
     console.log(`[ElectricSync] Could not count local tasks (table may not exist yet):`, err instanceof Error ? err.message : String(err));
   }
 
-  return syncShapeToTable(pglite, config, {
+  return syncShapeToTableWithCallbacks(pglite, config, {
     table: "tasks",
     primaryKey: ["id"],
     shapeKey: "tasks",
-  });
+  }, callbacks);
 }
 
 // Utility to check if PGlite instance has Electric sync extension
