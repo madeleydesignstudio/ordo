@@ -25,5 +25,4 @@ export * from "./schema/index.js";
 export * from "./utils.js";
 export * from "./migrate.js";
 export * from "./sync.js";
-export * from "./bidirectional-sync.js";
 export * from "./test-sync.js";
