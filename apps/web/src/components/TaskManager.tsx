@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useDatabase, type Task } from "../hooks/useDatabase";
+import { useDatabase } from "../hooks/useDatabase";
 import { useAutoSync } from "../hooks/useAutoSync";
 import { LoadingFallback } from "./LoadingFallback";
 import { ElectricSyncStatus } from "./ElectricSyncStatus";
 import { useElectricSync } from "../hooks/useElectricSync";
-import { eq, testElectricSync, testSyncConnectivity } from "@ordo/local-db";
+import { eq, testElectricSync, testSyncConnectivity, tasks, type Task, type NewTask } from "@ordo/local-db";
 
 export function TaskManager() {
   const {
@@ -43,6 +43,7 @@ export function TaskManager() {
   // Use basic ElectricSQL sync for reading from cloud
   const {
     isInitialized: isElectricSyncReady,
+    // isLoading: isElectricSyncing,  // Removed unused variable
     isUpToDate,
     error: electricSyncError,
     canSync: canUseElectric,
@@ -144,18 +145,19 @@ export function TaskManager() {
     if (!newTaskTitle.trim() || !db) return;
 
     try {
-      const newTask = {
-        id: Date.now().toString(),
+      // Create task object that matches the database schema exactly
+      const taskData = {
         title: newTaskTitle.trim(),
         description: newTaskDescription.trim() || null,
         completed: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        dueDate: null,
+        // Don't include createdAt, updatedAt, dueDate - let the database set defaults
+        // The schema has defaultNow() for these fields
       };
 
-      console.log("[TaskManager] Adding new task:", newTask);
-      await db.insert(tasks).values(newTask);
+      console.log("[TaskManager] Adding new task:", taskData);
+      const result = await db.insert(tasks).values(taskData).returning();
+
+      console.log("[TaskManager] Task inserted:", result);
 
       // Clear form
       setNewTaskTitle("");
@@ -164,9 +166,9 @@ export function TaskManager() {
       // Force refetch
       refetchTasks();
 
-      // Auto-sync to cloud if enabled
-      if (navigator.onLine) {
-        await autoSyncTask(newTask);
+      // Auto-sync to cloud if enabled (use the returned task with all fields)
+      if (navigator.onLine && result.length > 0) {
+        await autoSyncTask(result[0]);
       }
 
       console.log("[TaskManager] Task added successfully");
