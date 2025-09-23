@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { SyncClient, convertTaskToSyncFormat } from "../utils/syncClient";
 import type { Task } from "./useDatabase";
 
@@ -12,7 +12,11 @@ export function useAutoSync(options: UseAutoSyncOptions = {}) {
 
   // Use production backend URL if no baseUrl provided
   const defaultBaseUrl = import.meta.env.VITE_SYNC_BACKEND_URL || "https://ordo-sync-backend.vercel.app";
-  const syncClient = new SyncClient(baseUrl || defaultBaseUrl);
+  
+  // Memoize the sync client to prevent recreating it on every render
+  const syncClient = useMemo(() => {
+    return new SyncClient(baseUrl || defaultBaseUrl);
+  }, [baseUrl, defaultBaseUrl]);
 
   // Auto-sync a single task to cloud (for CREATE/UPDATE)
   const autoSyncTask = useCallback(async (task: Task): Promise<boolean> => {

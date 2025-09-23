@@ -123,26 +123,48 @@ export function TaskManager() {
 
   // Check sync availability on mount and when online status changes
   useEffect(() => {
+    let isMounted = true;
+    
     const checkSync = async () => {
+      if (!isMounted) return;
       setAutoSyncStatus("checking");
-      const isAvailable = await checkSyncAvailable();
-      setAutoSyncStatus(isAvailable ? "online" : "offline");
+      try {
+        const isAvailable = await checkSyncAvailable();
+        if (isMounted) {
+          setAutoSyncStatus(isAvailable ? "online" : "offline");
+        }
+      } catch (error) {
+        console.error("Failed to check sync availability:", error);
+        if (isMounted) {
+          setAutoSyncStatus("offline");
+        }
+      }
     };
     
+    // Check once on mount
     checkSync();
     
     // Listen for online/offline events
-    const handleOnline = () => checkSync();
-    const handleOffline = () => setAutoSyncStatus("offline");
+    const handleOnline = () => {
+      if (isMounted) {
+        checkSync();
+      }
+    };
+    const handleOffline = () => {
+      if (isMounted) {
+        setAutoSyncStatus("offline");
+      }
+    };
     
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
     
     return () => {
+      isMounted = false;
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [checkSyncAvailable]);
+  }, []); // Remove checkSyncAvailable from dependencies to prevent re-running
 
   if (error) {
     return (
