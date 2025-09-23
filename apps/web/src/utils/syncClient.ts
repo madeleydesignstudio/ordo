@@ -34,7 +34,7 @@ export class SyncClient {
   constructor(baseUrl?: string) {
     this.baseUrl = baseUrl ||
       import.meta.env.VITE_SYNC_BACKEND_URL ||
-      "http://localhost:3001";
+      "https://ordo-sync-backend.vercel.app";
   }
 
   // Check if the sync backend is available

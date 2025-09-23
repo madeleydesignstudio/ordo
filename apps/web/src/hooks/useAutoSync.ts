@@ -10,7 +10,9 @@ interface UseAutoSyncOptions {
 export function useAutoSync(options: UseAutoSyncOptions = {}) {
   const { enabled = true, baseUrl } = options;
 
-  const syncClient = new SyncClient(baseUrl);
+  // Use production backend URL if no baseUrl provided
+  const defaultBaseUrl = import.meta.env.VITE_SYNC_BACKEND_URL || "https://ordo-sync-backend.vercel.app";
+  const syncClient = new SyncClient(baseUrl || defaultBaseUrl);
 
   // Auto-sync a single task to cloud (for CREATE/UPDATE)
   const autoSyncTask = useCallback(async (task: Task): Promise<boolean> => {
