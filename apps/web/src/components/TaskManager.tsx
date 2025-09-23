@@ -5,7 +5,7 @@ import { useAutoSync } from "../hooks/useAutoSync";
 import { LoadingFallback } from "./LoadingFallback";
 import { ElectricSyncStatus } from "./ElectricSyncStatus";
 import { useElectricSync } from "../hooks/useElectricSync";
-import { eq, testElectricSync, testSyncConnectivity, tasks, type Task } from "@ordo/local-db";
+import { eq, testElectricSync, testSyncConnectivity, testElectricCloudSetup, tasks, type Task } from "@ordo/local-db";
 
 export function TaskManager() {
   const {
@@ -79,6 +79,36 @@ export function TaskManager() {
     refetchOnReconnect: true, // Refetch when internet reconnects
     // No refetchInterval - ElectricSQL automatically syncs cloud changes to PGlite
   });
+
+  // Test ElectricSQL Cloud setup
+  const handleTestElectricCloud = async () => {
+    if (!isElectricConfigured) {
+      alert("ElectricSQL is not configured. Please set VITE_ELECTRIC_SOURCE_ID and VITE_ELECTRIC_SECRET environment variables.");
+      return;
+    }
+
+    try {
+      console.log("Testing ElectricSQL Cloud setup...");
+      const result = await testElectricCloudSetup(electricConfig);
+
+      setSyncTestResult(result);
+      console.log("ElectricSQL Cloud test result:", result);
+
+      if (result.connected) {
+        if (result.hasData) {
+          alert(`✅ ElectricSQL Cloud connected successfully!\nFound ${result.details?.dataMessages || 0} data records in cloud database.`);
+        } else {
+          alert(`✅ ElectricSQL Cloud connected, but no tasks found in cloud database.\nThis is normal if you haven't created any tasks yet.`);
+        }
+      } else {
+        alert(`❌ ElectricSQL Cloud connection failed:\n${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error("ElectricSQL Cloud test failed:", error);
+      setSyncTestResult({ error: error instanceof Error ? error.message : String(error) });
+      alert(`ElectricSQL Cloud test failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
 
   // Test Electric sync connectivity
   const handleTestSync = async () => {
@@ -320,6 +350,16 @@ export function TaskManager() {
             }}
           >
             Test Full Sync
+          </button>
+          <button
+            onClick={handleTestElectricCloud}
+            disabled={!isElectricConfigured}
+            style={{
+              ...buttonStyle,
+              backgroundColor: isElectricConfigured ? "#9C27B0" : "#cccccc",
+            }}
+          >
+            Test Cloud Setup
           </button>
           <button
             onClick={restartSync}

@@ -66,6 +66,26 @@ export async function syncShapeToTable(
     shapeKey: shapeKey,
   });
 
+  // Test ElectricSQL Cloud connectivity
+  const testUrl = `${config.electricUrl}/v1/shape?table=${shape.table}&source_id=${config.sourceId}&secret=${config.secret}&offset=-1`;
+  console.log(`[ElectricSync] Testing connectivity to ElectricSQL Cloud:`, testUrl.replace(config.secret, '[REDACTED]'));
+
+  try {
+    const testResponse = await fetch(testUrl);
+    console.log(`[ElectricSync] ElectricSQL Cloud response:`, {
+      status: testResponse.status,
+      statusText: testResponse.statusText,
+      headers: Object.fromEntries(testResponse.headers.entries()),
+    });
+
+    if (!testResponse.ok) {
+      const errorText = await testResponse.text();
+      console.error(`[ElectricSync] ElectricSQL Cloud error response:`, errorText);
+    }
+  } catch (testError) {
+    console.error(`[ElectricSync] Failed to connect to ElectricSQL Cloud:`, testError);
+  }
+
   // Check if we already have an active subscription for this shape
   if (activeSubscriptions.has(shapeKey)) {
     console.log(`[ElectricSync] ⚠️ Reusing existing subscription for shape: ${shapeKey}`);
@@ -82,6 +102,15 @@ export async function syncShapeToTable(
   }
 
   try {
+    console.log(`[ElectricSync] Creating PGlite sync subscription with params:`, {
+      url: `${config.electricUrl}/v1/shape`,
+      table: shape.table,
+      sourceId: config.sourceId,
+      hasSecret: !!config.secret,
+      primaryKey: shape.primaryKey,
+      shapeKey: shapeKey,
+    });
+
     const subscription = await pglite.electric.syncShapeToTable({
       shape: {
         url: `${config.electricUrl}/v1/shape`,
@@ -95,15 +124,23 @@ export async function syncShapeToTable(
       schema: shape.schema || "public",
       primaryKey: shape.primaryKey,
       shapeKey: shapeKey,
-      initialInsertMethod: "json", // Required parameter
+      initialInsertMethod: "json",
 
-      // Callback when initial sync completes
       onInitialSync: () => {
         console.log(`[ElectricSync] ✅ Initial sync complete for ${shape.table}`);
 
         // Log current data count to verify sync worked
         pglite.query(`SELECT COUNT(*) as count FROM ${shape.table}`).then((result: any) => {
           console.log(`[ElectricSync] Table ${shape.table} now has ${result.rows[0]?.count || 0} records after initial sync`);
+
+          // Log sample records
+          pglite.query(`SELECT id, title, created_at FROM ${shape.table} ORDER BY created_at DESC LIMIT 3`).then((sampleResult: any) => {
+            if (sampleResult.rows.length > 0) {
+              console.log(`[ElectricSync] Sample synced records:`, sampleResult.rows);
+            }
+          }).catch((err: any) => {
+            console.log(`[ElectricSync] Could not fetch sample records:`, err);
+          });
         }).catch((err: any) => {
           console.log(`[ElectricSync] Could not count records in ${shape.table}:`, err);
         });
@@ -115,25 +152,32 @@ export async function syncShapeToTable(
       },
     });
 
-    // Set up listener for ongoing changes
-    if (callbacks?.onDataChange) {
+    // Set up listener for ongoing changes - according to PGlite docs
+    if (callbacks?.onDataChange && typeof subscription.subscribe === 'function') {
       console.log(`[ElectricSync] Setting up change subscription for ${shape.table}`);
-      subscription.subscribe(() => {
-        console.log(`[ElectricSync] 🔄 Data changed for ${shape.table}, triggering callback`);
 
-        // Log updated data count
-        pglite.query(`SELECT COUNT(*) as count FROM ${shape.table}`).then((result: any) => {
-          console.log(`[ElectricSync] Table ${shape.table} now has ${result.rows[0]?.count || 0} records after change`);
-        }).catch((err: any) => {
-          console.log(`[ElectricSync] Could not count records in ${shape.table}:`, err);
-        });
+      // PGlite sync API: subscribe(cb: () => void, error?: (err: Error) => void)
+      subscription.subscribe(
+        () => {
+          console.log(`[ElectricSync] 🔄 Shape caught up to main Postgres for ${shape.table}`);
 
-        callbacks.onDataChange();
-      }, (error: any) => {
-        console.error(`[ElectricSync] ❌ Sync error for ${shape.table}:`, error);
-      });
+          // Log updated data count
+          pglite.query(`SELECT COUNT(*) as count FROM ${shape.table}`).then((result: any) => {
+            console.log(`[ElectricSync] Table ${shape.table} now has ${result.rows[0]?.count || 0} records after sync update`);
+          }).catch((err: any) => {
+            console.log(`[ElectricSync] Could not count records in ${shape.table}:`, err);
+          });
+
+          if (callbacks.onDataChange) {
+            callbacks.onDataChange();
+          }
+        },
+        (error: any) => {
+          console.error(`[ElectricSync] ❌ Sync error for ${shape.table}:`, error);
+        }
+      );
     } else {
-      console.log(`[ElectricSync] No onDataChange callback provided for ${shape.table}`);
+      console.log(`[ElectricSync] No onDataChange callback provided or subscribe method unavailable for ${shape.table}`);
     }
 
     console.log(`[ElectricSync] Subscription created for ${shape.table}, isUpToDate:`, subscription.isUpToDate);
@@ -288,24 +332,129 @@ export async function testSyncConnectivity(config: ElectricSyncConfig): Promise<
     testUrl.searchParams.set('secret', config.secret);
     testUrl.searchParams.set('offset', '-1'); // Required for initial sync test
 
-    console.log(`[ElectricSync] Testing connectivity to: ${config.electricUrl}/v1/shape (with auth params)`);
+    console.log(`[ElectricSync] Testing ElectricSQL Cloud connectivity to: ${config.electricUrl}/v1/shape`);
+    console.log(`[ElectricSync] Using source_id: ${config.sourceId}, secret: [REDACTED]`);
 
     const response = await fetch(testUrl.toString());
     const isConnected = response.ok;
 
-    console.log(`[ElectricSync] Connectivity test result: ${isConnected ? 'SUCCESS' : 'FAILED'} (${response.status})`);
+    console.log(`[ElectricSync] ElectricSQL Cloud connectivity test result: ${isConnected ? 'SUCCESS' : 'FAILED'} (${response.status})`);
+
+    // Log response headers for debugging
+    console.log(`[ElectricSync] Response headers:`, Object.fromEntries(response.headers.entries()));
 
     if (!isConnected) {
       const errorData = await response.text();
-      console.log(`[ElectricSync] Error response:`, errorData);
+      console.error(`[ElectricSync] ElectricSQL Cloud error response:`, errorData);
+
+      // Check for common issues
+      if (response.status === 401) {
+        console.error(`[ElectricSync] Authentication failed - check your source_id and secret`);
+      } else if (response.status === 404) {
+        console.error(`[ElectricSync] Shape not found - check if the 'tasks' table exists in your cloud database`);
+      } else if (response.status === 400) {
+        console.error(`[ElectricSync] Bad request - check your shape parameters`);
+      }
     } else {
       const responseData = await response.text();
-      console.log(`[ElectricSync] Success response sample:`, responseData.substring(0, 200) + '...');
+      console.log(`[ElectricSync] ElectricSQL Cloud response sample:`, responseData.substring(0, 200) + '...');
+
+      // Try to parse the response to see if it's valid shape data
+      try {
+        const lines = responseData.split('\n').filter(line => line.trim());
+        console.log(`[ElectricSync] Received ${lines.length} lines from ElectricSQL Cloud`);
+        if (lines.length > 0) {
+          const firstMessage = JSON.parse(lines[0]);
+          console.log(`[ElectricSync] First message type:`, firstMessage.headers?.operation || 'control');
+        }
+      } catch (parseError) {
+        console.warn(`[ElectricSync] Could not parse response as JSON lines:`, parseError);
+      }
     }
 
     return isConnected;
   } catch (error) {
-    console.error(`[ElectricSync] Connectivity test failed:`, error);
+    console.error(`[ElectricSync] ElectricSQL Cloud connectivity test failed:`, error);
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      console.error(`[ElectricSync] Network error - check if ElectricSQL Cloud is accessible from your environment`);
+    }
     return false;
+  }
+}
+
+// Test ElectricSQL Cloud setup and return detailed results
+export async function testElectricCloudSetup(config: ElectricSyncConfig): Promise<{
+  connected: boolean;
+  hasData: boolean;
+  error?: string;
+  details?: any;
+}> {
+  try {
+    const testUrl = new URL(`${config.electricUrl}/v1/shape`);
+    testUrl.searchParams.set('table', 'tasks');
+    testUrl.searchParams.set('source_id', config.sourceId);
+    testUrl.searchParams.set('secret', config.secret);
+    testUrl.searchParams.set('offset', '-1');
+
+    console.log(`[ElectricSync] Testing ElectricSQL Cloud setup...`);
+
+    const response = await fetch(testUrl.toString(), {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return {
+        connected: false,
+        hasData: false,
+        error: `HTTP ${response.status}: ${response.statusText}`,
+        details: {
+          status: response.status,
+          statusText: response.statusText,
+          errorBody: errorText,
+          headers: Object.fromEntries(response.headers.entries())
+        }
+      };
+    }
+
+    const responseText = await response.text();
+    const lines = responseText.split('\n').filter(line => line.trim());
+
+    let hasData = false;
+    let dataCount = 0;
+
+    for (const line of lines) {
+      try {
+        const message = JSON.parse(line);
+        if (message.headers?.operation === 'insert') {
+          hasData = true;
+          dataCount++;
+        }
+      } catch (parseError) {
+        // Ignore parse errors for individual lines
+      }
+    }
+
+    return {
+      connected: true,
+      hasData,
+      details: {
+        totalMessages: lines.length,
+        dataMessages: dataCount,
+        responseHeaders: Object.fromEntries(response.headers.entries()),
+        sampleResponse: responseText.substring(0, 500)
+      }
+    };
+
+  } catch (error) {
+    return {
+      connected: false,
+      hasData: false,
+      error: error instanceof Error ? error.message : String(error),
+      details: { error }
+    };
   }
 }

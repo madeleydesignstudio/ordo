@@ -22,7 +22,7 @@ export async function runMigrations(client: PGliteClient) {
 
     await client.exec(`
       CREATE TABLE IF NOT EXISTS tasks (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        id TEXT PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         description TEXT,
         completed BOOLEAN DEFAULT FALSE NOT NULL,
