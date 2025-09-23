@@ -176,6 +176,15 @@ export async function syncShapeToTableWithCallbacks(
           callbacks.onDataChange();
         }
       },
+      
+      // Handle sync errors gracefully
+      onError: (error: any) => {
+        console.error(`[ElectricSync] ❌ Sync error for ${shape.table}:`, error);
+        if (error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
+          console.error(`[ElectricSync] 🚨 Primary key conflict detected - this usually means local and cloud data have conflicting IDs`);
+          console.error(`[ElectricSync] 💡 Recommendation: Reset local database to resolve conflicts`);
+        }
+      },
     });
 
     console.log(`[ElectricSync] Subscription with callbacks created for ${shape.table}, isUpToDate:`, subscription.isUpToDate);
