@@ -1,12 +1,11 @@
-import { usePGlite } from "@electric-sql/pglite-react";
-import { eq, testElectricSync, testSyncConnectivity } from "@ordo/local-db";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useAutoSync } from "../hooks/useAutoSync";
+import { useQuery } from "@tanstack/react-query";
 import { useDatabase, type Task } from "../hooks/useDatabase";
-import { useElectricSync } from "../hooks/useElectricSync";
-import { ElectricSyncStatus } from "./ElectricSyncStatus";
+import { useAutoSync } from "../hooks/useAutoSync";
 import { LoadingFallback } from "./LoadingFallback";
+import { ElectricSyncStatus } from "./ElectricSyncStatus";
+import { useElectricSync } from "../hooks/useElectricSync";
+import { eq, testElectricSync, testSyncConnectivity } from "@ordo/local-db";
 
 export function TaskManager() {
   const {
@@ -21,8 +20,6 @@ export function TaskManager() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [syncTestResult, setSyncTestResult] = useState<any>(null);
-  const pgliteClient = usePGlite();
-  const queryClient = useQueryClient();
 
   // Auto-sync hook for automatic cloud synchronization
   const { autoSyncTask, autoDeleteTask } = useAutoSync({
@@ -73,7 +70,6 @@ export function TaskManager() {
     refetchOnReconnect: true, // Refetch when internet reconnects
   });
 
-
   // Test Electric sync connectivity
   const handleTestSync = async () => {
     if (!isElectricConfigured) {
@@ -120,7 +116,6 @@ export function TaskManager() {
     marginRight: "10px",
   };
 
-
   if (error) {
     return (
       <div style={{ textAlign: "center", padding: "40px", color: "red" }}>
@@ -155,8 +150,9 @@ export function TaskManager() {
         title: newTaskTitle.trim(),
         description: newTaskDescription.trim() || null,
         completed: false,
-        created_at: new Date(),
-        updated_at: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        dueDate: null,
       };
 
       console.log("[TaskManager] Adding new task:", newTask);
@@ -195,7 +191,7 @@ export function TaskManager() {
       const updatedTask = {
         ...task,
         completed: !task.completed,
-        updated_at: new Date(),
+        updatedAt: new Date(),
       };
 
       console.log(
@@ -278,21 +274,72 @@ export function TaskManager() {
       <h1>📋 Task Manager</h1>
 
       {/* ElectricSQL Status */}
-      <ElectricSyncStatus
-        isEnabled={syncEnabled}
-        isConfigured={isElectricConfigured}
-        isReady={isElectricSyncReady}
-        isLoading={isElectricSyncing}
-        isUpToDate={isUpToDate}
-        error={electricSyncError}
-        canSync={canUseElectric}
-        onRestartSync={restartSync}
-        onClearError={clearElectricError}
-        onTestSync={handleTestSync}
-        onTestConnectivity={handleTestConnectivity}
-        taskCount={allTasks.length}
-        syncTestResult={syncTestResult}
-      />
+      <ElectricSyncStatus />
+
+      {/* Additional sync controls */}
+      <div style={{ margin: "20px 0", padding: "15px", border: "1px solid #ddd", borderRadius: "8px" }}>
+        <h4>🔄 Sync Controls</h4>
+        <p style={{ margin: "5px 0", fontSize: "14px", color: "#666" }}>
+          ElectricSQL Sync: {syncEnabled ? "Enabled" : "Disabled"} |
+          Config: {isElectricConfigured ? "✅" : "❌"} |
+          Ready: {isElectricSyncReady ? "✅" : "❌"} |
+          Up to Date: {isUpToDate ? "✅" : "❌"} |
+          Tasks: {allTasks.length}
+        </p>
+        <div>
+          <button
+            onClick={handleTestConnectivity}
+            disabled={!isElectricConfigured}
+            style={{
+              ...buttonStyle,
+              backgroundColor: isElectricConfigured ? "#2196F3" : "#cccccc",
+            }}
+          >
+            Test Connectivity
+          </button>
+          <button
+            onClick={handleTestSync}
+            disabled={!isElectricConfigured}
+            style={{
+              ...buttonStyle,
+              backgroundColor: isElectricConfigured ? "#4CAF50" : "#cccccc",
+            }}
+          >
+            Test Full Sync
+          </button>
+          <button
+            onClick={restartSync}
+            disabled={!canUseElectric}
+            style={{
+              ...buttonStyle,
+              backgroundColor: canUseElectric ? "#FF9800" : "#cccccc",
+            }}
+          >
+            Restart Sync
+          </button>
+          {electricSyncError && (
+            <button
+              onClick={clearElectricError}
+              style={{
+                ...buttonStyle,
+                backgroundColor: "#f44336",
+              }}
+            >
+              Clear Error
+            </button>
+          )}
+        </div>
+        {electricSyncError && (
+          <p style={{ color: "red", fontSize: "14px", margin: "10px 0 0 0" }}>
+            ❌ {electricSyncError}
+          </p>
+        )}
+        {syncTestResult && (
+          <pre style={{ fontSize: "12px", background: "#f5f5f5", padding: "10px", margin: "10px 0", overflow: "auto" }}>
+            {JSON.stringify(syncTestResult, null, 2)}
+          </pre>
+        )}
+      </div>
 
       {/* Task input form */}
       <div
@@ -425,13 +472,13 @@ export function TaskManager() {
                     </p>
                   )}
                   <small style={{ color: "#999" }}>
-                    Created: {new Date(task.created_at).toLocaleString()}
-                    {task.updated_at &&
-                      task.updated_at !== task.created_at && (
+                    Created: {new Date(task.createdAt).toLocaleString()}
+                    {task.updatedAt &&
+                      task.updatedAt !== task.createdAt && (
                         <>
                           {" "}
                           | Updated:{" "}
-                          {new Date(task.updated_at).toLocaleString()}
+                          {new Date(task.updatedAt).toLocaleString()}
                         </>
                       )}
                   </small>
