@@ -1,0 +1,37 @@
+{
+  "name": "@ordo/web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "build:prod": "tsc -b && vite build --mode production",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
+    "preview": "vite preview",
+    "check-electric": "node scripts/check-electric-config.js"
+  },
+  "dependencies": {
+    "@electric-sql/client": "^0.8.0",
+    "@electric-sql/pglite": "^0.3.8",
+    "@electric-sql/pglite-react": "^0.2.14",
+    "@ordo/local-db": "workspace:*",
+    "@tanstack/react-query": "^5.90.2",
+    "drizzle-orm": "^0.44.5",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@ordo/typescript-config": "workspace:*",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react-swc": "^4.0.1",
+    "drizzle-kit": "^0.31.4",
+    "typescript": "~5.8.3",
+    "vite": "^7.1.6",
+    "vite-plugin-pwa": "^1.0.3",
+    "workbox-window": "^7.3.0"
+  }
+}
