@@ -43,7 +43,6 @@ export function TaskManager() {
   // Use basic ElectricSQL sync for reading from cloud
   const {
     isInitialized: isElectricSyncReady,
-    isLoading: isElectricSyncing,
     isUpToDate,
     error: electricSyncError,
     canSync: canUseElectric,
