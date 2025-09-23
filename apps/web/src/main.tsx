@@ -127,15 +127,9 @@ async function initApp() {
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: {
-<<<<<<< HEAD
-          staleTime: 5 * 60 * 1000, // 5 minutes - ElectricSQL handles real-time updates
-          refetchOnWindowFocus: true, // Refetch when switching back to tab
-          refetchOnReconnect: true, // Refetch when internet reconnects
-=======
           staleTime: 30 * 1000, // 30 seconds default
           refetchOnWindowFocus: true, // Enable focus refetching for real-time feel
           refetchOnReconnect: true, // Refetch when reconnecting
->>>>>>> 61f33ff (fixed repo)
         },
       },
     });
@@ -147,37 +141,47 @@ async function initApp() {
             <App />
           </PGliteProvider>
         </QueryClientProvider>
-      </StrictMode>
+      </StrictMode>,
     );
   } catch (error) {
     console.error("Failed to initialize app:", error);
 
-    // Show error message directly in DOM
-    const root = document.getElementById("root");
-    if (root) {
-      root.innerHTML = `
-        <div style="padding: 20px; max-width: 600px; margin: 40px auto; font-family: system-ui, sans-serif;">
-          <h1 style="color: #c33;">⚠️ App Failed to Load</h1>
-          <p>The application couldn't initialize properly.</p>
-          <details style="margin: 20px 0;">
-            <summary style="cursor: pointer; font-weight: bold;">Error Details</summary>
-            <pre style="background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 4px; overflow: auto; font-size: 12px;">${error instanceof Error ? `${error.message}\n\n${error.stack}` : String(error)}</pre>
-          </details>
-          <button type="button" onclick="window.location.reload()" style="padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">
-            Reload Page
-          </button>
-          <button type="button" onclick="
-            if ('indexedDB' in window) indexedDB.deleteDatabase('ordo-db');
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.reload();
-          " style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
-            Reset & Reload
-          </button>
-        </div>
-      `;
-    }
+    // Show error UI
+    const errorDiv = document.createElement("div");
+    errorDiv.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      text-align: center;
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      z-index: 9999;
+    `;
+
+    errorDiv.innerHTML = `
+      <h2 style="color: #d32f2f; margin: 0 0 16px 0;">❌ App Failed to Start</h2>
+      <p style="margin: 0 0 16px 0; color: #666;">
+        ${error instanceof Error ? error.message : String(error)}
+      </p>
+      <button onclick="window.location.reload()" style="
+        background: #1976d2;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      ">Reload Page</button>
+    `;
+
+    document.body.appendChild(errorDiv);
   }
 }
 
+// Start the app
 initApp();

@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useDatabase, type Task } from "../hooks/useDatabase";
-import { useAutoSync } from "../hooks/useAutoSync";
-import { LoadingFallback } from "./LoadingFallback";
-import { ElectricSyncStatus } from "./ElectricSyncStatus";
-import { useElectricSync } from "../hooks/useElectricSync";
-import { eq, testElectricSync, testSyncConnectivity } from "@ordo/local-db";
 import { usePGlite } from "@electric-sql/pglite-react";
+import { eq, testElectricSync, testSyncConnectivity } from "@ordo/local-db";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useAutoSync } from "../hooks/useAutoSync";
+import { useDatabase, type Task } from "../hooks/useDatabase";
+import { useElectricSync } from "../hooks/useElectricSync";
+import { ElectricSyncStatus } from "./ElectricSyncStatus";
+import { LoadingFallback } from "./LoadingFallback";
 
 export function TaskManager() {
   const {
@@ -23,7 +23,7 @@ export function TaskManager() {
   const [syncTestResult, setSyncTestResult] = useState<any>(null);
   const pgliteClient = usePGlite();
   const queryClient = useQueryClient();
-  
+
   // Auto-sync hook for automatic cloud synchronization
   const { autoSyncTask, autoDeleteTask } = useAutoSync({
     enabled: navigator.onLine, // Only enable when online
@@ -55,19 +55,9 @@ export function TaskManager() {
   } = useElectricSync({
     config: isElectricConfigured ? electricConfig : undefined,
     autoStart: Boolean(syncEnabled && isElectricConfigured),
-<<<<<<< HEAD
-    onDataChange: () => {
-      console.log("[TaskManager] ElectricSQL detected data change, invalidating cache");
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-    },
-  });
-
-  // Use TanStack Query to fetch tasks - let ElectricSQL drive updates
-=======
   });
 
   // Use TanStack Query to fetch tasks - simple and effective
->>>>>>> 61f33ff (fixed repo)
   const { data: allTasks = [], refetch: refetchTasks } = useQuery<Task[]>({
     queryKey: ['tasks'],
     queryFn: async (): Promise<Task[]> => {
@@ -77,17 +67,10 @@ export function TaskManager() {
       return tasksData;
     },
     enabled: isInitialized && !!db,
-<<<<<<< HEAD
-    staleTime: Infinity, // Never consider data stale - ElectricSQL will tell us when to update
-    refetchOnWindowFocus: true, // Refetch when user switches back to tab
-    refetchOnReconnect: true, // Refetch when internet reconnects
-    // No refetchInterval - ElectricSQL handles real-time updates
-=======
     staleTime: 1000, // Consider data fresh for 1 second
     refetchInterval: isElectricSyncReady ? 3000 : false, // Refetch every 3s when sync is active for near real-time updates
     refetchOnWindowFocus: true, // Refetch when user switches back to tab
     refetchOnReconnect: true, // Refetch when internet reconnects
->>>>>>> 61f33ff (fixed repo)
   });
 
 
@@ -149,667 +132,333 @@ export function TaskManager() {
         >
           Reload Page
         </button>
-        <button
-          onClick={() => {
-            if ("indexedDB" in window) indexedDB.deleteDatabase("ordo-db");
-            window.location.reload();
-          }}
-          style={{
-            ...buttonStyle,
-            backgroundColor: "#dc3545",
-            marginRight: "0",
-          }}
-        >
-          Reset Database & Reload
-        </button>
       </div>
     );
   }
 
-  if (isLoading)
-    return <LoadingFallback message="🔄 Initializing database..." />;
-  if (!isInitialized || !db)
-    return (
-      <div style={{ textAlign: "center", padding: "40px", color: "orange" }}>
-        ⚠️ Database not ready. Please refresh the page.
-      </div>
-    );
+  if (isLoading) {
+    return <LoadingFallback message="Initializing database..." />;
+  }
 
-  // Add new task
-  async function addTask(e: React.FormEvent) {
-    e.preventDefault();
+  if (!isInitialized) {
+    return (
+      <LoadingFallback message="Database not initialized. Please refresh the page." />
+    );
+  }
+
+  const handleAddTask = async () => {
     if (!newTaskTitle.trim() || !db) return;
 
     try {
-      const newTask = await db
-        .insert(tasks)
-        .values({
-          title: newTaskTitle.trim(),
-          description: newTaskDescription.trim() || null,
-        })
-        .returning();
+      const newTask = {
+        id: Date.now().toString(),
+        title: newTaskTitle.trim(),
+        description: newTaskDescription.trim() || null,
+        completed: false,
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
 
-      if (newTask[0]) {
-        queryClient.invalidateQueries({ queryKey: ['tasks'] });
-        setNewTaskTitle("");
-        setNewTaskDescription("");
-        
-        // Auto-sync to cloud (silent)
-        autoSyncTask(newTask[0]);
-      }
-    } catch (err) {
-      console.error("Failed to add task:", err);
-      alert("Failed to add task. Please try again.");
-    }
-  }
+      console.log("[TaskManager] Adding new task:", newTask);
+      await db.insert(tasks).values(newTask);
 
-  // Toggle task completion
-  async function toggleTask(taskId: string, completed: boolean) {
-    if (!db) return;
+      // Clear form
+      setNewTaskTitle("");
+      setNewTaskDescription("");
 
-    try {
-      const updatedTask = await db
-        .update(tasks)
-        .set({ completed: !completed })
-        .where(eq(tasks.id, taskId))
-        .returning();
+      // Force refetch
+      refetchTasks();
 
-      if (updatedTask[0]) {
-        queryClient.invalidateQueries({ queryKey: ['tasks'] });
-        
-        // Auto-sync update to cloud (silent)
-        autoSyncTask(updatedTask[0]);
-      }
-    } catch (err) {
-      console.error("Failed to toggle task:", err);
-      alert("Failed to update task. Please try again.");
-    }
-  }
-
-  // Delete task
-  async function deleteTask(taskId: string) {
-    if (!db) return;
-
-    try {
-      await db.delete(tasks).where(eq(tasks.id, taskId));
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      
-      // Auto-sync deletion to cloud (silent)
-      autoDeleteTask(taskId);
-    } catch (err) {
-      console.error("Failed to delete task:", err);
-      alert("Failed to delete task. Please try again.");
-    }
-  }
-
-  async function handleResetDatabase() {
-    if (
-      !confirm(
-        "Are you sure you want to reset the database? This will delete all data!",
-      )
-    )
-      return;
-    try {
-      await resetDatabase();
-      window.location.reload();
-    } catch (err) {
-      console.error("Failed to reset database:", err);
-      alert("Failed to reset database. Check console for details.");
-    }
-  }
-
-  async function handleClearData() {
-    if (!confirm("Are you sure you want to clear all data?")) return;
-    try {
-      await clearDatabase();
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-    } catch (err) {
-      console.error("Failed to clear data:", err);
-      alert("Failed to clear data. Check console for details.");
-    }
-  }
-
-  // Debug function to check database state
-  const debugDatabaseState = async () => {
-    if (!db || !pgliteClient) {
-      console.log("[Debug] Database not ready");
-      return;
-    }
-
-    try {
-      console.log("[Debug] === Database State Debug ===");
-
-      // Check PGlite electric extension
-      console.log("[Debug] PGlite has electric extension:", !!pgliteClient.electric);
-
-      // Raw SQL query to check tasks table
-      try {
-        const rawResult = await pgliteClient.query('SELECT * FROM tasks ORDER BY created_at DESC');
-        console.log(`[Debug] Raw SQL query found ${rawResult.rows.length} tasks:`, rawResult.rows);
-      } catch (err) {
-        console.log("[Debug] Raw SQL query failed:", err instanceof Error ? err.message : String(err));
+      // Auto-sync to cloud if enabled
+      if (navigator.onLine) {
+        await autoSyncTask(newTask);
       }
 
-      // Drizzle ORM query
-      const countResult = await db.select().from(tasks);
-      console.log(`[Debug] Drizzle ORM query found ${countResult.length} tasks`);
-
-      // Show all tasks with details
-      countResult.forEach((task: Task, index: number) => {
-        console.log(`[Debug] Task ${index + 1}:`, {
-          id: task.id,
-          title: task.title,
-          completed: task.completed,
-          createdAt: task.createdAt,
-          updatedAt: task.updatedAt,
-          description: task.description,
-          dueDate: task.dueDate
-        });
-      });
-
-      // Check React state vs database
-      console.log(`[Debug] React state has ${allTasks.length} tasks`);
-      console.log(`[Debug] Database has ${countResult.length} tasks`);
-      console.log(`[Debug] State/DB mismatch: ${allTasks.length !== countResult.length ? 'YES' : 'NO'}`);
-
-      // Check electric metadata and sync status
-      if (pgliteClient.electric) {
-        try {
-          // Check electric tables
-          const metadataResult = await pgliteClient.query(`
-            SELECT schemaname, tablename
-            FROM pg_tables
-            WHERE schemaname = 'electric' OR tablename LIKE '%electric%'
-          `);
-          console.log("[Debug] Electric metadata tables:", metadataResult.rows);
-
-          // Check sync status
-          console.log("[Debug] ElectricSQL sync status:", {
-            isElectricSyncReady,
-            isElectricSyncing,
-            isUpToDate,
-            electricSyncError,
-            canUseElectric
-          });
-
-        } catch (err) {
-          console.log("[Debug] Could not query electric metadata:", err instanceof Error ? err.message : String(err));
-        }
-      }
-
-      console.log("[Debug] Database debugging complete");
+      console.log("[TaskManager] Task added successfully");
     } catch (error) {
-      console.error("[Debug] Error during database debug:", error);
+      console.error("[TaskManager] Failed to add task:", error);
+      alert(
+        `Failed to add task: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   };
 
-  // Reset database to fix primary key conflicts
-  const resetDatabaseForSync = async () => {
-    if (!confirm("⚠️ This will clear your local database and re-sync from cloud. Continue?")) {
-      return;
-    }
+  const handleToggleTask = async (taskId: string) => {
+    if (!db) return;
 
     try {
-      console.log("[Reset] Clearing local database for clean ElectricSQL sync...");
+      const task = allTasks.find((t) => t.id === taskId);
+      if (!task) return;
 
-      // Clear all local tasks
-      await clearDatabase();
+      const updatedTask = {
+        ...task,
+        completed: !task.completed,
+        updated_at: new Date(),
+      };
 
-      // Clear browser storage to reset ElectricSQL sync state
-      localStorage.removeItem('electric-sync-state');
+      console.log(
+        `[TaskManager] Toggling task ${taskId}: ${task.completed} -> ${updatedTask.completed}`,
+      );
+      await db
+        .update(tasks)
+        .set(updatedTask)
+        .where(eq(tasks.id, taskId));
 
-      // Also clear any ElectricSQL metadata
-      if (pgliteClient.electric) {
-        try {
-          await pgliteClient.query('DROP SCHEMA IF EXISTS electric CASCADE');
-        } catch (err) {
-          console.log("[Reset] No electric schema to drop");
-        }
+      // Force refetch
+      refetchTasks();
+
+      // Auto-sync to cloud if enabled
+      if (navigator.onLine) {
+        await autoSyncTask(updatedTask);
       }
 
-      console.log("[Reset] ✅ Local database cleared. Refreshing page for clean sync...");
-
-      // Refresh page to restart ElectricSQL sync
-      window.location.reload();
+      console.log("[TaskManager] Task toggled successfully");
     } catch (error) {
-      console.error("[Reset] ❌ Failed to reset database:", error);
-      alert("Failed to reset database. Check console for details.");
+      console.error("[TaskManager] Failed to toggle task:", error);
+      alert(
+        `Failed to toggle task: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    if (!db) return;
+
+    try {
+      console.log(`[TaskManager] Deleting task ${taskId}`);
+      await db.delete(tasks).where(eq(tasks.id, taskId));
+
+      // Force refetch
+      refetchTasks();
+
+      // Auto-delete from cloud if enabled
+      if (navigator.onLine) {
+        await autoDeleteTask(taskId);
+      }
+
+      console.log("[TaskManager] Task deleted successfully");
+    } catch (error) {
+      console.error("[TaskManager] Failed to delete task:", error);
+      alert(
+        `Failed to delete task: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  };
+
+  const handleClearAllTasks = async () => {
+    if (!confirm("Are you sure you want to delete all tasks?")) return;
+    if (!db) return;
+
+    try {
+      console.log("[TaskManager] Clearing all tasks");
+      await db.delete(tasks);
+
+      // Force refetch
+      refetchTasks();
+
+      console.log("[TaskManager] All tasks cleared successfully");
+    } catch (error) {
+      console.error("[TaskManager] Failed to clear tasks:", error);
+      alert(
+        `Failed to clear tasks: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   };
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
-      <header style={{ marginBottom: "30px", textAlign: "center" }}>
-        <h1>📋 Simple Task Manager</h1>
-        <p>Powered by Drizzle ORM + PGlite</p>
-        <div
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+      <h1>📋 Task Manager</h1>
+
+      {/* ElectricSQL Status */}
+      <ElectricSyncStatus
+        isEnabled={syncEnabled}
+        isConfigured={isElectricConfigured}
+        isReady={isElectricSyncReady}
+        isLoading={isElectricSyncing}
+        isUpToDate={isUpToDate}
+        error={electricSyncError}
+        canSync={canUseElectric}
+        onRestartSync={restartSync}
+        onClearError={clearElectricError}
+        onTestSync={handleTestSync}
+        onTestConnectivity={handleTestConnectivity}
+        taskCount={allTasks.length}
+        syncTestResult={syncTestResult}
+      />
+
+      {/* Task input form */}
+      <div
+        style={{
+          margin: "20px 0",
+          padding: "20px",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+        }}
+      >
+        <h3>Add New Task</h3>
+        <input
+          type="text"
+          placeholder="Task title"
+          value={newTaskTitle}
+          onChange={(e) => setNewTaskTitle(e.target.value)}
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "6px 12px",
-            backgroundColor: "#e8f5e8",
-            border: "1px solid #4caf50",
-            borderRadius: "4px",
-            fontSize: "12px",
-            color: "#2e7d32",
-            marginTop: "10px",
-          }}
-        >
-          <span>💾</span>
-          <span>Data persisted in browser storage</span>
-        </div>
-      </header>
-
-      {/* Add New Task */}
-      <section
-        style={{
-          marginBottom: "30px",
-          padding: "20px",
-          border: "1px solid #e0e0e0",
-          borderRadius: "8px",
-        }}
-      >
-        <h2>➕ Add New Task</h2>
-        <form onSubmit={addTask}>
-          <div style={{ marginBottom: "10px" }}>
-            <input
-              type="text"
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              placeholder="Task title"
-              style={{
-                padding: "8px",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-                width: "100%",
-              }}
-            />
-          </div>
-          <div style={{ marginBottom: "10px" }}>
-            <textarea
-              value={newTaskDescription}
-              onChange={(e) => setNewTaskDescription(e.target.value)}
-              placeholder="Task description (optional)"
-              rows={3}
-              style={{
-                padding: "8px",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-                width: "100%",
-                resize: "vertical",
-              }}
-            />
-          </div>
-          <button
-            type="submit"
-            style={{
-              ...buttonStyle,
-              backgroundColor: "#2196F3",
-              padding: "8px 16px",
-            }}
-          >
-            Add Task
-          </button>
-        </form>
-      </section>
-
-
-      {/* ElectricSQL Sync Status */}
-      <section
-        style={{
-          marginBottom: "20px",
-          padding: "20px",
-          border: "1px solid #e0e0e0",
-          borderRadius: "8px",
-        }}
-      >
-        <div style={{ marginBottom: "20px" }}>
-          <h3>🔄 ElectricSQL Sync (Read-Only from Cloud)</h3>
-
-          {syncEnabled && isElectricConfigured ? (
-            <div style={{ marginBottom: "15px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                <span style={{
-                  width: "8px",
-                  height: "8px",
-                  borderRadius: "50%",
-                  background: isElectricSyncReady ? "#28a745" : isElectricSyncing ? "#007bff" : electricSyncError ? "#dc3545" : "#6c757d",
-                  display: "inline-block",
-                }}></span>
-                <span style={{ fontSize: "14px", fontWeight: "500" }}>
-                  {isElectricSyncReady ? "ElectricSQL Sync Active" :
-                   isElectricSyncing ? "Initializing Sync..." :
-                   electricSyncError ? "Sync Error" :
-                   !canUseElectric ? "Sync Unavailable" :
-                   "Sync Stopped"}
-                </span>
-                <span style={{ fontSize: "12px", color: "#666" }}>
-                  (Up-to-date: {isUpToDate ? "Yes" : "No"})
-                </span>
-              </div>
-
-              {electricSyncError && (
-                <div style={{ fontSize: "12px", color: "#dc3545", marginBottom: "8px" }}>
-                  Error: {electricSyncError}
-                </div>
-              )}
-
-              <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "10px" }}>
-                {canUseElectric && (
-                  <button
-                    onClick={restartSync}
-                    disabled={isElectricSyncing}
-                    style={{
-                      padding: "4px 12px",
-                      fontSize: "11px",
-                      backgroundColor: "#007bff",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "3px",
-                      cursor: isElectricSyncing ? "not-allowed" : "pointer",
-                      opacity: isElectricSyncing ? 0.6 : 1,
-                    }}
-                    title="Restart sync from cloud"
-                  >
-                    🔄 Restart Sync
-                  </button>
-                )}
-
-                {electricSyncError && (
-                  <button
-                    onClick={clearElectricError}
-                    style={{
-                      padding: "4px 8px",
-                      fontSize: "11px",
-                      backgroundColor: "#6c757d",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "3px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Clear Error
-                  </button>
-                )}
-              </div>
-
-              <ElectricSyncStatus />
-              
-              <div style={{ marginTop: "10px" }}>
-                <button
-                  onClick={handleTestConnectivity}
-                  style={{ ...buttonStyle, background: "#17a2b8", marginRight: "10px" }}
-                >
-                  🔗 Test Connectivity
-                </button>
-                <button
-                  onClick={handleTestSync}
-                  style={{ ...buttonStyle, background: "#6f42c1" }}
-                >
-                  🧪 Test Full Sync
-                </button>
-              </div>
-              
-              {syncTestResult && (
-                <div style={{ 
-                  marginTop: "10px", 
-                  padding: "10px", 
-                  background: syncTestResult.error ? "#f8d7da" : "#d4edda", 
-                  border: `1px solid ${syncTestResult.error ? "#f5c6cb" : "#c3e6cb"}`, 
-                  borderRadius: "4px" 
-                }}>
-                  {syncTestResult.error ? (
-                    <p>❌ <strong>Sync Test Failed:</strong> {syncTestResult.error}</p>
-                  ) : (
-                    <div>
-                      <p>✅ <strong>Sync Test Passed!</strong></p>
-                      <ul>
-                        <li>Connected: {syncTestResult.connected ? '✅' : '❌'}</li>
-                        <li>Sync Setup: {syncTestResult.syncSetup ? '✅' : '❌'}</li>
-                        <li>Tasks Found: {syncTestResult.taskCount}</li>
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div style={{ padding: "10px", background: "#f8f9fa", border: "1px solid #dee2e6", borderRadius: "4px", marginBottom: "15px" }}>
-              <p>⚠️ ElectricSQL sync is not configured</p>
-              <small style={{ color: "#6c757d" }}>Set VITE_ELECTRIC_SOURCE_ID and VITE_ELECTRIC_SECRET environment variables</small>
-            </div>
-          )}
-
-          {/* Sync Status and Controls */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-
-              <div style={{ display: "flex", gap: "8px" }}>
-              <button
-                onClick={() => {
-                  console.log("[TaskManager] Manual task refresh triggered");
-                  refetchTasks();
-                }}
-                style={{
-                  padding: "4px 8px",
-                  fontSize: "11px",
-                  backgroundColor: "#28a745",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "3px",
-                  cursor: "pointer",
-                }}
-                title="Refresh tasks from database"
-              >
-                🔄 Refresh Tasks
-              </button>
-              <button
-                onClick={debugDatabaseState}
-                style={{
-                  padding: "4px 8px",
-                  fontSize: "11px",
-                  backgroundColor: "#6c757d",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "3px",
-                  cursor: "pointer",
-                }}
-                title="Debug database state (check browser console)"
-              >
-                🐛 Debug DB
-              </button>
-              <button
-                onClick={resetDatabaseForSync}
-                style={{
-                  padding: "4px 8px",
-                  fontSize: "11px",
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "3px",
-                  cursor: "pointer",
-                }}
-                title="Clear local database and restart ElectricSQL sync"
-              >
-                🔄 Reset & Sync
-              </button>
-            </div>
-          </div>
-
-          {/* ElectricSQL Sync Info */}
-          <div style={{
-            marginTop: "10px",
+            width: "100%",
             padding: "10px",
-            backgroundColor: "#e8f4ff",
-            border: "1px solid #007bff",
+            marginBottom: "10px",
+            border: "1px solid #ccc",
             borderRadius: "4px",
-            fontSize: "12px",
-          }}>
-            <strong>⚡ ElectricSQL Read-Only Sync:</strong>
-            <ul style={{ margin: "5px 0 0 20px", padding: 0 }}>
-              <li>📥 Pulls latest data from cloud database</li>
-              <li>🔄 Real-time updates when cloud data changes</li>
-              <li>📝 Local writes handled by @ordo/engine service</li>
-              <li>🚀 Fast local reads with cloud sync</li>
-            </ul>
-          </div>
-        </div>
-      </section>
+          }}
+        />
+        <textarea
+          placeholder="Task description (optional)"
+          value={newTaskDescription}
+          onChange={(e) => setNewTaskDescription(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginBottom: "10px",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            resize: "vertical",
+            minHeight: "60px",
+          }}
+        />
+        <button
+          onClick={handleAddTask}
+          disabled={!newTaskTitle.trim()}
+          style={{
+            ...buttonStyle,
+            backgroundColor: newTaskTitle.trim() ? "#4CAF50" : "#cccccc",
+          }}
+        >
+          Add Task
+        </button>
+      </div>
 
-      {/* Task Statistics */}
-      <section
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          gap: "15px",
-          flexWrap: "wrap",
-        }}
-      >
+      {/* Task list */}
+      <div>
         <div
           style={{
-            padding: "15px",
-            backgroundColor: "#e3f2fd",
-            borderRadius: "8px",
-            flex: "1",
-            minWidth: "120px",
-            textAlign: "center",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
           }}
         >
-          <div
-            style={{
-              fontSize: "24px",
-              fontWeight: "bold",
-              color: "#1976d2",
-            }}
-          >
-            {allTasks.length}
+          <h3>
+            Tasks ({allTasks.length}) - Completed:{" "}
+            {allTasks.filter((t) => t.completed).length}
+          </h3>
+          <div>
+            <button
+              onClick={handleClearAllTasks}
+              disabled={allTasks.length === 0}
+              style={{
+                ...buttonStyle,
+                backgroundColor: allTasks.length > 0 ? "#f44336" : "#cccccc",
+              }}
+            >
+              Clear All
+            </button>
+            <button
+              onClick={clearDatabase}
+              style={{ ...buttonStyle, backgroundColor: "#ff9800" }}
+            >
+              Clear Database
+            </button>
+            <button
+              onClick={resetDatabase}
+              style={{ ...buttonStyle, backgroundColor: "#9c27b0" }}
+            >
+              Reset Database
+            </button>
           </div>
-          <div style={{ fontSize: "14px", color: "#666" }}>Total Tasks</div>
         </div>
-        <div
-          style={{
-            padding: "15px",
-            backgroundColor: "#e8f5e8",
-            borderRadius: "8px",
-            flex: "1",
-            minWidth: "120px",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "24px",
-              fontWeight: "bold",
-              color: "#4caf50",
-            }}
-          >
-            {allTasks.filter((task) => task.completed).length}
-          </div>
-          <div style={{ fontSize: "14px", color: "#666" }}>Completed</div>
-        </div>
-        <div
-          style={{
-            padding: "15px",
-            backgroundColor: "#fff3e0",
-            borderRadius: "8px",
-            flex: "1",
-            minWidth: "120px",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "24px",
-              fontWeight: "bold",
-              color: "#ff9800",
-            }}
-          >
-            {allTasks.filter((task) => !task.completed).length}
-          </div>
-          <div style={{ fontSize: "14px", color: "#666" }}>Pending</div>
-        </div>
-      </section>
 
-      {/* Task List */}
-      <section>
-        <h2>📝 Your Tasks</h2>
         {allTasks.length === 0 ? (
-          <p
-            style={{
-              textAlign: "center",
-              color: "#666",
-              fontStyle: "italic",
-              padding: "20px",
-            }}
-          >
-            No tasks yet. Add one above!
+          <p style={{ color: "#666", fontStyle: "italic" }}>
+            No tasks yet. Add your first task above!
           </p>
         ) : (
-          <div style={{ display: "grid", gap: "12px" }}>
+          <div>
             {allTasks.map((task) => (
               <div
                 key={task.id}
                 style={{
-                  padding: "16px",
-                  border: "1px solid #e0e0e0",
+                  padding: "15px",
+                  margin: "10px 0",
+                  border: "1px solid #ddd",
                   borderRadius: "8px",
-                  backgroundColor: task.completed ? "#f8f9fa" : "white",
-                  opacity: task.completed ? 0.8 : 1,
+                  backgroundColor: task.completed ? "#f0f8ff" : "#ffffff",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
                 }}
               >
+                <div style={{ flex: 1 }}>
+                  <h4
+                    style={{
+                      margin: "0 0 8px 0",
+                      textDecoration: task.completed ? "line-through" : "none",
+                      color: task.completed ? "#666" : "#000",
+                    }}
+                  >
+                    {task.title}
+                  </h4>
+                  {task.description && (
+                    <p
+                      style={{
+                        margin: "0 0 8px 0",
+                        color: "#666",
+                        fontSize: "14px",
+                      }}
+                    >
+                      {task.description}
+                    </p>
+                  )}
+                  <small style={{ color: "#999" }}>
+                    Created: {new Date(task.created_at).toLocaleString()}
+                    {task.updated_at &&
+                      task.updated_at !== task.created_at && (
+                        <>
+                          {" "}
+                          | Updated:{" "}
+                          {new Date(task.updated_at).toLocaleString()}
+                        </>
+                      )}
+                  </small>
+                </div>
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "flex-start",
-                    gap: "12px",
+                    gap: "10px",
+                    marginLeft: "15px",
+                    flexShrink: 0,
                   }}
                 >
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={() => toggleTask(task.id, task.completed)}
-                    style={{ marginTop: "2px", transform: "scale(1.2)" }}
-                  />
-                  <div style={{ flex: 1 }}>
-                    <h3
-                      style={{
-                        margin: "0 0 8px 0",
-                        textDecoration: task.completed
-                          ? "line-through"
-                          : "none",
-                        color: task.completed ? "#666" : "#333",
-                      }}
-                    >
-                      {task.title}
-                    </h3>
-                    {task.description && (
-                      <p
-                        style={{
-                          margin: "0 0 8px 0",
-                          color: "#666",
-                          fontSize: "14px",
-                          textDecoration: task.completed
-                            ? "line-through"
-                            : "none",
-                        }}
-                      >
-                        {task.description}
-                      </p>
-                    )}
-                    <div style={{ fontSize: "12px", color: "#999" }}>
-                      Created: {task.createdAt.toLocaleDateString()}
-                      {task.dueDate && (
-                        <> • Due: {task.dueDate.toLocaleDateString()}</>
-                      )}
-                    </div>
-                  </div>
                   <button
-                    onClick={() => deleteTask(task.id)}
+                    onClick={() => handleToggleTask(task.id)}
+                    style={{
+                      ...buttonStyle,
+                      backgroundColor: task.completed ? "#ff9800" : "#4CAF50",
+                      marginRight: "0",
+                    }}
+                  >
+                    {task.completed ? "Undo" : "Complete"}
+                  </button>
+                  <button
+                    onClick={() => handleDeleteTask(task.id)}
                     style={{
                       ...buttonStyle,
                       backgroundColor: "#f44336",
-                      padding: "6px 12px",
-                      fontSize: "12px",
                       marginRight: "0",
                     }}
                   >
@@ -820,87 +469,7 @@ export function TaskManager() {
             ))}
           </div>
         )}
-      </section>
-
-      {/* Developer Tools */}
-      <details
-        style={{
-          marginTop: "40px",
-          padding: "20px",
-          border: "1px solid #ffa726",
-          borderRadius: "8px",
-          backgroundColor: "#fff8e1",
-        }}
-      >
-        <summary
-          style={{
-            cursor: "pointer",
-            marginBottom: "15px",
-            fontWeight: "bold",
-            color: "#f57c00",
-          }}
-        >
-          🔧 Developer Tools
-        </summary>
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            flexWrap: "wrap",
-            marginBottom: "15px",
-          }}
-        >
-          <button
-            onClick={handleClearData}
-            style={{
-              ...buttonStyle,
-              backgroundColor: "#ff9800",
-              padding: "8px 16px",
-              fontSize: "12px",
-            }}
-          >
-            Clear All Data
-          </button>
-          <button
-            onClick={handleResetDatabase}
-            style={{
-              ...buttonStyle,
-              backgroundColor: "#f44336",
-              padding: "8px 16px",
-              fontSize: "12px",
-              marginRight: "0",
-            }}
-          >
-            Reset Database & Reload
-          </button>
-        </div>
-        <div style={{ fontSize: "12px", color: "#666" }}>
-          <strong>Clear All Data:</strong> Removes all tasks but keeps the
-          schema.
-          <br />
-          <strong>Reset Database:</strong> Drops and recreates the entire
-          database, then reloads the page.
-        </div>
-      </details>
-
-      <details style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
-        <summary style={{ cursor: "pointer", marginBottom: "10px" }}>
-          Debug Info
-        </summary>
-        <pre
-          style={{
-            backgroundColor: "#f5f5f5",
-            padding: "10px",
-            borderRadius: "4px",
-            overflow: "auto",
-          }}
-        >
-          Tasks: {allTasks.length}
-          {"\n"}Database Status: {isInitialized ? "Ready" : "Not Ready"}
-          {"\n"}Storage: IndexedDB (idb://ordo-db){"\n"}Persistent: Yes - Data
-          survives page refresh
-        </pre>
-      </details>
+      </div>
     </div>
   );
 }

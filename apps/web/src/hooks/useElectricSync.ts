@@ -19,18 +19,10 @@ interface ElectricSyncState {
 interface UseElectricSyncOptions {
   config?: ElectricSyncConfig;
   autoStart?: boolean;
-<<<<<<< HEAD
-  onDataChange?: () => void;
-}
-
-export function useElectricSync(options: UseElectricSyncOptions = {}) {
-  const { config, autoStart = false, onDataChange } = options;
-=======
 }
 
 export function useElectricSync(options: UseElectricSyncOptions = {}) {
   const { config, autoStart = false } = options;
->>>>>>> 61f33ff (fixed repo)
 
   const [syncState, setSyncState] = useState<ElectricSyncState>({
     isInitialized: false,
@@ -43,59 +35,40 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
 
   const pgliteClient = usePGlite();
   const subscriptionRef = useRef<SyncSubscription | null>(null);
-  const initRef = useRef(false);
 
-  // Check if the PGlite instance has Electric sync capability
-  const canSync = hasElectricSync(pgliteClient);
+  // Check if we can sync (have config and PGlite with Electric)
+  const canSync = Boolean(
+    config && pgliteClient && hasElectricSync(pgliteClient)
+  );
 
-  // Initialize sync
-  const initializeSync = useCallback(async () => {
-    if (!canSync || !config || initRef.current || syncState.isLoading || syncState.isInitialized) {
-      console.log("[useElectricSync] Skipping init:", { 
-        canSync, 
-        hasConfig: !!config, 
-        alreadyInit: initRef.current,
-        isLoading: syncState.isLoading,
-        isInitialized: syncState.isInitialized
-      });
+  const startSync = useCallback(async () => {
+    if (!config || !pgliteClient || !hasElectricSync(pgliteClient)) {
+      console.log("[useElectricSync] Cannot start sync: missing config or PGlite client");
+      setSyncState(prev => ({
+        ...prev,
+        error: "Cannot start sync: missing config or database client"
+      }));
       return;
     }
 
-    console.log("[useElectricSync] Starting ElectricSQL sync initialization...");
-    console.log("[useElectricSync] Config:", {
-      url: config.electricUrl,
-      sourceId: config.sourceId?.substring(0, 8) + '...',
-      secretLength: config.secret?.length || 0
-    });
+    if (subscriptionRef.current) {
+      console.log("[useElectricSync] ⚠️ Sync already active, skipping");
+      return;
+    }
 
+    console.log("[useElectricSync] Starting Electric sync...");
     setSyncState(prev => ({
       ...prev,
       isLoading: true,
-      error: null,
+      error: null
     }));
 
     try {
-      initRef.current = true;
-
-      // Check if PGlite has the electric extension
-      if (!pgliteClient.electric) {
-        throw new Error("PGlite instance missing electric extension");
-      }
-
+      console.log("[useElectricSync] PGlite client:", typeof pgliteClient);
       console.log("[useElectricSync] PGlite electric extension found, setting up tasks sync...");
 
-<<<<<<< HEAD
-      // Set up tasks sync with data change callback
-      const subscription = await setupTasksSync(pgliteClient, config, {
-        onDataChange: () => {
-          console.log("[useElectricSync] ElectricSQL data changed, triggering callback");
-          if (onDataChange) onDataChange();
-        }
-      });
-=======
       // Set up tasks sync - let ElectricSQL handle it
       const subscription = await setupTasksSync(pgliteClient, config);
->>>>>>> 61f33ff (fixed repo)
 
       subscriptionRef.current = subscription;
 
@@ -109,156 +82,78 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
         ...prev,
         isInitialized: true,
         isLoading: false,
+        isSyncing: true,
         isUpToDate: subscription.isUpToDate,
         lastSyncTime: new Date(),
+        error: null
       }));
 
-      console.log("[useElectricSync] ✅ ElectricSQL sync initialized successfully");
-
+      console.log("[useElectricSync] ✅ Electric sync started successfully");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown sync error";
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("[useElectricSync] ❌ Failed to start sync:", errorMessage);
 
       setSyncState(prev => ({
         ...prev,
         isLoading: false,
-        error: errorMessage,
+        error: errorMessage
       }));
-
-      console.error("[useElectricSync] ❌ Failed to initialize ElectricSQL sync:", error);
-      initRef.current = false;
-      
-      // Clean up any partial subscription
-      if (subscriptionRef.current) {
-        try {
-          subscriptionRef.current.unsubscribe();
-          subscriptionRef.current = null;
-        } catch (cleanupError) {
-          console.warn("[useElectricSync] Error during cleanup:", cleanupError);
-        }
-      }
     }
-  }, [canSync, config, pgliteClient, syncState.isLoading, syncState.isInitialized]);
+  }, [config, pgliteClient]);
 
-  // Start sync manually
-  const startSync = useCallback(async () => {
-    if (!canSync || !config) {
+  const stopSync = useCallback(() => {
+    if (subscriptionRef.current) {
+      console.log("[useElectricSync] Stopping sync...");
+      subscriptionRef.current.unsubscribe();
+      subscriptionRef.current = null;
+
       setSyncState(prev => ({
         ...prev,
-        error: "Sync not available or not configured",
+        isSyncing: false,
+        isUpToDate: false
       }));
-      return;
+
+      console.log("[useElectricSync] Sync stopped");
     }
-
-    if (!syncState.isInitialized) {
-      await initializeSync();
-    }
-  }, [canSync, config, syncState.isInitialized, initializeSync]);
-
-  // Stop sync
-  const stopSync = useCallback(() => {
-    console.log("[useElectricSync] Stopping sync...");
-    
-    if (subscriptionRef.current) {
-      try {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
-        console.log("[useElectricSync] Subscription unsubscribed successfully");
-      } catch (error) {
-        console.warn("[useElectricSync] Error during unsubscribe:", error);
-      }
-    }
-
-    setSyncState(prev => ({
-      ...prev,
-      isInitialized: false,
-      isSyncing: false,
-      isUpToDate: false,
-      isLoading: false,
-      error: null,
-    }));
-
-    initRef.current = false;
-    console.log("[useElectricSync] ElectricSQL sync stopped");
   }, []);
 
-  // Restart sync
   const restartSync = useCallback(async () => {
+    console.log("[useElectricSync] Restarting sync...");
     stopSync();
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait a bit
-    await startSync();
+    // Small delay to ensure cleanup
+    setTimeout(() => {
+      startSync();
+    }, 100);
   }, [stopSync, startSync]);
 
-  // Clear error
   const clearError = useCallback(() => {
-    setSyncState(prev => ({
-      ...prev,
-      error: null,
-    }));
+    setSyncState(prev => ({ ...prev, error: null }));
   }, []);
 
-  // Auto-start sync if enabled
+  // Auto-start effect
   useEffect(() => {
-    if (autoStart && canSync && config && !syncState.isInitialized && !initRef.current && !syncState.isLoading) {
+    if (autoStart && canSync && !syncState.isInitialized && !syncState.isLoading) {
       console.log("[useElectricSync] Auto-starting sync...");
-      initializeSync();
+      startSync();
     }
-  }, [autoStart, canSync, config, syncState.isInitialized, syncState.isLoading, initializeSync]);
+  }, [autoStart, canSync, syncState.isInitialized, syncState.isLoading, startSync]);
 
-  // Cleanup on unmount
+  // Cleanup effect
   useEffect(() => {
     return () => {
       if (subscriptionRef.current) {
+        console.log("[useElectricSync] Cleaning up subscription on unmount");
         subscriptionRef.current.unsubscribe();
       }
     };
   }, []);
 
-  // Update sync status based on subscription - check periodically
-  useEffect(() => {
-    if (!subscriptionRef.current) return;
-
-    console.log("[useElectricSync] Setting up periodic status checks...");
-
-    const interval = setInterval(() => {
-      if (subscriptionRef.current) {
-        const wasUpToDate = syncState.isUpToDate;
-        const isNowUpToDate = subscriptionRef.current?.isUpToDate || false;
-
-        if (wasUpToDate !== isNowUpToDate) {
-          console.log("[useElectricSync] Sync status changed:", { from: wasUpToDate, to: isNowUpToDate });
-        }
-
-        setSyncState(prev => ({
-          ...prev,
-          isUpToDate: isNowUpToDate,
-          lastSyncTime: isNowUpToDate ? new Date() : prev.lastSyncTime,
-        }));
-      }
-    }, 2000); // Check every 2 seconds
-
-    return () => {
-      console.log("[useElectricSync] Cleaning up periodic status checks");
-      clearInterval(interval);
-    };
-  }, [subscriptionRef.current, syncState.isUpToDate]);
-
   return {
-    // State
-    isInitialized: syncState.isInitialized,
-    isLoading: syncState.isLoading,
-    isSyncing: syncState.isSyncing,
-    isUpToDate: syncState.isUpToDate,
-    error: syncState.error,
-    lastSyncTime: syncState.lastSyncTime,
+    ...syncState,
     canSync,
-
-    // Actions
     startSync,
     stopSync,
     restartSync,
     clearError,
-
-    // Raw subscription for advanced usage
-    subscription: subscriptionRef.current,
   };
 }
