@@ -55,6 +55,7 @@ export function TaskManager() {
   } = useElectricSync({
     config: isElectricConfigured ? electricConfig : undefined,
     autoStart: Boolean(syncEnabled && isElectricConfigured),
+<<<<<<< HEAD
     onDataChange: () => {
       console.log("[TaskManager] ElectricSQL detected data change, invalidating cache");
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
@@ -62,6 +63,11 @@ export function TaskManager() {
   });
 
   // Use TanStack Query to fetch tasks - let ElectricSQL drive updates
+=======
+  });
+
+  // Use TanStack Query to fetch tasks - simple and effective
+>>>>>>> 61f33ff (fixed repo)
   const { data: allTasks = [], refetch: refetchTasks } = useQuery<Task[]>({
     queryKey: ['tasks'],
     queryFn: async (): Promise<Task[]> => {
@@ -71,10 +77,17 @@ export function TaskManager() {
       return tasksData;
     },
     enabled: isInitialized && !!db,
+<<<<<<< HEAD
     staleTime: Infinity, // Never consider data stale - ElectricSQL will tell us when to update
     refetchOnWindowFocus: true, // Refetch when user switches back to tab
     refetchOnReconnect: true, // Refetch when internet reconnects
     // No refetchInterval - ElectricSQL handles real-time updates
+=======
+    staleTime: 1000, // Consider data fresh for 1 second
+    refetchInterval: isElectricSyncReady ? 3000 : false, // Refetch every 3s when sync is active for near real-time updates
+    refetchOnWindowFocus: true, // Refetch when user switches back to tab
+    refetchOnReconnect: true, // Refetch when internet reconnects
+>>>>>>> 61f33ff (fixed repo)
   });
 
 

@@ -19,11 +19,18 @@ interface ElectricSyncState {
 interface UseElectricSyncOptions {
   config?: ElectricSyncConfig;
   autoStart?: boolean;
+<<<<<<< HEAD
   onDataChange?: () => void;
 }
 
 export function useElectricSync(options: UseElectricSyncOptions = {}) {
   const { config, autoStart = false, onDataChange } = options;
+=======
+}
+
+export function useElectricSync(options: UseElectricSyncOptions = {}) {
+  const { config, autoStart = false } = options;
+>>>>>>> 61f33ff (fixed repo)
 
   const [syncState, setSyncState] = useState<ElectricSyncState>({
     isInitialized: false,
@@ -77,6 +84,7 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
 
       console.log("[useElectricSync] PGlite electric extension found, setting up tasks sync...");
 
+<<<<<<< HEAD
       // Set up tasks sync with data change callback
       const subscription = await setupTasksSync(pgliteClient, config, {
         onDataChange: () => {
@@ -84,6 +92,10 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
           if (onDataChange) onDataChange();
         }
       });
+=======
+      // Set up tasks sync - let ElectricSQL handle it
+      const subscription = await setupTasksSync(pgliteClient, config);
+>>>>>>> 61f33ff (fixed repo)
 
       subscriptionRef.current = subscription;
 

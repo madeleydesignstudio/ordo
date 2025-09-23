@@ -115,6 +115,7 @@ export async function syncShapeToTable(
   }
 }
 
+<<<<<<< HEAD
 // Sync a single shape to a table with callbacks for data changes
 export async function syncShapeToTableWithCallbacks(
   pglite: any,
@@ -206,6 +207,8 @@ export async function syncShapeToTableWithCallbacks(
     throw error;
   }
 }
+=======
+>>>>>>> 61f33ff (fixed repo)
 
 // Sync multiple shapes to multiple tables with transactional consistency
 export async function syncShapesToTables(
@@ -276,10 +279,14 @@ export async function syncShapesToTables(
 // Create a complete sync setup for the tasks table
 export async function setupTasksSync(
   pglite: any,
+<<<<<<< HEAD
   config: ElectricSyncConfig,
   callbacks?: {
     onDataChange?: () => void;
   }
+=======
+  config: ElectricSyncConfig
+>>>>>>> 61f33ff (fixed repo)
 ): Promise<SyncSubscription> {
   console.log(`[ElectricSync] Setting up tasks table sync`);
   console.log(`[ElectricSync] Electric URL: ${config.electricUrl}`);
@@ -292,11 +299,19 @@ export async function setupTasksSync(
     console.log(`[ElectricSync] Could not count local tasks (table may not exist yet):`, err instanceof Error ? err.message : String(err));
   }
 
+<<<<<<< HEAD
   return syncShapeToTableWithCallbacks(pglite, config, {
     table: "tasks",
     primaryKey: ["id"],
     shapeKey: "tasks",
   }, callbacks);
+=======
+  return syncShapeToTable(pglite, config, {
+    table: "tasks",
+    primaryKey: ["id"],
+    shapeKey: "tasks",
+  });
+>>>>>>> 61f33ff (fixed repo)
 }
 
 // Utility to check if PGlite instance has Electric sync extension
