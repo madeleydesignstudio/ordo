@@ -357,13 +357,13 @@ export async function testSyncConnectivity(config: ElectricSyncConfig): Promise<
       }
     } else {
       const responseData = await response.text();
-      console.log(`[ElectricSync] ElectricSQL Cloud response sample:`, responseData.substring(0, 200) + '...');
+      console.log(`[ElectricSync] ElectricSQL Cloud response sample:`, responseData?.substring(0, 200) + '...' || 'No response data');
 
       // Try to parse the response to see if it's valid shape data
       try {
-        const lines = responseData.split('\n').filter(line => line.trim());
+        const lines = (responseData || '').split('\n').filter(line => line.trim());
         console.log(`[ElectricSync] Received ${lines.length} lines from ElectricSQL Cloud`);
-        if (lines.length > 0) {
+        if (lines.length > 0 && lines[0]) {
           const firstMessage = JSON.parse(lines[0]);
           console.log(`[ElectricSync] First message type:`, firstMessage.headers?.operation || 'control');
         }
@@ -421,7 +421,7 @@ export async function testElectricCloudSetup(config: ElectricSyncConfig): Promis
     }
 
     const responseText = await response.text();
-    const lines = responseText.split('\n').filter(line => line.trim());
+    const lines = (responseText || '').split('\n').filter(line => line.trim());
 
     let hasData = false;
     let dataCount = 0;
