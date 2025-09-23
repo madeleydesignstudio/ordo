@@ -50,7 +50,10 @@ const activeSubscriptions = new Map<string, any>();
 export async function syncShapeToTable(
   pglite: any,
   config: ElectricSyncConfig,
-  shape: SyncShape
+  shape: SyncShape,
+  callbacks?: {
+    onDataChange?: () => void;
+  }
 ): Promise<SyncSubscription> {
   const shapeKey = shape.shapeKey || shape.table;
 
@@ -93,7 +96,45 @@ export async function syncShapeToTable(
       primaryKey: shape.primaryKey,
       shapeKey: shapeKey,
       initialInsertMethod: "json", // Required parameter
+
+      // Callback when initial sync completes
+      onInitialSync: () => {
+        console.log(`[ElectricSync] ✅ Initial sync complete for ${shape.table}`);
+
+        // Log current data count to verify sync worked
+        pglite.query(`SELECT COUNT(*) as count FROM ${shape.table}`).then((result: any) => {
+          console.log(`[ElectricSync] Table ${shape.table} now has ${result.rows[0]?.count || 0} records after initial sync`);
+        }).catch((err: any) => {
+          console.log(`[ElectricSync] Could not count records in ${shape.table}:`, err);
+        });
+
+        if (callbacks?.onDataChange) {
+          console.log(`[ElectricSync] Triggering onDataChange callback for initial sync`);
+          callbacks.onDataChange();
+        }
+      },
     });
+
+    // Set up listener for ongoing changes
+    if (callbacks?.onDataChange) {
+      console.log(`[ElectricSync] Setting up change subscription for ${shape.table}`);
+      subscription.subscribe(() => {
+        console.log(`[ElectricSync] 🔄 Data changed for ${shape.table}, triggering callback`);
+
+        // Log updated data count
+        pglite.query(`SELECT COUNT(*) as count FROM ${shape.table}`).then((result: any) => {
+          console.log(`[ElectricSync] Table ${shape.table} now has ${result.rows[0]?.count || 0} records after change`);
+        }).catch((err: any) => {
+          console.log(`[ElectricSync] Could not count records in ${shape.table}:`, err);
+        });
+
+        callbacks.onDataChange();
+      }, (error: any) => {
+        console.error(`[ElectricSync] ❌ Sync error for ${shape.table}:`, error);
+      });
+    } else {
+      console.log(`[ElectricSync] No onDataChange callback provided for ${shape.table}`);
+    }
 
     console.log(`[ElectricSync] Subscription created for ${shape.table}, isUpToDate:`, subscription.isUpToDate);
 
@@ -184,7 +225,10 @@ export async function syncShapesToTables(
 // Create a complete sync setup for the tasks table
 export async function setupTasksSync(
   pglite: any,
-  config: ElectricSyncConfig
+  config: ElectricSyncConfig,
+  callbacks?: {
+    onDataChange?: () => void;
+  }
 ): Promise<SyncSubscription> {
   console.log(`[ElectricSync] Setting up tasks table sync`);
   console.log(`[ElectricSync] Electric URL: ${config.electricUrl}`);
@@ -193,6 +237,12 @@ export async function setupTasksSync(
   try {
     const beforeResult = await pglite.query('SELECT COUNT(*) as count FROM tasks');
     console.log(`[ElectricSync] Local tasks before sync: ${beforeResult.rows[0]?.count || 0}`);
+
+    // Also log some sample tasks if they exist
+    const sampleResult = await pglite.query('SELECT id, title, created_at FROM tasks ORDER BY created_at DESC LIMIT 3');
+    if (sampleResult.rows.length > 0) {
+      console.log(`[ElectricSync] Sample local tasks:`, sampleResult.rows);
+    }
   } catch (err) {
     console.log(`[ElectricSync] Could not count local tasks (table may not exist yet):`, err instanceof Error ? err.message : String(err));
   }
@@ -201,7 +251,7 @@ export async function setupTasksSync(
     table: "tasks",
     primaryKey: ["id"],
     shapeKey: "tasks",
-  });
+  }, callbacks);
 }
 
 // Utility to check if PGlite instance has Electric sync extension

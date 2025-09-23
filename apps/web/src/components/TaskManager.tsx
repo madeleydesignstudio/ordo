@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDatabase } from "../hooks/useDatabase";
 import { useAutoSync } from "../hooks/useAutoSync";
 import { LoadingFallback } from "./LoadingFallback";
@@ -19,6 +19,7 @@ export function TaskManager() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [syncTestResult, setSyncTestResult] = useState<any>(null);
+  const queryClient = useQueryClient();
 
   // Auto-sync hook for local-to-cloud synchronization via engine
   const { autoSyncTask, autoDeleteTask } = useAutoSync({
@@ -52,6 +53,10 @@ export function TaskManager() {
   } = useElectricSync({
     config: isElectricConfigured ? electricConfig : undefined,
     autoStart: Boolean(syncEnabled && isElectricConfigured),
+    onDataChange: () => {
+      console.log("[TaskManager] ElectricSQL detected data change, invalidating TanStack Query cache");
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
   });
 
   // TanStack Query: Reads from local PGlite database
@@ -69,7 +74,7 @@ export function TaskManager() {
       return tasksData;
     },
     enabled: isInitialized && !!db,
-    staleTime: 5 * 60 * 1000, // 5 minutes - ElectricSQL handles cloud-to-local updates
+    staleTime: Infinity, // Never consider data stale - ElectricSQL callbacks handle invalidation
     refetchOnWindowFocus: true, // Refetch when user switches back to tab
     refetchOnReconnect: true, // Refetch when internet reconnects
     // No refetchInterval - ElectricSQL automatically syncs cloud changes to PGlite

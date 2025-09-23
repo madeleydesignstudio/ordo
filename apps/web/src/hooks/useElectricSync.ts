@@ -19,10 +19,11 @@ interface ElectricSyncState {
 interface UseElectricSyncOptions {
   config?: ElectricSyncConfig;
   autoStart?: boolean;
+  onDataChange?: () => void;
 }
 
 export function useElectricSync(options: UseElectricSyncOptions = {}) {
-  const { config, autoStart = false } = options;
+  const { config, autoStart = false, onDataChange } = options;
 
   const [syncState, setSyncState] = useState<ElectricSyncState>({
     isInitialized: false,
@@ -63,12 +64,24 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
       error: null
     }));
 
+    console.log("[useElectricSync] 🚀 Starting sync with config:", {
+      url: config.electricUrl,
+      sourceId: config.sourceId,
+      hasSecret: !!config.secret,
+      debug: config.debug
+    });
+
     try {
       console.log("[useElectricSync] PGlite client:", typeof pgliteClient);
       console.log("[useElectricSync] PGlite electric extension found, setting up tasks sync...");
 
-      // Set up tasks sync - let ElectricSQL handle it
-      const subscription = await setupTasksSync(pgliteClient, config);
+      // Set up tasks sync with data change callback
+      const subscription = await setupTasksSync(pgliteClient, config, {
+        onDataChange: () => {
+          console.log("[useElectricSync] ElectricSQL data changed, triggering callback");
+          if (onDataChange) onDataChange();
+        }
+      });
 
       subscriptionRef.current = subscription;
 
@@ -88,7 +101,22 @@ export function useElectricSync(options: UseElectricSyncOptions = {}) {
         error: null
       }));
 
+      // Debug: Monitor subscription status changes
+      if (subscription.subscription?.subscribe) {
+        subscription.subscription.subscribe(() => {
+          console.log("[useElectricSync] 🔄 Subscription status changed - shape is up to date");
+          setSyncState(prev => ({ ...prev, isUpToDate: true, lastSyncTime: new Date() }));
+        });
+      }
+
       console.log("[useElectricSync] ✅ Electric sync started successfully");
+
+      // Debug: Log subscription details
+      console.log("[useElectricSync] Subscription details:", {
+        isUpToDate: subscription.isUpToDate,
+        shapeId: subscription.subscription?.shapeId || 'unknown',
+        hasStream: !!subscription.subscription?.stream
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error("[useElectricSync] ❌ Failed to start sync:", errorMessage);

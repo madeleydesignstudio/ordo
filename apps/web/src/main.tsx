@@ -128,7 +128,7 @@ async function initApp() {
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: {
-          staleTime: 5 * 60 * 1000, // 5 minutes - ElectricSQL handles real-time updates
+          staleTime: Infinity, // Never consider data stale - ElectricSQL callbacks handle invalidation
           refetchOnWindowFocus: true, // Refetch when switching back to tab
           refetchOnReconnect: true, // Refetch when internet reconnects
           // No refetchInterval needed - ElectricSQL automatically syncs changes to PGlite
