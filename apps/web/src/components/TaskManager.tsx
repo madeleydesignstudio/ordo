@@ -5,7 +5,7 @@ import { useAutoSync } from "../hooks/useAutoSync";
 import { LoadingFallback } from "./LoadingFallback";
 import { ElectricSyncStatus } from "./ElectricSyncStatus";
 import { useElectricSync } from "../hooks/useElectricSync";
-import { eq, testElectricSync, testSyncConnectivity, tasks, type Task, type NewTask } from "@ordo/local-db";
+import { eq, testElectricSync, testSyncConnectivity, tasks, type Task } from "@ordo/local-db";
 
 export function TaskManager() {
   const {
@@ -13,7 +13,6 @@ export function TaskManager() {
     isInitialized,
     isLoading,
     error,
-    tasks,
     clearDatabase,
     resetDatabase,
   } = useDatabase();
