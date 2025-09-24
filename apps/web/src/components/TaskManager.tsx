@@ -1,32 +1,29 @@
-import { useState } from "react";
+import {
+  eq,
+  type Task,
+  tasks,
+  testElectricCloudSetup,
+  testElectricSync,
+  testSyncConnectivity,
+} from "@ordo/local-db";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useDatabase } from "../hooks/useDatabase";
-import { useAutoSync } from "../hooks/useAutoSync";
-import { LoadingFallback } from "./LoadingFallback";
-import { ElectricSyncStatus } from "./ElectricSyncStatus";
-import { useElectricSync } from "../hooks/useElectricSync";
 import { useElectricSyncEngine } from "../hooks/useElectricSyncEngine";
-import { eq, tasks, type Task, testSyncConnectivity, testElectricSync } from "@ordo/local-db";
+import { ElectricSyncStatus } from "./ElectricSyncStatus";
+import { LoadingFallback } from "./LoadingFallback";
 
 export function TaskManager() {
-  const {
-    db,
-    isInitialized,
-    isLoading,
-    error,
-    clearDatabase,
-    resetDatabase,
-  } = useDatabase();
+  const { db, isInitialized, isLoading, error, clearDatabase, resetDatabase } = useDatabase();
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [syncTestResult, setSyncTestResult] = useState<any>(null);
   const queryClient = useQueryClient();
 
-  // Auto-sync hook for local-to-cloud synchronization via engine
-  const { autoSyncTask, autoDeleteTask } = useAutoSync({
-    enabled: navigator.onLine, // Only enable when online
-  });
-
+  // Auto-sync hook for local-to-cloud synchronization via engine (legacy - now handled by sync engine)
+  // const { autoSyncTask, autoDeleteTask } = useAutoSync({
+  //   enabled: navigator.onLine, // Only enable when online
+  // });
 
   // Get ElectricSQL configuration
   const electricConfig = {
@@ -34,7 +31,7 @@ export function TaskManager() {
     sourceId: import.meta.env.VITE_ELECTRIC_SOURCE_ID || "",
     secret: import.meta.env.VITE_ELECTRIC_SECRET || "",
     debug: import.meta.env.DEV === true,
-    conflictResolution: 'latest-wins' as const,
+    conflictResolution: "latest-wins" as const,
     syncInterval: 5000,
     enableRealTimeSync: true,
   };
@@ -45,7 +42,6 @@ export function TaskManager() {
   // ElectricSQL Sync Engine: Bidirectional sync based on Linear Lite example
   const {
     isInitialized: isElectricSyncReady,
-    isLoading: isElectricSyncing,
     isSyncing,
     syncStatus,
     syncMessage,
@@ -55,22 +51,13 @@ export function TaskManager() {
     stopSyncEngine,
     restartSyncEngine,
     clearError: clearElectricError,
-    waitForSync,
   } = useElectricSyncEngine({
     autoStart: Boolean(syncEnabled && isElectricConfigured),
     onDataChange: () => {
-      console.log("[TaskManager] ElectricSQL sync engine detected data change, invalidating TanStack Query cache");
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-    },
-  });
-
-  // Legacy ElectricSQL hook for comparison/fallback
-  const legacyElectricSync = useElectricSync({
-    config: isElectricConfigured ? electricConfig : undefined,
-    autoStart: false, // Disabled in favor of new sync engine
-    onDataChange: () => {
-      console.log("[TaskManager] Legacy ElectricSQL detected data change");
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      console.log(
+        "[TaskManager] ElectricSQL sync engine detected data change, invalidating TanStack Query cache"
+      );
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 
@@ -80,12 +67,14 @@ export function TaskManager() {
   // 1. ElectricSQL Sync Engine: Bidirectional sync (based on Linear Lite example)
   // 2. TanStack Query: PGlite → React UI (cached queries)
   const { data: allTasks = [], refetch: refetchTasks } = useQuery<Task[]>({
-    queryKey: ['tasks'],
+    queryKey: ["tasks"],
     queryFn: async (): Promise<Task[]> => {
       if (!isInitialized || !db) return [];
       // Filter out deleted tasks from the UI
       const tasksData = await db.select().from(tasks).where(eq(tasks.deleted, false));
-      console.log(`[TaskManager] TanStack Query fetched ${tasksData.length} non-deleted tasks from local PGlite`);
+      console.log(
+        `[TaskManager] TanStack Query fetched ${tasksData.length} non-deleted tasks from local PGlite`
+      );
       return tasksData;
     },
     enabled: isInitialized && !!db,
@@ -98,7 +87,9 @@ export function TaskManager() {
   // Test ElectricSQL Cloud setup
   const handleTestElectricCloud = async () => {
     if (!isElectricConfigured) {
-      alert("ElectricSQL is not configured. Please set VITE_ELECTRIC_SOURCE_ID and VITE_ELECTRIC_SECRET environment variables.");
+      alert(
+        "ElectricSQL is not configured. Please set VITE_ELECTRIC_SOURCE_ID and VITE_ELECTRIC_SECRET environment variables."
+      );
       return;
     }
 
@@ -111,24 +102,32 @@ export function TaskManager() {
 
       if (result.connected) {
         if (result.hasData) {
-          alert(`✅ ElectricSQL Cloud connected successfully!\nFound ${result.details?.dataMessages || 0} data records in cloud database.`);
+          alert(
+            `✅ ElectricSQL Cloud connected successfully!\nFound ${result.details?.dataMessages || 0} data records in cloud database.`
+          );
         } else {
-          alert(`✅ ElectricSQL Cloud connected, but no tasks found in cloud database.\nThis is normal if you haven't created any tasks yet.`);
+          alert(
+            `✅ ElectricSQL Cloud connected, but no tasks found in cloud database.\nThis is normal if you haven't created any tasks yet.`
+          );
         }
       } else {
-        alert(`❌ ElectricSQL Cloud connection failed:\n${result.error || 'Unknown error'}`);
+        alert(`❌ ElectricSQL Cloud connection failed:\n${result.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("ElectricSQL Cloud test failed:", error);
       setSyncTestResult({ error: error instanceof Error ? error.message : String(error) });
-      alert(`ElectricSQL Cloud test failed: ${error instanceof Error ? error.message : String(error)}`);
+      alert(
+        `ElectricSQL Cloud test failed: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   };
 
   // Test Electric sync connectivity
   const handleTestSync = async () => {
     if (!isElectricConfigured) {
-      alert("Electric sync is not configured. Please set VITE_ELECTRIC_SOURCE_ID and VITE_ELECTRIC_SECRET environment variables.");
+      alert(
+        "Electric sync is not configured. Please set VITE_ELECTRIC_SOURCE_ID and VITE_ELECTRIC_SECRET environment variables."
+      );
       return;
     }
 
@@ -148,14 +147,16 @@ export function TaskManager() {
   // Test connectivity only
   const handleTestConnectivity = async () => {
     if (!isElectricConfigured) {
-      alert("Electric sync is not configured. Please set VITE_ELECTRIC_SOURCE_ID and VITE_ELECTRIC_SECRET environment variables.");
+      alert(
+        "Electric sync is not configured. Please set VITE_ELECTRIC_SOURCE_ID and VITE_ELECTRIC_SECRET environment variables."
+      );
       return;
     }
 
     try {
       console.log("Testing connectivity...");
       const isConnected = await testSyncConnectivity(electricConfig);
-      alert(`Connectivity test: ${isConnected ? 'SUCCESS' : 'FAILED'}`);
+      alert(`Connectivity test: ${isConnected ? "SUCCESS" : "FAILED"}`);
     } catch (error) {
       console.error("Connectivity test failed:", error);
       alert(`Connectivity test failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -191,9 +192,7 @@ export function TaskManager() {
   }
 
   if (!isInitialized) {
-    return (
-      <LoadingFallback message="Database not initialized. Please refresh the page." />
-    );
+    return <LoadingFallback message="Database not initialized. Please refresh the page." />;
   }
 
   const handleAddTask = async () => {
@@ -208,10 +207,10 @@ export function TaskManager() {
         // Sync tracking columns for Electric SQL
         synced: false,
         sentToServer: false,
-        modifiedColumns: 'title,description,completed',
+        modifiedColumns: "title,description,completed",
         deleted: false,
         new: true,
-        username: 'local_user', // TODO: Replace with actual user when auth is implemented
+        username: "local_user", // TODO: Replace with actual user when auth is implemented
         // Don't include createdAt, updatedAt, dueDate - let the database set defaults
         // The schema has defaultNow() for these fields
       };
@@ -234,11 +233,7 @@ export function TaskManager() {
       console.log("[TaskManager] Task added successfully");
     } catch (error) {
       console.error("[TaskManager] Failed to add task:", error);
-      alert(
-        `Failed to add task: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
+      alert(`Failed to add task: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
@@ -255,18 +250,15 @@ export function TaskManager() {
         // Sync tracking columns for Electric SQL
         synced: false,
         sentToServer: false,
-        modifiedColumns: 'completed',
+        modifiedColumns: "completed",
         new: false, // This is an update, not a new task
-        username: 'local_user', // TODO: Replace with actual user when auth is implemented
+        username: "local_user", // TODO: Replace with actual user when auth is implemented
       };
 
       console.log(
-        `[TaskManager] Toggling task ${taskId}: ${task.completed} -> ${updatedTask.completed}`,
+        `[TaskManager] Toggling task ${taskId}: ${task.completed} -> ${updatedTask.completed}`
       );
-      await db
-        .update(tasks)
-        .set(updatedTask)
-        .where(eq(tasks.id, taskId));
+      await db.update(tasks).set(updatedTask).where(eq(tasks.id, taskId));
 
       // Update UI immediately
       refetchTasks();
@@ -277,11 +269,7 @@ export function TaskManager() {
       console.log("[TaskManager] Task toggled successfully");
     } catch (error) {
       console.error("[TaskManager] Failed to toggle task:", error);
-      alert(
-        `Failed to toggle task: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
+      alert(`Failed to toggle task: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
@@ -290,21 +278,18 @@ export function TaskManager() {
 
     try {
       console.log(`[TaskManager] Marking task ${taskId} as deleted`);
-      
+
       // Instead of hard deleting, mark as deleted for sync
       const deletedTask = {
         deleted: true,
         synced: false,
         sentToServer: false,
-        modifiedColumns: 'deleted',
+        modifiedColumns: "deleted",
         updatedAt: new Date(),
-        username: 'local_user', // TODO: Replace with actual user when auth is implemented
+        username: "local_user", // TODO: Replace with actual user when auth is implemented
       };
 
-      await db
-        .update(tasks)
-        .set(deletedTask)
-        .where(eq(tasks.id, taskId));
+      await db.update(tasks).set(deletedTask).where(eq(tasks.id, taskId));
 
       // Update UI immediately
       refetchTasks();
@@ -315,11 +300,7 @@ export function TaskManager() {
       console.log("[TaskManager] Task marked as deleted successfully");
     } catch (error) {
       console.error("[TaskManager] Failed to delete task:", error);
-      alert(
-        `Failed to delete task: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
+      alert(`Failed to delete task: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
@@ -340,11 +321,7 @@ export function TaskManager() {
       console.log("[TaskManager] All tasks cleared successfully");
     } catch (error) {
       console.error("[TaskManager] Failed to clear tasks:", error);
-      alert(
-        `Failed to clear tasks: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
+      alert(`Failed to clear tasks: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
@@ -356,15 +333,14 @@ export function TaskManager() {
       <ElectricSyncStatus />
 
       {/* Electric Sync Engine Status */}
-      <div style={{ margin: "20px 0", padding: "15px", border: "1px solid #ddd", borderRadius: "8px" }}>
+      <div
+        style={{ margin: "20px 0", padding: "15px", border: "1px solid #ddd", borderRadius: "8px" }}
+      >
         <h4>🔄 Electric Sync Engine</h4>
         <p style={{ margin: "5px 0", fontSize: "14px", color: "#666" }}>
-          Status: {syncStatus} |
-          {syncMessage && ` Message: ${syncMessage} |`}
-          Ready: {isElectricSyncReady ? "✅" : "❌"} |
-          Syncing: {isSyncing ? "✅" : "❌"} |
-          Config: {isElectricConfigured ? "✅" : "❌"} |
-          Tasks: {allTasks.length}
+          Status: {syncStatus} |{syncMessage && ` Message: ${syncMessage} |`}
+          Ready: {isElectricSyncReady ? "✅" : "❌"} | Syncing: {isSyncing ? "✅" : "❌"} | Config:{" "}
+          {isElectricConfigured ? "✅" : "❌"} | Tasks: {allTasks.length}
         </p>
         {electricSyncError && (
           <p style={{ margin: "5px 0", fontSize: "12px", color: "red" }}>
@@ -433,7 +409,7 @@ export function TaskManager() {
             Test Cloud Setup
           </button>
           <button
-            onClick={restartSync}
+            onClick={restartSyncEngine}
             disabled={!canUseElectric}
             style={{
               ...buttonStyle,
@@ -460,7 +436,15 @@ export function TaskManager() {
           </p>
         )}
         {syncTestResult && (
-          <pre style={{ fontSize: "12px", background: "#f5f5f5", padding: "10px", margin: "10px 0", overflow: "auto" }}>
+          <pre
+            style={{
+              fontSize: "12px",
+              background: "#f5f5f5",
+              padding: "10px",
+              margin: "10px 0",
+              overflow: "auto",
+            }}
+          >
             {JSON.stringify(syncTestResult, null, 2)}
           </pre>
         )}
@@ -526,8 +510,7 @@ export function TaskManager() {
           }}
         >
           <h3>
-            Tasks ({allTasks.length}) - Completed:{" "}
-            {allTasks.filter((t) => t.completed).length}
+            Tasks ({allTasks.length}) - Completed: {allTasks.filter((t) => t.completed).length}
           </h3>
           <div>
             <button
@@ -540,16 +523,10 @@ export function TaskManager() {
             >
               Clear All
             </button>
-            <button
-              onClick={clearDatabase}
-              style={{ ...buttonStyle, backgroundColor: "#ff9800" }}
-            >
+            <button onClick={clearDatabase} style={{ ...buttonStyle, backgroundColor: "#ff9800" }}>
               Clear Database
             </button>
-            <button
-              onClick={resetDatabase}
-              style={{ ...buttonStyle, backgroundColor: "#9c27b0" }}
-            >
+            <button onClick={resetDatabase} style={{ ...buttonStyle, backgroundColor: "#9c27b0" }}>
               Reset Database
             </button>
           </div>
@@ -598,14 +575,9 @@ export function TaskManager() {
                   )}
                   <small style={{ color: "#999" }}>
                     Created: {new Date(task.createdAt).toLocaleString()}
-                    {task.updatedAt &&
-                      task.updatedAt !== task.createdAt && (
-                        <>
-                          {" "}
-                          | Updated:{" "}
-                          {new Date(task.updatedAt).toLocaleString()}
-                        </>
-                      )}
+                    {task.updatedAt && task.updatedAt !== task.createdAt && (
+                      <> | Updated: {new Date(task.updatedAt).toLocaleString()}</>
+                    )}
                   </small>
                 </div>
                 <div

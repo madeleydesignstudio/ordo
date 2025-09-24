@@ -1,17 +1,10 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import type { PGliteWithLive } from "@electric-sql/pglite/live";
 import { usePGlite } from "@electric-sql/pglite-react";
-import {
-  startSync,
-  updateSyncStatus,
-  useSyncStatus,
-  waitForInitialSyncDone,
-  type TaskChange,
-  type ChangeSet
-} from "@ordo/local-db";
-import { type PGliteWithLive } from '@electric-sql/pglite/live'
-import { type PGliteWithSync } from '@electric-sql/pglite-sync'
+import type { PGliteWithSync } from "@electric-sql/pglite-sync";
+import { startSync, useSyncStatus, waitForInitialSyncDone } from "@ordo/local-db";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-type PGliteWithExtensions = PGliteWithLive & PGliteWithSync
+type PGliteWithExtensions = PGliteWithLive & PGliteWithSync;
 
 interface ElectricSyncEngineState {
   isInitialized: boolean;
@@ -39,23 +32,21 @@ export function useElectricSyncEngine(options: UseElectricSyncEngineOptions = {}
 
   const pgliteClient = usePGlite() as PGliteWithExtensions;
   const syncStartedRef = useRef<boolean>(false);
-  
+
   // Use the sync status hook from the Electric sync engine
   const [syncStatus, syncMessage] = useSyncStatus();
 
   // Check if we can sync (have PGlite with sync and live extensions)
-  const canSync = Boolean(
-    pgliteClient && 
-    pgliteClient.sync && 
-    pgliteClient.live
-  );
+  const canSync = Boolean(pgliteClient && pgliteClient.sync && pgliteClient.live);
 
   const startSyncEngine = useCallback(async () => {
     if (!pgliteClient || !canSync) {
-      console.log("[useElectricSyncEngine] Cannot start sync: missing PGlite client with extensions");
-      setSyncState(prev => ({
+      console.log(
+        "[useElectricSyncEngine] Cannot start sync: missing PGlite client with extensions"
+      );
+      setSyncState((prev) => ({
         ...prev,
-        error: "Cannot start sync: missing database client with sync extensions"
+        error: "Cannot start sync: missing database client with sync extensions",
       }));
       return;
     }
@@ -66,25 +57,25 @@ export function useElectricSyncEngine(options: UseElectricSyncEngineOptions = {}
     }
 
     console.log("[useElectricSyncEngine] Starting Electric sync engine...");
-    setSyncState(prev => ({
+    setSyncState((prev) => ({
       ...prev,
       isLoading: true,
-      error: null
+      error: null,
     }));
 
     try {
       // Start the Electric SQL sync engine (based on Linear Lite example)
       await startSync(pgliteClient);
-      
+
       syncStartedRef.current = true;
 
-      setSyncState(prev => ({
+      setSyncState((prev) => ({
         ...prev,
         isInitialized: true,
         isLoading: false,
         isSyncing: true,
         lastSyncTime: new Date(),
-        error: null
+        error: null,
       }));
 
       console.log("[useElectricSyncEngine] ✅ Electric sync engine started successfully");
@@ -92,24 +83,19 @@ export function useElectricSyncEngine(options: UseElectricSyncEngineOptions = {}
       // Set up data change callback if provided
       if (onDataChange) {
         // Monitor for changes using live queries
-        pgliteClient.live.query(
-          'SELECT COUNT(*) as count FROM tasks',
-          [],
-          (results) => {
-            console.log("[useElectricSyncEngine] Data changed, triggering callback");
-            onDataChange();
-          }
-        );
+        pgliteClient.live.query("SELECT COUNT(*) as count FROM tasks", [], () => {
+          console.log("[useElectricSyncEngine] Data changed, triggering callback");
+          onDataChange();
+        });
       }
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error("[useElectricSyncEngine] ❌ Failed to start sync engine:", errorMessage);
 
-      setSyncState(prev => ({
+      setSyncState((prev) => ({
         ...prev,
         isLoading: false,
-        error: errorMessage
+        error: errorMessage,
       }));
     }
   }, [pgliteClient, canSync, onDataChange]);
@@ -119,10 +105,10 @@ export function useElectricSyncEngine(options: UseElectricSyncEngineOptions = {}
       console.log("[useElectricSyncEngine] Stopping sync engine...");
       syncStartedRef.current = false;
 
-      setSyncState(prev => ({
+      setSyncState((prev) => ({
         ...prev,
         isSyncing: false,
-        isInitialized: false
+        isInitialized: false,
       }));
 
       console.log("[useElectricSyncEngine] Sync engine stopped");
@@ -139,7 +125,7 @@ export function useElectricSyncEngine(options: UseElectricSyncEngineOptions = {}
   }, [stopSyncEngine, startSyncEngine]);
 
   const clearError = useCallback(() => {
-    setSyncState(prev => ({ ...prev, error: null }));
+    setSyncState((prev) => ({ ...prev, error: null }));
   }, []);
 
   const waitForSync = useCallback(async () => {
@@ -148,7 +134,13 @@ export function useElectricSyncEngine(options: UseElectricSyncEngineOptions = {}
 
   // Auto-start effect
   useEffect(() => {
-    if (autoStart && canSync && !syncState.isInitialized && !syncState.isLoading && !syncStartedRef.current) {
+    if (
+      autoStart &&
+      canSync &&
+      !syncState.isInitialized &&
+      !syncState.isLoading &&
+      !syncStartedRef.current
+    ) {
       console.log("[useElectricSyncEngine] Auto-starting sync engine...");
       startSyncEngine();
     }
@@ -156,9 +148,9 @@ export function useElectricSyncEngine(options: UseElectricSyncEngineOptions = {}
 
   // Update sync state based on Electric sync status
   useEffect(() => {
-    setSyncState(prev => ({
+    setSyncState((prev) => ({
       ...prev,
-      isSyncing: syncStatus === 'initial-sync',
+      isSyncing: syncStatus === "initial-sync",
     }));
   }, [syncStatus]);
 
