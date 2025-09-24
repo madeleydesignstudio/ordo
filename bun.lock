@@ -51,6 +51,7 @@
         "@electric-sql/client": "^0.8.0",
         "@electric-sql/pglite": "^0.3.8",
         "@electric-sql/pglite-react": "^0.2.14",
+        "@electric-sql/pglite-sync": "^0.3.8",
         "@ordo/local-db": "workspace:*",
         "@tanstack/react-query": "^5.90.2",
         "drizzle-orm": "^0.44.5",

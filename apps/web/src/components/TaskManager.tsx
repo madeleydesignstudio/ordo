@@ -5,7 +5,8 @@ import { useAutoSync } from "../hooks/useAutoSync";
 import { LoadingFallback } from "./LoadingFallback";
 import { ElectricSyncStatus } from "./ElectricSyncStatus";
 import { useElectricSync } from "../hooks/useElectricSync";
-import { eq, testElectricSync, testSyncConnectivity, testElectricCloudSetup, tasks, type Task } from "@ordo/local-db";
+import { useElectricSyncEngine } from "../hooks/useElectricSyncEngine";
+import { eq, tasks, type Task, testSyncConnectivity, testElectricSync } from "@ordo/local-db";
 
 export function TaskManager() {
   const {
@@ -41,20 +42,34 @@ export function TaskManager() {
   const syncEnabled = import.meta.env.VITE_ELECTRIC_SYNC_ENABLED === "true";
   const isElectricConfigured = electricConfig.sourceId && electricConfig.secret;
 
-  // ElectricSQL: Cloud → Local sync ONLY (reads from cloud to PGlite)
+  // ElectricSQL Sync Engine: Bidirectional sync based on Linear Lite example
   const {
     isInitialized: isElectricSyncReady,
-    // isLoading: isElectricSyncing,  // Removed unused variable
-    isUpToDate,
+    isLoading: isElectricSyncing,
+    isSyncing,
+    syncStatus,
+    syncMessage,
     error: electricSyncError,
     canSync: canUseElectric,
-    restartSync,
+    startSyncEngine,
+    stopSyncEngine,
+    restartSyncEngine,
     clearError: clearElectricError,
-  } = useElectricSync({
-    config: isElectricConfigured ? electricConfig : undefined,
+    waitForSync,
+  } = useElectricSyncEngine({
     autoStart: Boolean(syncEnabled && isElectricConfigured),
     onDataChange: () => {
-      console.log("[TaskManager] ElectricSQL detected data change, invalidating TanStack Query cache");
+      console.log("[TaskManager] ElectricSQL sync engine detected data change, invalidating TanStack Query cache");
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+  });
+
+  // Legacy ElectricSQL hook for comparison/fallback
+  const legacyElectricSync = useElectricSync({
+    config: isElectricConfigured ? electricConfig : undefined,
+    autoStart: false, // Disabled in favor of new sync engine
+    onDataChange: () => {
+      console.log("[TaskManager] Legacy ElectricSQL detected data change");
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
   });
@@ -62,22 +77,22 @@ export function TaskManager() {
   // TanStack Query: Reads from local PGlite database
   //
   // Sync Architecture:
-  // 1. ElectricSQL: Cloud Postgres → PGlite (automatic, real-time)
-  // 2. Engine API: PGlite → Cloud Postgres (manual, via useAutoSync)
-  // 3. TanStack Query: PGlite → React UI (cached queries)
+  // 1. ElectricSQL Sync Engine: Bidirectional sync (based on Linear Lite example)
+  // 2. TanStack Query: PGlite → React UI (cached queries)
   const { data: allTasks = [], refetch: refetchTasks } = useQuery<Task[]>({
     queryKey: ['tasks'],
     queryFn: async (): Promise<Task[]> => {
       if (!isInitialized || !db) return [];
-      const tasksData = await db.select().from(tasks);
-      console.log(`[TaskManager] TanStack Query fetched ${tasksData.length} tasks from local PGlite`);
+      // Filter out deleted tasks from the UI
+      const tasksData = await db.select().from(tasks).where(eq(tasks.deleted, false));
+      console.log(`[TaskManager] TanStack Query fetched ${tasksData.length} non-deleted tasks from local PGlite`);
       return tasksData;
     },
     enabled: isInitialized && !!db,
     staleTime: Infinity, // Never consider data stale - ElectricSQL callbacks handle invalidation
     refetchOnWindowFocus: true, // Refetch when user switches back to tab
     refetchOnReconnect: true, // Refetch when internet reconnects
-    // No refetchInterval - ElectricSQL automatically syncs cloud changes to PGlite
+    // No refetchInterval - ElectricSQL sync engine automatically handles sync
   });
 
   // Test ElectricSQL Cloud setup
@@ -185,11 +200,18 @@ export function TaskManager() {
     if (!newTaskTitle.trim() || !db) return;
 
     try {
-      // Create task object that matches the database schema exactly
+      // Create task object that matches the database schema with sync columns
       const taskData = {
         title: newTaskTitle.trim(),
         description: newTaskDescription.trim() || null,
         completed: false,
+        // Sync tracking columns for Electric SQL
+        synced: false,
+        sentToServer: false,
+        modifiedColumns: 'title,description,completed',
+        deleted: false,
+        new: true,
+        username: 'local_user', // TODO: Replace with actual user when auth is implemented
         // Don't include createdAt, updatedAt, dueDate - let the database set defaults
         // The schema has defaultNow() for these fields
       };
@@ -206,10 +228,8 @@ export function TaskManager() {
       // Update UI immediately
       refetchTasks();
 
-      // Push to cloud via Engine API (ElectricSQL only handles cloud→local)
-      if (navigator.onLine && result.length > 0) {
-        await autoSyncTask(result[0]);
-      }
+      // The Electric SQL sync engine will automatically pick up this change
+      // via the live query watching for synced=false tasks
 
       console.log("[TaskManager] Task added successfully");
     } catch (error) {
@@ -230,9 +250,14 @@ export function TaskManager() {
       if (!task) return;
 
       const updatedTask = {
-        ...task,
         completed: !task.completed,
         updatedAt: new Date(),
+        // Sync tracking columns for Electric SQL
+        synced: false,
+        sentToServer: false,
+        modifiedColumns: 'completed',
+        new: false, // This is an update, not a new task
+        username: 'local_user', // TODO: Replace with actual user when auth is implemented
       };
 
       console.log(
@@ -246,10 +271,8 @@ export function TaskManager() {
       // Update UI immediately
       refetchTasks();
 
-      // Push to cloud via Engine API (ElectricSQL only handles cloud→local)
-      if (navigator.onLine) {
-        await autoSyncTask(updatedTask);
-      }
+      // The Electric SQL sync engine will automatically pick up this change
+      // via the live query watching for synced=false tasks
 
       console.log("[TaskManager] Task toggled successfully");
     } catch (error) {
@@ -266,18 +289,30 @@ export function TaskManager() {
     if (!db) return;
 
     try {
-      console.log(`[TaskManager] Deleting task ${taskId}`);
-      await db.delete(tasks).where(eq(tasks.id, taskId));
+      console.log(`[TaskManager] Marking task ${taskId} as deleted`);
+      
+      // Instead of hard deleting, mark as deleted for sync
+      const deletedTask = {
+        deleted: true,
+        synced: false,
+        sentToServer: false,
+        modifiedColumns: 'deleted',
+        updatedAt: new Date(),
+        username: 'local_user', // TODO: Replace with actual user when auth is implemented
+      };
+
+      await db
+        .update(tasks)
+        .set(deletedTask)
+        .where(eq(tasks.id, taskId));
 
       // Update UI immediately
       refetchTasks();
 
-      // Push deletion to cloud via Engine API (ElectricSQL only handles cloud→local)
-      if (navigator.onLine) {
-        await autoDeleteTask(taskId);
-      }
+      // The Electric SQL sync engine will automatically pick up this change
+      // via the live query watching for synced=false tasks
 
-      console.log("[TaskManager] Task deleted successfully");
+      console.log("[TaskManager] Task marked as deleted successfully");
     } catch (error) {
       console.error("[TaskManager] Failed to delete task:", error);
       alert(
@@ -320,17 +355,53 @@ export function TaskManager() {
       {/* ElectricSQL Status */}
       <ElectricSyncStatus />
 
-      {/* Additional sync controls */}
+      {/* Electric Sync Engine Status */}
       <div style={{ margin: "20px 0", padding: "15px", border: "1px solid #ddd", borderRadius: "8px" }}>
-        <h4>🔄 Sync Controls</h4>
+        <h4>🔄 Electric Sync Engine</h4>
         <p style={{ margin: "5px 0", fontSize: "14px", color: "#666" }}>
-          ElectricSQL Sync: {syncEnabled ? "Enabled" : "Disabled"} |
-          Config: {isElectricConfigured ? "✅" : "❌"} |
+          Status: {syncStatus} |
+          {syncMessage && ` Message: ${syncMessage} |`}
           Ready: {isElectricSyncReady ? "✅" : "❌"} |
-          Up to Date: {isUpToDate ? "✅" : "❌"} |
+          Syncing: {isSyncing ? "✅" : "❌"} |
+          Config: {isElectricConfigured ? "✅" : "❌"} |
           Tasks: {allTasks.length}
         </p>
+        {electricSyncError && (
+          <p style={{ margin: "5px 0", fontSize: "12px", color: "red" }}>
+            Error: {electricSyncError}
+          </p>
+        )}
         <div>
+          <button
+            onClick={startSyncEngine}
+            disabled={!canUseElectric || isElectricSyncReady}
+            style={{
+              ...buttonStyle,
+              backgroundColor: !canUseElectric || isElectricSyncReady ? "#cccccc" : "#4CAF50",
+            }}
+          >
+            Start Sync Engine
+          </button>
+          <button
+            onClick={stopSyncEngine}
+            disabled={!isElectricSyncReady}
+            style={{
+              ...buttonStyle,
+              backgroundColor: !isElectricSyncReady ? "#cccccc" : "#f44336",
+            }}
+          >
+            Stop Sync Engine
+          </button>
+          <button
+            onClick={restartSyncEngine}
+            disabled={!canUseElectric}
+            style={{
+              ...buttonStyle,
+              backgroundColor: !canUseElectric ? "#cccccc" : "#FF9800",
+            }}
+          >
+            Restart Sync Engine
+          </button>
           <button
             onClick={handleTestConnectivity}
             disabled={!isElectricConfigured}

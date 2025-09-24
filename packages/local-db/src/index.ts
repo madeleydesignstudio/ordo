@@ -26,3 +26,5 @@ export * from "./utils.js";
 export * from "./migrate.js";
 export * from "./sync.js";
 export * from "./test-sync.js";
+export * from "./electric-sync.js";
+export * from "./utils/changes.js";
