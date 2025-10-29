@@ -95,3 +95,36 @@ func (db *DB) GetAllUsers() ([]User, error) {
 
 	return users, nil
 }
+
+func (db *DB) GetUserByID(id int) (*User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var user User
+	err := db.Pool.QueryRow(ctx,
+		"SELECT id, email, name FROM users WHERE id = $1",
+		id).Scan(&user.ID, &user.Email, &user.Name)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	return &user, nil
+}
+
+func (db *DB) DeleteUser(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	result, err := db.Pool.Exec(ctx, "DELETE FROM users WHERE id = $1", id)
+	if err != nil {
+		return fmt.Errorf("failed to delete user: %w", err)
+	}
+
+	rowsAffected := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("user with id %d not found", id)
+	}
+
+	return nil
+}

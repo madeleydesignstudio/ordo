@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -129,6 +130,71 @@ func setupRoutes(app *fiber.App, config *Config) {
 	api := app.Group("/api")
 	api.Post("/users", func(c *fiber.Ctx) error {
 		return handleCreateUser(c, config.DB)
+	})
+	api.Get("/users", func(c *fiber.Ctx) error {
+		return handleGetAllUsers(c, config.DB)
+	})
+	api.Get("/users/:id", func(c *fiber.Ctx) error {
+		return handleGetUser(c, config.DB)
+	})
+	api.Delete("/users/:id", func(c *fiber.Ctx) error {
+		return handleDeleteUser(c, config.DB)
+	})
+}
+
+func handleGetAllUsers(c *fiber.Ctx, db *DB) error {
+	users, err := db.GetAllUsers()
+	if err != nil {
+		log.Printf("Failed to get users: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to retrieve users",
+		})
+	}
+
+	return c.JSON(users)
+}
+
+func handleGetUser(c *fiber.Ctx, db *DB) error {
+	idStr := c.Params("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid user ID",
+		})
+	}
+
+	user, err := db.GetUserByID(id)
+	if err != nil {
+		log.Printf("Failed to get user: %v", err)
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User not found",
+		})
+	}
+
+	return c.JSON(user)
+}
+
+func handleDeleteUser(c *fiber.Ctx, db *DB) error {
+	idStr := c.Params("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid user ID",
+		})
+	}
+
+	err = db.DeleteUser(id)
+	if err != nil {
+		log.Printf("Failed to delete user: %v", err)
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User not found",
+		})
+	}
+
+	log.Printf("✅ Deleted user with ID: %d", id)
+	return c.JSON(fiber.Map{
+		"message": "User deleted successfully",
+		"id":      id,
 	})
 }
 

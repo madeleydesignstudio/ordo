@@ -30,6 +30,85 @@ const queryClient = new QueryClient({
 // Create column helper
 const columnHelper = createColumnHelper<User>();
 
+// Delete user function
+const deleteUser = async (userId: number): Promise<void> => {
+  const response = await fetch(`http://localhost:8080/api/users/${userId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to delete user");
+  }
+};
+
+// Delete button component
+function DeleteButton({
+  userId,
+  userName,
+}: {
+  userId: number;
+  userName: string;
+}) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleDelete = async () => {
+    if (!showConfirm) {
+      setShowConfirm(true);
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await deleteUser(userId);
+      // Electric SQL will automatically update the UI via real-time sync
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      alert(
+        `Failed to delete user: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    } finally {
+      setIsDeleting(false);
+      setShowConfirm(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setShowConfirm(false);
+  };
+
+  if (showConfirm) {
+    return (
+      <div className="flex items-center space-x-2">
+        <span className="text-xs text-gray-600">Delete {userName}?</span>
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+        >
+          {isDeleting ? "..." : "Yes"}
+        </button>
+        <button
+          onClick={handleCancel}
+          className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+        >
+          No
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleDelete}
+      className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors duration-200 border border-red-300"
+    >
+      Delete
+    </button>
+  );
+}
+
 // Define table columns
 const columns = [
   columnHelper.accessor("id", {
@@ -53,6 +132,15 @@ const columns = [
     cell: (info) => (
       <span className="font-medium text-gray-900">{info.getValue()}</span>
     ),
+  }),
+  // Add the new Actions column
+  columnHelper.display({
+    id: "actions",
+    header: "Actions",
+    cell: (info) => {
+      const user = info.row.original;
+      return <DeleteButton userId={user.id} userName={user.name} />;
+    },
   }),
 ];
 
@@ -86,12 +174,14 @@ function UsersTable() {
               <div className="h-4 bg-gray-200 rounded w-16"></div>
               <div className="h-4 bg-gray-200 rounded w-48"></div>
               <div className="h-4 bg-gray-200 rounded w-32"></div>
+              <div className="h-4 bg-gray-200 rounded w-20"></div>
             </div>
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex space-x-4">
                 <div className="h-4 bg-gray-100 rounded w-16"></div>
                 <div className="h-4 bg-gray-100 rounded w-48"></div>
                 <div className="h-4 bg-gray-100 rounded w-32"></div>
+                <div className="h-4 bg-gray-100 rounded w-20"></div>
               </div>
             ))}
           </div>
@@ -314,7 +404,7 @@ function App() {
                 Real-time user data synced with Electric SQL
               </p>
             </header>
-            <CreateUserForm /> {/* Add this line */}
+            <CreateUserForm />
             <UsersTable />
           </div>
         </div>
