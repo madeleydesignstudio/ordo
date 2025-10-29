@@ -1,15 +1,19 @@
-import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 import "./App.css";
 
 // Import all components
-import ProjectsTable from "./components/ProjectsTable";
-import TasksTable from "./components/TasksTable";
-import UsersTable from "./components/UsersTable";
 import CreateProjectForm from "./components/CreateProjectForm";
 import CreateTaskForm from "./components/CreateTaskForm";
 import CreateUserForm from "./components/CreateUserForm";
+import ProjectsTable from "./components/ProjectsTable";
+import TasksTable from "./components/TasksTable";
+import UsersTable from "./components/UsersTable";
 
+import { PGlite } from "@electric-sql/pglite";
+import { PGliteProvider } from "@electric-sql/pglite-react";
+import { electricSync } from "@electric-sql/pglite-sync";
+import { live } from "@electric-sql/pglite/live";
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,6 +63,10 @@ function TabNavigation({
   );
 }
 
+const db = await PGlite.create({
+  extensions: { live, electric: electricSync() },
+});
+
 // Main App component
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>("projects");
@@ -93,24 +101,26 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-gray-100">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-7xl mx-auto">
-            <header className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">
-                Ordo Dashboard
-              </h1>
-              <p className="text-gray-600 mt-2">
-                Project management with real-time sync powered by Electric SQL
-              </p>
-            </header>
+      <PGliteProvider db={db}>
+        <div className="min-h-screen bg-gray-100">
+          <div className="container mx-auto px-4 py-8">
+            <div className="max-w-7xl mx-auto">
+              <header className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Ordo Dashboard
+                </h1>
+                <p className="text-gray-600 mt-2">
+                  Project management with real-time sync powered by Electric SQL
+                </p>
+              </header>
 
-            <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+              <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-            {renderContent()}
+              {renderContent()}
+            </div>
           </div>
         </div>
-      </div>
+      </PGliteProvider>
     </QueryClientProvider>
   );
 }
