@@ -1,0 +1,326 @@
+import { useShape } from "@electric-sql/react";
+import React, { useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import "./App.css";
+
+// Define the user type with index signature for TanStack Table compatibility
+interface User {
+  id: number;
+  email: string;
+  name: string;
+  [key: string]: any; // This satisfies the Row<unknown> constraint
+}
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity, // Since Electric SQL handles the real-time updates
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+// Create column helper
+const columnHelper = createColumnHelper<User>();
+
+// Define table columns
+const columns = [
+  columnHelper.accessor("id", {
+    header: "ID",
+    cell: (info) => (
+      <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+        {info.getValue()}
+      </span>
+    ),
+  }),
+  columnHelper.accessor("email", {
+    header: "Email",
+    cell: (info) => (
+      <span className="text-blue-600 hover:text-blue-800 cursor-pointer">
+        {info.getValue()}
+      </span>
+    ),
+  }),
+  columnHelper.accessor("name", {
+    header: "Name",
+    cell: (info) => (
+      <span className="font-medium text-gray-900">{info.getValue()}</span>
+    ),
+  }),
+];
+
+// Users table component that uses Electric SQL's useShape
+function UsersTable() {
+  const { isLoading, data } = useShape<User>({
+    url: `http://localhost:8080/shape`,
+    params: {
+      table: `users`,
+    },
+  });
+
+  const table = useReactTable({
+    data: data || [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-800">
+            Loading Users...
+          </h2>
+        </div>
+        <div className="p-8">
+          {/* Loading skeleton */}
+          <div className="animate-pulse space-y-4">
+            <div className="flex space-x-4">
+              <div className="h-4 bg-gray-200 rounded w-16"></div>
+              <div className="h-4 bg-gray-200 rounded w-48"></div>
+              <div className="h-4 bg-gray-200 rounded w-32"></div>
+            </div>
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex space-x-4">
+                <div className="h-4 bg-gray-100 rounded w-16"></div>
+                <div className="h-4 bg-gray-100 rounded w-48"></div>
+                <div className="h-4 bg-gray-100 rounded w-32"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+      {/* Header */}
+      <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-gray-800">
+            Users ({data?.length || 0})
+          </h2>
+          <div className="flex items-center space-x-2">
+            <div className="flex items-center text-sm text-gray-500">
+              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+              Real-time sync active
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {table.getRowModel().rows.map((row, index) => (
+              <tr
+                key={row.id}
+                className={`hover:bg-gray-50 transition-colors duration-200 ${
+                  index % 2 === 0 ? "bg-white" : "bg-gray-25"
+                }`}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    className="px-6 py-4 whitespace-nowrap text-sm"
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Empty state */}
+      {data && data.length === 0 && (
+        <div className="text-center py-12">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            stroke="currentColor"
+            fill="none"
+            viewBox="0 0 48 48"
+          >
+            <path
+              d="M34 40h10v-4a6 6 0 00-10.712-3.714M34 40H14m20 0v-4a9.971 9.971 0 00-.712-3.714M14 40H4v-4a6 6 0 0110.713-3.714M14 40v-4c0-1.313.253-2.566.713-3.714m0 0A10.003 10.003 0 0124 26c4.21 0 7.813 2.602 9.288 6.286M30 14a6 6 0 11-12 0 6 6 0 0112 0zm12 6a4 4 0 11-8 0 4 4 0 018 0zm-28 0a4 4 0 11-8 0 4 4 0 018 0z"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No users found
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">
+            No users have been synced yet. Data will appear here automatically.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Add this new component before your existing UsersTable component
+function CreateUserForm() {
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !name) return;
+
+    setIsSubmitting(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, name }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create user");
+      }
+
+      setEmail("");
+      setName("");
+      setMessage({ type: "success", text: "User created successfully!" });
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Failed to create user",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-lg mb-8">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">
+        Create New User
+      </h2>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter email address"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter full name"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting || !email || !name}
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+        >
+          {isSubmitting ? "Creating..." : "Create User"}
+        </button>
+      </form>
+
+      {message && (
+        <div
+          className={`mt-4 p-3 rounded ${
+            message.type === "success"
+              ? "bg-green-100 border border-green-400 text-green-700"
+              : "bg-red-100 border border-red-400 text-red-700"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Main App component
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <div className="min-h-screen bg-gray-100">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-6xl mx-auto">
+            <header className="mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">
+                Electric SQL Dashboard
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Real-time user data synced with Electric SQL
+              </p>
+            </header>
+            <CreateUserForm /> {/* Add this line */}
+            <UsersTable />
+          </div>
+        </div>
+      </div>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
