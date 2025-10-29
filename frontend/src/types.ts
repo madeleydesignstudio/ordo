@@ -36,14 +36,28 @@ export interface ProjectWithTasks {
   tasks: Task[];
 }
 
-// Form types for creating/updating
-export interface CreateProjectForm {
+// Form data types for creating/updating (renamed to avoid conflicts)
+export interface CreateProjectData {
   title: string;
   start_date?: string;
   finish_date?: string;
 }
 
-export interface CreateTaskForm {
+export interface CreateTaskData {
+  project_id: number;
+  title: string;
+  description?: string;
+  start_date?: string;
+  finish_date?: string;
+}
+
+export interface CreateProjectData {
+  title: string;
+  start_date?: string;
+  finish_date?: string;
+}
+
+export interface CreateTaskData {
   project_id: number;
   title: string;
   description?: string;

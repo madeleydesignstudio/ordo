@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Task } from "../types";
+import type { Task } from "../types";
 
 // Create column helper
 const columnHelper = createColumnHelper<Task>();
@@ -46,7 +46,9 @@ function DeleteButton({
       // Electric SQL will automatically update the UI via real-time sync
     } catch (error) {
       console.error("Failed to delete task:", error);
-      alert(`Failed to delete task: ${error instanceof Error ? error.message : "Unknown error"}`);
+      alert(
+        `Failed to delete task: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     } finally {
       setIsDeleting(false);
       setShowConfirm(false);
@@ -148,12 +150,7 @@ const columns = [
     header: "Actions",
     cell: (info) => {
       const task = info.row.original;
-      return (
-        <DeleteButton
-          taskId={task.id}
-          taskTitle={task.title}
-        />
-      );
+      return <DeleteButton taskId={task.id} taskTitle={task.title} />;
     },
   }),
 ];
@@ -291,7 +288,8 @@ function TasksTable() {
             No tasks found
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            No tasks have been created yet. Tasks will appear here automatically.
+            No tasks have been created yet. Tasks will appear here
+            automatically.
           </p>
         </div>
       )}

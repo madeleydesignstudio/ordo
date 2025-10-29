@@ -6,7 +6,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useState } from "react";
-import { User } from "../types";
+import type { User } from "../types";
 
 // Create column helper
 const columnHelper = createColumnHelper<User>();

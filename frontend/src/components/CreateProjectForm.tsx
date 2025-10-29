@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CreateProjectForm as CreateProjectFormType } from "../types";
+import type { CreateProjectData } from "../types";
 
 function CreateProjectForm() {
   const [title, setTitle] = useState("");
@@ -19,7 +19,7 @@ function CreateProjectForm() {
     setMessage(null);
 
     try {
-      const projectData: CreateProjectFormType = {
+      const projectData: CreateProjectData = {
         title,
         start_date: startDate || undefined,
         finish_date: finishDate || undefined,

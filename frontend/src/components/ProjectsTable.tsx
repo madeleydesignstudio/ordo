@@ -6,16 +6,19 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Project } from "../types";
+import type { Project } from "../types";
 
 // Create column helper
 const columnHelper = createColumnHelper<Project>();
 
 // Delete project function
 const deleteProject = async (projectId: number): Promise<void> => {
-  const response = await fetch(`http://localhost:8080/api/projects/${projectId}`, {
-    method: "DELETE",
-  });
+  const response = await fetch(
+    `http://localhost:8080/api/projects/${projectId}`,
+    {
+      method: "DELETE",
+    },
+  );
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -46,7 +49,9 @@ function DeleteButton({
       // Electric SQL will automatically update the UI via real-time sync
     } catch (error) {
       console.error("Failed to delete project:", error);
-      alert(`Failed to delete project: ${error instanceof Error ? error.message : "Unknown error"}`);
+      alert(
+        `Failed to delete project: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     } finally {
       setIsDeleting(false);
       setShowConfirm(false);
@@ -141,10 +146,7 @@ const columns = [
     cell: (info) => {
       const project = info.row.original;
       return (
-        <DeleteButton
-          projectId={project.id}
-          projectTitle={project.title}
-        />
+        <DeleteButton projectId={project.id} projectTitle={project.title} />
       );
     },
   }),
@@ -281,7 +283,8 @@ function ProjectsTable() {
             No projects found
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            No projects have been created yet. Create your first project to get started.
+            No projects have been created yet. Create your first project to get
+            started.
           </p>
         </div>
       )}

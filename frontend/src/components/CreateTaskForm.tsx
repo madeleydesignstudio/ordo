@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CreateTaskForm as CreateTaskFormType, Project } from "../types";
+import type { CreateTaskData, Project } from "../types";
 
 function CreateTaskForm() {
   const [projectId, setProjectId] = useState("");
@@ -42,7 +42,7 @@ function CreateTaskForm() {
     setMessage(null);
 
     try {
-      const taskData: CreateTaskFormType = {
+      const taskData: CreateTaskData = {
         project_id: parseInt(projectId),
         title,
         description: description || undefined,
