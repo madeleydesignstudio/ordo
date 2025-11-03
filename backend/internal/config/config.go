@@ -8,10 +8,13 @@ import (
 )
 
 type Config struct {
-	SourceID     string
-	SourceSecret string
-	DatabaseURL  string
-	Port         string
+	SourceID           string
+	SourceSecret       string
+	DatabaseURL        string
+	Port               string
+	GoogleClientID     string
+	GoogleClientSecret string
+	GoogleRedirectURL  string
 }
 
 func Load() (*Config, error) {
@@ -21,10 +24,13 @@ func Load() (*Config, error) {
 	}
 
 	cfg := &Config{
-		SourceID:     os.Getenv("SOURCE_ID"),
-		SourceSecret: os.Getenv("SOURCE_SECRET"),
-		DatabaseURL:  os.Getenv("DATABASE_URL"),
-		Port:         os.Getenv("PORT"),
+		SourceID:           os.Getenv("SOURCE_ID"),
+		SourceSecret:       os.Getenv("SOURCE_SECRET"),
+		DatabaseURL:        os.Getenv("DATABASE_URL"),
+		Port:               os.Getenv("PORT"),
+		GoogleClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		GoogleRedirectURL:  os.Getenv("GOOGLE_REDIRECT_URL"),
 	}
 
 	// Validate required fields
@@ -34,6 +40,10 @@ func Load() (*Config, error) {
 
 	if cfg.DatabaseURL == "" {
 		return nil, fmt.Errorf("DATABASE_URL environment variable is required")
+	}
+
+	if cfg.GoogleClientID == "" || cfg.GoogleClientSecret == "" || cfg.GoogleRedirectURL == "" {
+		return nil, fmt.Errorf("GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REDIRECT_URL environment variables are required")
 	}
 
 	// Set default port

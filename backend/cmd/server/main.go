@@ -56,9 +56,10 @@ func setupRoutes(app *fiber.App, cfg *config.Config, db *database.DB) {
 		Format: "${time} ${status} - ${method} ${path} - ${latency}\n",
 	}))
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:5173",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
-		AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
+		AllowOrigins:     "http://localhost:5173",
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
+		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
+		AllowCredentials: true,
 	}))
 
 	// Initialize handlers
@@ -67,13 +68,22 @@ func setupRoutes(app *fiber.App, cfg *config.Config, db *database.DB) {
 	projectHandler := handlers.NewProjectHandler(db)
 	taskHandler := handlers.NewTaskHandler(db)
 	proxyHandler := handlers.NewProxyHandler(cfg)
+	authHandler := handlers.NewAuthHandler(cfg, db)
 
 	// Routes
 	app.Get("/health", healthHandler.Health)
 	app.Get("/shape", proxyHandler.Shape)
 
+	// Auth routes
+	app.Get("/auth/google", authHandler.GoogleLogin)
+	app.Get("/auth/google/callback", authHandler.GoogleCallback)
+
 	// API routes
 	api := app.Group("/api")
+
+	// Auth API routes
+	api.Get("/auth/verify", authHandler.VerifyToken)
+	api.Get("/auth/users", authHandler.GetOAuthUsers)
 
 	// User routes
 	api.Post("/users", userHandler.Create)
