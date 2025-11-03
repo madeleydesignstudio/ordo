@@ -4,6 +4,9 @@
     "": {
       "name": "frontend",
       "dependencies": {
+        "@electric-sql/pglite": "^0.3.11",
+        "@electric-sql/pglite-react": "^0.2.29",
+        "@electric-sql/pglite-sync": "^0.3.15",
         "@electric-sql/react": "^1.0.16",
         "@tanstack/react-query": "^5.90.5",
         "@tanstack/react-table": "^8.21.3",
@@ -31,6 +34,14 @@
   },
   "packages": {
     "@electric-sql/client": ["@electric-sql/client@1.1.1", "", { "dependencies": { "@microsoft/fetch-event-source": "^2.0.1" }, "optionalDependencies": { "@rollup/rollup-darwin-arm64": "^4.18.1" } }, "sha512-E9aZ3PJ/kBRmuxth9fKNt72wTqP5XjXUPu3V2SxNugAFWMgdJ++ErwGtskuUG8W3js7fGeP545yNQTeVlCQRmg=="],
+
+    "@electric-sql/experimental": ["@electric-sql/experimental@1.0.14", "", { "optionalDependencies": { "@rollup/rollup-darwin-arm64": "^4.18.1" }, "peerDependencies": { "@electric-sql/client": "1.0.14" } }, "sha512-Wpv9UC7r4JYnQO4GbtQve7SVIX/VcBwAP12Xx11ObK2TBI+NJHtDRimUEKKQorq9Kr6yTAJ3BYOKCINxFsbDIg=="],
+
+    "@electric-sql/pglite": ["@electric-sql/pglite@0.3.11", "", {}, "sha512-FJtjnEyez8XgmgyE5Ewmx89TGVN+75ZjykFoExApRIbJBMT4dsbsuZkF/YWLuymGDfGFHDACjvENPMEqg4FoWg=="],
+
+    "@electric-sql/pglite-react": ["@electric-sql/pglite-react@0.2.29", "", { "peerDependencies": { "@electric-sql/pglite": "0.3.11", "react": "^18.0.0 || ^19.0.0 || ^19.0.0-rc" } }, "sha512-xdbieHPybQOR2Rurttvr8G8fOfDRfGqpuUJXeWtvuOAGZhxyULZo166dfD0kmnqyk2RBt5rv6eNJmuVTDy5OdQ=="],
+
+    "@electric-sql/pglite-sync": ["@electric-sql/pglite-sync@0.3.15", "", { "dependencies": { "@electric-sql/client": "^1.0.9", "@electric-sql/experimental": "^1.0.9" }, "peerDependencies": { "@electric-sql/pglite": "0.3.11" } }, "sha512-greEbsL0lU8lISVJYCQIUThM9NYW/cgTxz7c470xhMehIDxEuB4DVbCettJuazkrxDu00w2Be92w8NoN6oqZ7A=="],
 
     "@electric-sql/react": ["@electric-sql/react@1.0.16", "", { "dependencies": { "@electric-sql/client": "1.1.1", "use-sync-external-store": "^1.2.2" }, "peerDependencies": { "react": ">=18.3.1 <20.0.0" }, "optionalPeers": ["react"] }, "sha512-14jsGrcFft02NqOEIOhdd3CP5tBScpPq4Jlyvj6Q6+LeWTk1VRr9oiQS8UX73MBB1wHmy9xCeGxWvnBakJO7bg=="],
 
