@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
 import "./App.css";
 
 // Import all components
@@ -12,13 +11,16 @@ import UsersTable from "./components/UsersTable";
 import Login from "./components/Login";
 import OAuthCallback from "./components/OAuthCallback";
 import UserProfile from "./components/UserProfile";
+import PGTaskTable from "./components/PGTaskTable";
+
+import { AuthProvider } from "./contexts/AuthContext";
+import { useAuth } from "./hooks/useAuth";
 
 import { PGlite } from "@electric-sql/pglite";
 import { PGliteProvider } from "@electric-sql/pglite-react";
 import { electricSync } from "@electric-sql/pglite-sync";
 import { live } from "@electric-sql/pglite/live";
-import { AuthProvider } from "./contexts/AuthContext";
-import { useAuth } from "./hooks/useAuth";
+import { useState, useEffect } from "react";
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,7 +31,7 @@ const queryClient = new QueryClient({
   },
 });
 
-type Tab = "projects" | "tasks" | "users";
+type Tab = "projects" | "tasks" | "users" | "pgtasks";
 
 // Tab navigation component
 function TabNavigation({
@@ -43,6 +45,7 @@ function TabNavigation({
     { id: "projects" as Tab, name: "Projects", icon: "📋" },
     { id: "tasks" as Tab, name: "Tasks", icon: "✅" },
     { id: "users" as Tab, name: "Users", icon: "👥" },
+    { id: "pgtasks" as Tab, name: "PG Tasks", icon: "⚡" },
   ];
 
   return (
@@ -68,14 +71,45 @@ function TabNavigation({
   );
 }
 
-const db = await PGlite.create({
-  extensions: { live, electric: electricSync() },
-});
+// Initialize PGlite database
+let pgInstancePromise: Promise<PGlite> | null = null;
+
+const initializePGlite = async (): Promise<PGlite> => {
+  if (!pgInstancePromise) {
+    pgInstancePromise = PGlite.create({
+      dataDir: "idb://ordo-tasks-sync-db",
+      extensions: {
+        electric: electricSync(),
+        live,
+      },
+    });
+  }
+  return pgInstancePromise;
+};
 
 // Main App component content (authenticated)
 function AppContent() {
   const { isAuthenticated, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("projects");
+  const [pgDb, setPgDb] = useState<PGlite | null>(null);
+  const [pgError, setPgError] = useState<string | null>(null);
+
+  // Initialize PGlite when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      initializePGlite()
+        .then((db) => {
+          setPgDb(db);
+          console.log("PGlite initialized successfully in App.tsx");
+        })
+        .catch((err) => {
+          console.error("Failed to initialize PGlite:", err);
+          setPgError(
+            err instanceof Error ? err.message : "Failed to initialize PGlite",
+          );
+        });
+    }
+  }, [isAuthenticated]);
 
   // Check for OAuth callback parameters
   const urlParams = new URLSearchParams(window.location.search);
@@ -126,35 +160,66 @@ function AppContent() {
             <UsersTable />
           </>
         );
+      case "pgtasks":
+        return <PGTaskTable />;
       default:
         return null;
     }
   };
 
-  return (
-    <PGliteProvider db={db}>
+  // Show PGlite initialization error if there is one
+  if (pgError) {
+    return (
       <div className="min-h-screen bg-gray-100">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-7xl mx-auto">
-            <UserProfile />
-
-            <header className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">
-                Ordo Dashboard
-              </h1>
-              <p className="text-gray-600 mt-2">
-                Project management with real-time sync powered by Electric SQL
-              </p>
-            </header>
-
-            <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-
-            {renderContent()}
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <h3 className="text-sm font-medium text-red-800">
+                Database Initialization Error
+              </h3>
+              <p className="mt-2 text-sm text-red-700">{pgError}</p>
+            </div>
           </div>
         </div>
       </div>
-    </PGliteProvider>
+    );
+  }
+
+  // Show loading for PGlite initialization
+  if (isAuthenticated && !pgDb) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Initializing database...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const content = (
+    <div className="min-h-screen bg-gray-100">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+          <UserProfile />
+
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Ordo Dashboard</h1>
+            <p className="text-gray-600 mt-2">
+              Project management with real-time sync powered by Electric SQL
+            </p>
+          </header>
+
+          <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+          {renderContent()}
+        </div>
+      </div>
+    </div>
   );
+
+  // Wrap with PGliteProvider if we have the database instance
+  return pgDb ? <PGliteProvider db={pgDb}>{content}</PGliteProvider> : content;
 }
 
 // Main App wrapper with providers
