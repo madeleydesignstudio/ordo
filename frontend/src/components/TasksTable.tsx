@@ -1,11 +1,11 @@
 import { useShape } from "@electric-sql/react";
-import React, { useState } from "react";
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { useState } from "react";
 import type { Task } from "../types";
 
 // Create column helper
