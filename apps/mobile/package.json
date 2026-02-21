@@ -1,0 +1,46 @@
+{
+  "name": "@ordo/mobile",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@ordo/engine-core": "workspace:*",
+    "@ordo/sync-engine": "workspace:*",
+    "@expo/vector-icons": "15.0.2",
+    "@livestore/adapter-expo": "0.4.0-dev.22",
+    "@livestore/devtools-expo": "0.4.0-dev.22",
+    "@livestore/livestore": "0.4.0-dev.22",
+    "@livestore/peer-deps": "0.4.0-dev.22",
+    "@livestore/react": "0.4.0-dev.22",
+    "@livestore/sync-cf": "0.4.0-dev.22",
+    "babel-preset-expo": "54.0.3",
+    "expo": "54.0.12",
+    "expo-application": "7.0.7",
+    "expo-asset": "12.0.9",
+    "expo-crypto": "15.0.7",
+    "expo-sqlite": "16.0.8",
+    "expo-status-bar": "3.0.8",
+    "react": "19.1.0",
+    "react-native": "0.81.4",
+    "react-native-worklets": "0.5.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/plugin-syntax-import-attributes": "^7.27.1",
+    "@babel/runtime": "^7.28.2",
+    "@types/react": "^19.1.13",
+    "babel-plugin-transform-vite-meta-env": "^1.0.3",
+    "eas-cli": "^16.19.3",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.42.2"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "main": "./src/AppEntry.ts",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "dev": "MONOREPO_ROOT=../.. EXPO_PUBLIC_LIVESTORE_SYNC_URL=ws://192.168.0.9:8787/sync EXPO_PUBLIC_LIVESTORE_STORE_ID=ordo-dev-shared-v2 expo start",
+    "start": "MONOREPO_ROOT=../.. EXPO_PUBLIC_LIVESTORE_SYNC_URL=ws://192.168.0.9:8787/sync EXPO_PUBLIC_LIVESTORE_STORE_ID=ordo-dev-shared-v2 expo start",
+    "typecheck": "tsc --noEmit"
+  }
+}

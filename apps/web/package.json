@@ -1,0 +1,46 @@
+{
+  "name": "@ordo/web",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@ordo/engine-core": "workspace:*",
+    "@ordo/sync-engine": "workspace:*",
+    "@livestore/adapter-web": "0.4.0-dev.22",
+    "@livestore/livestore": "0.4.0-dev.22",
+    "@livestore/peer-deps": "0.4.0-dev.22",
+    "@livestore/react": "0.4.0-dev.22",
+    "@livestore/sync-cf": "0.4.0-dev.22",
+    "@livestore/wa-sqlite": "0.4.0-dev.22",
+    "@overengineering/fps-meter": "0.2.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-error-boundary": "6.0.0",
+    "todomvc-app-css": "2.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.13.12",
+    "@cloudflare/workers-types": "4.20251118.0",
+    "@livestore/devtools-vite": "0.4.0-dev.22",
+    "@playwright/test": "^1.56.0",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.3",
+    "typescript": "^5.9.2",
+    "vite": "^7.2.4",
+    "@types/wicg-file-system-access": "^2023.10.6",
+    "wrangler": "^4.42.2"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "deploy": "bun run build && wrangler deploy",
+    "deploy:prod": "VITE_LIVESTORE_SYNC_URL=wss://ordo-engine.daniel-a01.workers.dev/sync VITE_LIVESTORE_STORE_ID=ordo-dev-shared-v2 bun run build && wrangler deploy",
+    "dev": "VITE_LIVESTORE_SYNC_URL=ws://localhost:8787/sync VITE_LIVESTORE_STORE_ID=ordo-dev-shared-v2 vite --force",
+    "preview": "vite preview",
+    "test": "playwright test"
+  }
+}

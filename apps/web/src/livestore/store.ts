@@ -1,0 +1,37 @@
+import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
+
+import { makePersistedAdapter } from '@livestore/adapter-web'
+import LiveStoreSharedWorker from '@livestore/adapter-web/shared-worker?sharedworker'
+import { useStore } from '@livestore/react'
+import { makeClientSyncConfig } from '@ordo/sync-engine'
+
+import LiveStoreWorker from '../livestore.worker.ts?worker'
+import { SyncPayload, schema } from './schema.ts'
+
+const { storeId } = makeClientSyncConfig({
+  storeId: import.meta.env.VITE_LIVESTORE_STORE_ID,
+  syncUrl: import.meta.env.VITE_LIVESTORE_SYNC_URL,
+})
+
+if (import.meta.env.DEV) {
+  console.log('[ordo:web] LiveStore startup', {
+    storeId,
+    syncUrl: import.meta.env.VITE_LIVESTORE_SYNC_URL ?? 'ws://localhost:8787/sync',
+  })
+}
+
+const adapter = makePersistedAdapter({
+  storage: { type: 'opfs' },
+  worker: LiveStoreWorker,
+  sharedWorker: LiveStoreSharedWorker,
+})
+
+export const useAppStore = () =>
+  useStore({
+    storeId,
+    schema,
+    adapter,
+    batchUpdates,
+    syncPayloadSchema: SyncPayload,
+    syncPayload: { authToken: 'insecure-token-change-me' },
+  })

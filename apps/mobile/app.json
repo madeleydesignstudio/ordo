@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "ordo",
+    "slug": "ordo",
+    "version": "1.0.0",
+    "newArchEnabled": true,
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.livestore.livestore-expo"
+    },
+    "android": {
+      "package": "dev.livestore.livestoreexpo",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5af6c9ed-57b8-4cc7-b2cb-6fd3c0f93a0b"
+      }
+    },
+    "owner": "mxdeley"
+  }
+}

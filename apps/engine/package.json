@@ -1,0 +1,22 @@
+{
+  "name": "@ordo/engine",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@livestore/sync-cf": "0.4.0-dev.22",
+    "@ordo/engine-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "4.20251118.0",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.42.2"
+  },
+  "scripts": {
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "dev": "wrangler dev --ip 0.0.0.0 --port 8787 --inspector-ip 0.0.0.0 --inspector-port 9230",
+    "typecheck": "tsc --noEmit",
+    "wrangler:dev": "wrangler dev --ip 0.0.0.0 --port 8787 --inspector-ip 0.0.0.0 --inspector-port 9230",
+    "wrangler:deploy": "wrangler deploy"
+  }
+}

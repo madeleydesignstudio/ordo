@@ -1,0 +1,32 @@
+{
+  "cli": {
+    "version": ">= 16.32.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_LIVESTORE_SYNC_URL": "wss://ordo-engine.daniel-a01.workers.dev/sync",
+        "EXPO_PUBLIC_LIVESTORE_STORE_ID": "ordo-dev-shared-v2"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_LIVESTORE_SYNC_URL": "wss://ordo-engine.daniel-a01.workers.dev/sync",
+        "EXPO_PUBLIC_LIVESTORE_STORE_ID": "ordo-dev-shared-v2"
+      }
+    },
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_LIVESTORE_SYNC_URL": "wss://ordo-engine.daniel-a01.workers.dev/sync",
+        "EXPO_PUBLIC_LIVESTORE_STORE_ID": "ordo-dev-shared-v2"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

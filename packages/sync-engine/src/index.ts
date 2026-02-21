@@ -1,0 +1,5 @@
+export { events, schema, SyncPayload, tables } from './schema.ts'
+export { uiState$ } from './queries.ts'
+export { makeClientSyncConfig } from './client-config.ts'
+export { Filter } from './types.ts'
+export type { Filter as FilterType } from './types.ts'
