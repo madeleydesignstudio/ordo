@@ -1,7 +1,7 @@
 import { nanoid } from '@livestore/livestore'
 import { useCallback, useRef } from 'react'
 import type { NativeSyntheticEvent, TextInputKeyPressEventData } from 'react-native'
-import { Keyboard, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, Pressable, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native'
 
 import { uiState$ } from '../livestore/queries.ts'
 import { events } from '../livestore/schema.ts'
@@ -41,51 +41,36 @@ export const NewTodo: React.FC = () => {
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <View style={styles.container}>
+      <View className="flex-row items-center p-3 w-full max-w-md">
         <TextInput
           ref={inputRef}
-          style={styles.input}
+          className="flex-1 h-10 mx-3 px-3 border border-gray-300 rounded-md text-base"
           value={newTodoText}
           onChangeText={updatedNewTodoText}
           onKeyPress={handleInputKeyPress}
           onSubmitEditing={todoCreated}
+          placeholder="What needs to be done?"
+          placeholderTextColor="#9ca3af"
         />
-        <Pressable onPress={todoCreated}>
-          <Text style={styles.submit}>Add</Text>
+        <Pressable 
+          onPress={todoCreated}
+          className="px-3 py-2 bg-blue-500 rounded-md mr-2"
+        >
+          <Text className="text-white text-sm font-medium">Add</Text>
         </Pressable>
-        <Pressable onPress={addRandom50}>
-          <Text style={styles.submit}>Random (50)</Text>
+        <Pressable 
+          onPress={addRandom50}
+          className="px-3 py-2 bg-green-500 rounded-md mr-2"
+        >
+          <Text className="text-white text-sm font-medium">+50</Text>
         </Pressable>
-        <Pressable onPress={reset}>
-          <Text style={styles.submit}>Clear</Text>
+        <Pressable 
+          onPress={reset}
+          className="px-3 py-2 bg-red-500 rounded-md"
+        >
+          <Text className="text-white text-sm font-medium">Clear</Text>
         </Pressable>
       </View>
     </TouchableWithoutFeedback>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    flexGrow: 0,
-    flexBasis: 100,
-    flexShrink: 0,
-    alignItems: 'center',
-    padding: 10,
-    width: 400,
-  },
-  input: {
-    height: 40,
-    width: 200,
-    margin: 12,
-    borderWidth: 1,
-    borderRadius: 6,
-  },
-  submit: {
-    padding: 4,
-    // backgroundColor: 'blue',
-    borderRadius: 6,
-    fontSize: 12,
-  },
-})

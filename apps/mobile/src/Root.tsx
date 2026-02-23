@@ -2,20 +2,22 @@ import { StoreRegistry } from '@livestore/livestore'
 import { StoreRegistryProvider } from '@livestore/react'
 import { StatusBar } from 'expo-status-bar'
 import { Suspense, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 
 import { Filters } from './components/Filters.tsx'
 import { ListTodos } from './components/ListTodos.tsx'
 import { Meta } from './components/Meta.tsx'
 import { NewTodo } from './components/NewTodo.tsx'
 
-const loadingFallback = <Text>Loading LiveStore...</Text>
+import './global.css'
+
+const loadingFallback = <Text className="text-gray-500">Loading LiveStore...</Text>
 
 export const Root = () => {
   const [storeRegistry] = useState(() => new StoreRegistry())
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 pt-16 bg-white items-center pb-8">
       <Suspense fallback={loadingFallback}>
         <StoreRegistryProvider storeRegistry={storeRegistry}>
           <InnerApp />
@@ -27,21 +29,10 @@ export const Root = () => {
 }
 
 const InnerApp = () => (
-  <>
+  <View className="flex-1 w-full px-4">
     <NewTodo />
     <Meta />
     <ListTodos />
     <Filters />
-  </>
+  </View>
 )
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 60,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingBottom: 32,
-  },
-})

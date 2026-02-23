@@ -23,6 +23,10 @@
     "target": "ESNext",
     "strict": true
   },
+  "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    },
   "exclude": [
     "node_modules",
     "babel.config.js",

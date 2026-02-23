@@ -1,6 +1,6 @@
 import { queryDb } from '@livestore/livestore'
 import { useCallback } from 'react'
-import { FlatList } from 'react-native'
+import { FlatList, View } from 'react-native'
 
 import { uiState$ } from '../livestore/queries.ts'
 import { tables } from '../livestore/schema.ts'
@@ -25,12 +25,15 @@ export const ListTodos = () => {
   const keyExtractor = useCallback((item: typeof tables.todos.Type) => item.id.toString(), [])
 
   return (
-    <FlatList
-      data={visibleTodos}
-      renderItem={renderTodo}
-      keyExtractor={keyExtractor}
-      initialNumToRender={20}
-      maxToRenderPerBatch={20}
-    />
+    <View className="flex-1 w-full">
+      <FlatList
+        data={visibleTodos}
+        renderItem={renderTodo}
+        keyExtractor={keyExtractor}
+        initialNumToRender={20}
+        maxToRenderPerBatch={20}
+        className="flex-1"
+      />
+    </View>
   )
 }

@@ -1,5 +1,5 @@
 import type * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 
 import { queryDb } from '@livestore/livestore'
 
@@ -15,18 +15,8 @@ export const Meta: React.FC = () => {
   const count = store.useQuery(incompleteCount$)
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>{count} todos</Text>
+    <View className="py-2 px-4 bg-white">
+      <Text className="text-gray-800 font-medium">{count} items left</Text>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 10,
-    backgroundColor: '#fff',
-  },
-  text: {
-    color: 'black',
-  },
-})

@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useCallback } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 
 import type { tables } from '../livestore/schema.ts'
 import { events } from '../livestore/schema.ts'
@@ -14,54 +14,28 @@ export const Todo = ({ id, text, completed }: typeof tables.todos.Type) => {
     () => store.commit(events.todoDeleted({ id, deletedAt: new Date() })),
     [id, store],
   )
-  const textStyle = StyleSheet.compose(styles.text, completed ? styles.textCompleted : undefined)
 
   return (
-    <View style={styles.container}>
-      <View style={styles.row}>
+    <View className="flex-row items-center justify-between py-3 px-4 border-b border-gray-100 bg-white">
+      <View className="flex-row items-center flex-1">
         <Checkbox id={id} isCompleted={completed} />
-        <View style={styles.textContainer}>
-          <Text selectable style={textStyle}>
+        <View className="flex-1 ml-3">
+          <Text 
+            selectable 
+            className={`text-base font-medium ${
+              completed ? 'line-through text-gray-400' : 'text-gray-600'
+            }`}
+          >
             {text}
           </Text>
         </View>
-        <TouchableOpacity onPress={handleDeleteTodo}>
-          <MaterialIcons name="delete-outline" size={24} color="#73737340" style={styles.delete} />
-        </TouchableOpacity>
       </View>
+      <TouchableOpacity 
+        onPress={handleDeleteTodo}
+        className="p-2"
+      >
+        <MaterialIcons name="delete-outline" size={24} color="#9ca3af" />
+      </TouchableOpacity>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  text: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#737373',
-  },
-  textCompleted: {
-    textDecorationLine: 'line-through',
-    color: '#73737330',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  textContainer: {
-    flex: 1,
-  },
-  time: {
-    fontSize: 13,
-    color: '#a3a3a3',
-    fontWeight: '500',
-  },
-  delete: {
-    marginRight: 10,
-  },
-})

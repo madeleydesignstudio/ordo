@@ -1,12 +1,12 @@
-import 'todomvc-app-css/index.css'
 import ReactDOM from 'react-dom/client'
 
 import { App } from './Root.tsx'
+import '@/index.css'
+import React from 'react'
 
-ReactDOM.createRoot(document.getElementById('react-app')!).render(<App />)
 
-// ReactDOM.createRoot(document.getElementById('react-app')!).render(
-//   <React.StrictMode>
-//     <App />
-//   </React.StrictMode>,
-// )
+ReactDOM.createRoot(document.getElementById('Ordo')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)

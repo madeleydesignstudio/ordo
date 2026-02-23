@@ -1,6 +1,11 @@
 import React from 'react'
 
 import { queryDb } from '@livestore/livestore'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Cancel01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 
 import { uiState$ } from '../livestore/queries.ts'
 import { events, tables } from '../livestore/schema.ts'
@@ -29,48 +34,49 @@ export const MainSection: React.FC = () => {
   const visibleTodos = store.useQuery(visibleTodos$)
 
   const handleTodoToggle = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const id = e.currentTarget.dataset.todoId
-      if (!id) return
-      const todo = visibleTodos.find((item) => item.id === id)
-      if (todo) {
-        toggleTodo(todo)
-      }
+    (id: string, completed: boolean) => {
+      store.commit(completed ? events.todoUncompleted({ id }) : events.todoCompleted({ id }))
     },
-    [toggleTodo, visibleTodos],
+    [store],
   )
 
   const handleTodoDelete = React.useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      const id = e.currentTarget.dataset.todoId
-      if (!id) return
+    (id: string) => {
       store.commit(events.todoDeleted({ id, deletedAt: new Date() }))
     },
     [store],
   )
 
   return (
-    <section className="main">
-      <ul className="todo-list">
+    <section className="flex-1">
+      <ul className="divide-y divide-border">
         {visibleTodos.map((todo) => (
           <li key={todo.id}>
-            <div className="state">
-              <input
-                type="checkbox"
-                className="toggle"
-                checked={todo.completed}
-                data-todo-id={todo.id}
-                onChange={handleTodoToggle}
-              />
-              {/** biome-ignore lint/a11y/noLabelWithoutControl: otherwise breaks TODO MVC CSS 🙈 */}
-              <label>{todo.text}</label>
-              <button
-                type="button"
-                className="destroy"
-                data-todo-id={todo.id}
-                onClick={handleTodoDelete}
-              />
-            </div>
+            <Card className="border-0 shadow-none rounded-none px-4 py-3 hover:bg-muted/30 transition-colors">
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  checked={todo.completed}
+                  onCheckedChange={() => handleTodoToggle(todo.id, todo.completed)}
+                />
+                <span 
+                  className={`flex-1 text-base ${
+                    todo.completed 
+                      ? 'line-through text-muted-foreground' 
+                      : 'text-foreground'
+                  }`}
+                >
+                  {todo.text}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleTodoDelete(todo.id)}
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
+                >
+                  <HugeiconsIcon icon={Cancel01Icon} size={16} />
+                </Button>
+              </div>
+            </Card>
           </li>
         ))}
       </ul>

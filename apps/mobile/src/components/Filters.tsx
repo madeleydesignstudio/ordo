@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 
 import { uiState$ } from '../livestore/queries.ts'
 import { events } from '../livestore/schema.ts'
@@ -16,7 +16,7 @@ export const Filters = () => {
   const setCompletedFilter = useCallback(() => setFilter('completed'), [setFilter])
 
   return (
-    <View style={styles.container}>
+    <View className="flex-row gap-2 py-4 px-4 items-center justify-center">
       <Tag isActive={filter === 'all'} onPress={setAllFilter}>
         All
       </Tag>
@@ -26,7 +26,7 @@ export const Filters = () => {
       <Tag isActive={filter === 'completed'} onPress={setCompletedFilter}>
         Completed
       </Tag>
-      <Text style={styles.storeId}>StoreId: {store.storeId}</Text>
+      <Text className="text-gray-400 text-xs ml-4">Store: {store.storeId.slice(0, 8)}...</Text>
     </View>
   )
 }
@@ -40,50 +40,21 @@ const Tag = ({
   onPress: () => void
   children: React.ReactNode
 }) => {
-  const tagStyle = StyleSheet.compose(styles.tag, isActive ? styles.tagActive : undefined)
-  const tagTextStyle = StyleSheet.compose(styles.tagText, isActive ? styles.tagTextActive : undefined)
-
   return (
-    <Pressable style={tagStyle} hitSlop={4} onPress={onPress}>
-      <Text style={tagTextStyle}>{children}</Text>
+    <Pressable 
+      onPress={onPress}
+      hitSlop={4}
+      className={`px-3 py-1.5 rounded-lg border ${
+        isActive 
+          ? 'bg-neutral-900 border-neutral-900 shadow-md' 
+          : 'bg-white border-gray-200'
+      }`}
+    >
+      <Text className={`text-sm font-medium ${
+        isActive ? 'text-white' : 'text-gray-500'
+      }`}>
+        {children}
+      </Text>
     </Pressable>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 8,
-  },
-  tag: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#dedede',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  tagActive: {
-    borderColor: '#000',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  tagText: {
-    color: '#969696',
-  },
-  tagTextActive: {
-    color: '#000',
-  },
-  storeId: {
-    alignSelf: 'center',
-    color: '#BBB',
-    fontSize: 12,
-  },
-})
